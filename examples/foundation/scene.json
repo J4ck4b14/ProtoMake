@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "6dbe1937-06d4-46a1-a050-669b005b10a8",
+  "name": "Foundation acceptance",
+  "entities": [
+    {
+      "id": "6b425f42-a1a2-4e2b-8cd5-5ac752b71e9f",
+      "name": "Root",
+      "enabled": true,
+      "parent": null,
+      "components": { "protomake.transform": { "local": [1, 0, 0, 1, 100, 50] } }
+    },
+    {
+      "id": "9e730f18-1c97-4430-8d04-93c90f5cf1ca",
+      "name": "Child",
+      "enabled": true,
+      "parent": "6b425f42-a1a2-4e2b-8cd5-5ac752b71e9f",
+      "components": { "protomake.transform": { "local": [1, 0, 0, 1, 25, 10] } }
+    }
+  ]
+}

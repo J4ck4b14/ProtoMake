@@ -1,0 +1,25 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM"],
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "verbatimModuleSyntax": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "types": ["node"],
+    "paths": {
+      "@protomake/core": ["./packages/core/src/index.ts"],
+      "@protomake/serialization": ["./packages/serialization/src/index.ts"],
+      "@protomake/runtime": ["./packages/runtime/src/index.ts"]
+    }
+  },
+  "include": ["packages", "examples", "tests", "vite.config.ts"]
+}

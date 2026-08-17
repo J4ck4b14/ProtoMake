@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ProtoMake · Foundation</title>
+  </head>
+  <body>
+    <main>
+      <header>
+        <span class="mark">F</span>
+        <div>
+          <p class="eyebrow">PROTOMAKE / ENGINEERING WORKSPACE</p>
+          <h1>A foundation for human craft.</h1>
+        </div>
+        <span class="badge">MILESTONE 0</span>
+      </header>
+      <p class="intro">
+        A runnable verification harness for the engine foundation. The visual
+        editor starts in Milestone 1.
+      </p>
+      <section aria-labelledby="acceptance-title">
+        <h2 id="acceptance-title">Scene round trip</h2>
+        <p>
+          Load the authored fixture, instantiate entities and components, then
+          serialize and restore a separate world.
+        </p>
+        <button id="verify">Run acceptance check</button
+        ><output id="result" aria-live="polite">Ready</output>
+      </section>
+      <section aria-labelledby="runtime-title">
+        <h2 id="runtime-title">Runtime lifecycle</h2>
+        <p>
+          An example system counts fixed updates. Its host supplies animation
+          frames; the engine owns lifecycle and time.
+        </p>
+        <div class="toolbar">
+          <button id="start">Start</button
+          ><button id="pause" disabled>Pause</button
+          ><button id="step" disabled>Step</button
+          ><button id="stop" disabled>Stop</button>
+        </div>
+        <dl>
+          <div>
+            <dt>State</dt>
+            <dd id="state">stopped</dd>
+          </div>
+          <div>
+            <dt>Fixed updates</dt>
+            <dd id="ticks">0</dd>
+          </div>
+          <div>
+            <dt>Elapsed</dt>
+            <dd id="elapsed">0.00 s</dd>
+          </div>
+        </dl>
+      </section>
+      <section>
+        <h2>Canonical scene data</h2>
+        <pre id="scene"></pre>
+      </section>
+      <footer>
+        Core → Serialization · Core → Runtime<br />No renderer, physics or
+        editor is included in this milestone.
+      </footer>
+    </main>
+    <script type="module" src="/examples/foundation/main.ts"></script>
+  </body>
+</html>
