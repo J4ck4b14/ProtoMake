@@ -2,7 +2,7 @@
 
 A browser-native 2D engine under construction, designed for human-authored games.
 
-**Status: Milestone 0 — foundation implemented.** This repository is not yet a general-purpose game engine or visual editor. The browser application is an executable foundation harness. Milestones 1–7 remain unimplemented.
+**Status: Milestone 1 — initial editor implemented.** The root page opens the editor. The original foundation harness remains at `/foundation.html`. Rendering/assets and the later engine milestones are not yet implemented. See [editor usage](docs/editor.md).
 
 ## Run
 

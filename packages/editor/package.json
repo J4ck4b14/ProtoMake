@@ -1,0 +1,12 @@
+{
+  "name": "@protomake/editor",
+  "version": "0.2.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@protomake/core": "0.1.0",
+    "@protomake/serialization": "0.1.0",
+    "@protomake/runtime": "0.1.0"
+  }
+}

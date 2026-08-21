@@ -3,6 +3,7 @@ const allowed = {
   core: [],
   serialization: ['@protomake/core', 'zod'],
   runtime: ['@protomake/core'],
+  editor: ['@protomake/core', '@protomake/serialization', '@protomake/runtime'],
 };
 let errors = 0;
 for (const [name, dependencies] of Object.entries(allowed)) {

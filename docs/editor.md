@@ -1,0 +1,13 @@
+# ProtoMake editor — Milestone 1
+
+Run `npm ci` and `npm run dev` from the directory containing package.json. The root page now opens the editor; `/foundation.html` keeps the original Milestone 0 harness.
+
+Create entities through Hierarchy; select in the tree or scene, with Shift/Ctrl for multi-selection. Empty-space dragging selects a marquee. Q/W/E/R/H select selection/move/rotation/scale/pan tools. Use the visible axis handles, rotation ring or scale squares to transform. F frames selected entities (or all entities when selection is empty). Middle-drag or Space-drag pans; wheel zooms at the pointer. Grid and snapping have independent toggles; Alt bypasses snapping. Rotate snaps in 15-degree increments; scale snaps in 0.1 increments. Arrow keys nudge by one world unit; Shift uses grid spacing. Escape cancels an active gesture.
+
+The Inspector edits registered component properties. Transform exposes its canonical affine basis and x/y translation, retaining shear exactly. Author note is a working editor annotation component, not a runtime behavior. Add/remove/reset participate in undo. Parent selection and hierarchy dropping preserve world transforms. Dropping on the root control unparents selected roots. Duplicate/Delete apply to selected subtrees. Ctrl/Cmd+C/V uses a session-local scene clipboard; pasted roots receive a 24-unit offset. Ctrl/Cmd+D duplicates. Ctrl/Cmd+Z and Shift+Z undo/redo. Continuous gestures commit one history entry; history retains 100 project snapshots and is not serialized.
+
+Project Browser creates, opens, renames, duplicates and deletes scenes, and sets the startup scene. Project name edits are undoable. Save/Ctrl+S writes to IndexedDB under the current browser origin, retaining other projects. Open lists saved projects, including saved-copy deletion. Export JSON makes a portable backup; Import JSON validates before replacing the current model. Closing/reloading prompts for unsaved changes. Changing browser, origin, port or clearing browser data changes the available saved projects; export first when moving installations.
+
+Play creates a separate iframe containing a deserialized world. Pause/Step/Resume control its engine; Stop destroys that context and unlocks authored editing. Milestone 1 Play runs the lifecycle but does not render a game yet. Project code is not executed in this milestone.
+
+Automated acceptance covers save/reopen equivalence through an IndexedDB implementation, command undo/redo, transform gestures, component editing and isolation. DOM tests exercise the actual inspector and viewport event handlers with a mocked canvas context; they do not claim GPU or visual validation.
