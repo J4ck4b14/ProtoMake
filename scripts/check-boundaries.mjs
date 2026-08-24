@@ -1,9 +1,17 @@
 import { readdir, readFile } from 'node:fs/promises';
 const allowed = {
   core: [],
-  serialization: ['@protomake/core', 'zod'],
+  assets: ['@protomake/core', 'zod'],
+  renderer: ['@protomake/core', '@protomake/assets', 'zod', 'pixi.js'],
+  serialization: ['@protomake/core', '@protomake/assets', 'zod'],
   runtime: ['@protomake/core'],
-  editor: ['@protomake/core', '@protomake/serialization', '@protomake/runtime'],
+  editor: [
+    '@protomake/core',
+    '@protomake/serialization',
+    '@protomake/runtime',
+    '@protomake/assets',
+    '@protomake/renderer',
+  ],
 };
 let errors = 0;
 for (const [name, dependencies] of Object.entries(allowed)) {
@@ -15,7 +23,10 @@ for (const [name, dependencies] of Object.entries(allowed)) {
     )) {
       const specifier = match[1];
       if (specifier.startsWith('./') && !specifier.includes('/../')) continue;
-      if (!dependencies.includes(specifier)) {
+      if (
+        !dependencies.includes(specifier) &&
+        !dependencies.includes(specifier.split('/').slice(0, 2).join('/'))
+      ) {
         console.error(`${name}/${file}: forbidden dependency ${specifier}`);
         errors++;
       }

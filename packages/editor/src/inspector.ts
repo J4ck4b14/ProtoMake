@@ -75,6 +75,31 @@ export class Inspector {
       section.append(header);
       for (const field of definition.inspector) {
         const value = getPath(data, field.path);
+        if (
+          field.kind === 'asset' ||
+          field.kind === 'enum' ||
+          field.kind === 'entity'
+        ) {
+          const row = node('label', 'field'),
+            select = node('select');
+          select.setAttribute('aria-label', field.label);
+          select.append(new Option('None', ''));
+          if (field.kind === 'asset')
+            for (const asset of model.project.assets)
+              select.append(new Option(asset.path, asset.id));
+          else if (field.kind === 'entity')
+            for (const entity of model.world.all())
+              select.append(new Option(entity.name, entity.guid));
+          else
+            for (const option of field.options ?? [])
+              select.append(new Option(option, option));
+          select.value = String(value ?? '');
+          select.onchange = () =>
+            this.run(() => model.setProperty(type, field.path, select.value));
+          row.append(node('span', '', field.label), select);
+          section.append(row);
+          continue;
+        }
         const control = input(
           field.label,
           String(value ?? ''),
@@ -82,7 +107,9 @@ export class Inspector {
             ? 'number'
             : field.kind === 'boolean'
               ? 'checkbox'
-              : 'text',
+              : field.kind === 'color'
+                ? 'color'
+                : 'text',
         );
         if (field.kind === 'number') control.input.step = 'any';
         if (field.kind === 'boolean') control.input.checked = Boolean(value);

@@ -46,7 +46,7 @@ it('viewport move handle makes one reversible transform and cancellation restore
   vi.stubGlobal('devicePixelRatio', 1);
   const context = new Proxy({}, { get: () => () => {} });
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
-    context as CanvasRenderingContext2D,
+    context as never,
   );
   const canvas = document.createElement('canvas');
   document.body.append(canvas);

@@ -5,7 +5,15 @@ export interface Schema<T> {
 export interface InspectorField {
   readonly path: string;
   readonly label: string;
-  readonly kind: 'number' | 'boolean' | 'string';
+  readonly options?: readonly string[];
+  readonly kind:
+    | 'number'
+    | 'boolean'
+    | 'string'
+    | 'color'
+    | 'asset'
+    | 'enum'
+    | 'entity';
 }
 export interface ComponentDefinition<T> {
   readonly type: string;

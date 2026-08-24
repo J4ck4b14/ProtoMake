@@ -1,3 +1,4 @@
+import { AssetsPanel, attachRenderer } from './assets-panel';
 import {
   serializeProject,
   deserializeProject,
@@ -362,7 +363,7 @@ function refresh(): void {
     b.disabled = model.locked;
   }
   playButton.disabled = play.state !== 'stopped';
-  pause.disabled = play.state === 'stopped';
+  pause.disabled = play.state === 'stopped' || play.state === 'loading';
   pause.textContent = play.state === 'paused' ? 'Resume' : 'Pause';
   step.disabled = play.state !== 'paused';
   stop.disabled = play.state === 'stopped';
@@ -445,3 +446,10 @@ window.addEventListener('beforeunload', (e) => {
     e.returnValue = '';
   }
 });
+
+const assetHost = node('section', 'assets panel');
+bottom.append(assetHost);
+new AssetsPanel(assetHost, model, log);
+void attachRenderer(sceneArea, viewport, model, log).catch((error) =>
+  log(`Renderer unavailable: ${String(error)}`, true),
+);

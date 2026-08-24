@@ -33,6 +33,8 @@
     "vitest": "3.2.4"
   },
   "dependencies": {
+    "@dimforge/rapier2d-compat": "0.19.3",
+    "pixi.js": "8.16.0",
     "zod": "4.3.6"
   }
 }

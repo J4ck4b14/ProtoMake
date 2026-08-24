@@ -1,3 +1,4 @@
+import { registerRendering } from '@protomake/renderer';
 import {
   World,
   guid,
@@ -42,6 +43,7 @@ export const NoteComponent: ComponentDefinition<{ text: string }> = {
 export function editorRegistry(): ComponentRegistry {
   const registry = createRegistry();
   registry.register(NoteComponent);
+  registerRendering(registry);
   return registry;
 }
 interface Snapshot {

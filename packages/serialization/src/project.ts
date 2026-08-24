@@ -1,3 +1,4 @@
+import { AssetSchema, AssetDatabase, assetReferences } from '@protomake/assets';
 import { z } from 'zod';
 import { guid, type ComponentRegistry } from '@protomake/core';
 import {
@@ -7,7 +8,7 @@ import {
   validateScene,
 } from './scene';
 import { MigrationChain } from './migrations';
-export const PROJECT_SCHEMA_VERSION = 1;
+export const PROJECT_SCHEMA_VERSION = 2;
 export const ProjectSchema = z.strictObject({
   schemaVersion: z.literal(PROJECT_SCHEMA_VERSION),
   id: GuidSchema,
@@ -15,9 +16,15 @@ export const ProjectSchema = z.strictObject({
   engineVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
   startupScene: GuidSchema.nullable(),
   scenes: z.array(SceneSchema),
+  assets: z.array(AssetSchema),
 });
 export type ProjectData = z.infer<typeof ProjectSchema>;
 export const projectMigrations = new MigrationChain(PROJECT_SCHEMA_VERSION);
+projectMigrations.register(1, (input) => ({
+  ...(input as object),
+  schemaVersion: 2,
+  assets: [],
+}));
 export function createProject(name: string): ProjectData {
   return ProjectSchema.parse({
     schemaVersion: PROJECT_SCHEMA_VERSION,
@@ -26,6 +33,7 @@ export function createProject(name: string): ProjectData {
     engineVersion: '0.1.0',
     startupScene: null,
     scenes: [],
+    assets: [],
   });
 }
 export function validateProject(
@@ -43,6 +51,12 @@ export function validateProject(
   if (project.startupScene !== null && !ids.has(project.startupScene))
     throw new Error(
       `Project ${project.name}: missing startup scene ${project.startupScene}`,
+    );
+  const database = new AssetDatabase(project.assets);
+  const missing = database.missing(assetReferences(project.scenes, registry));
+  if (missing.length)
+    throw new Error(
+      `Missing asset ${missing[0]!.asset} on ${missing[0]!.scene}/${missing[0]!.entity}`,
     );
   return project;
 }

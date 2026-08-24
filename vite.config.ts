@@ -11,13 +11,25 @@ export default defineConfig({
     },
   },
   resolve: {
-    alias: Object.fromEntries(
-      ['core', 'serialization', 'runtime', 'editor'].map((name) => [
-        `@protomake/${name}`,
-        fileURLToPath(
-          new URL(`./packages/${name}/src/index.ts`, import.meta.url),
-        ),
-      ]),
-    ),
+    alias: {
+      '@protomake/renderer/pixi': fileURLToPath(
+        new URL('./packages/renderer/src/pixi.ts', import.meta.url),
+      ),
+      ...Object.fromEntries(
+        [
+          'core',
+          'serialization',
+          'runtime',
+          'editor',
+          'assets',
+          'renderer',
+        ].map((name) => [
+          `@protomake/${name}`,
+          fileURLToPath(
+            new URL(`./packages/${name}/src/index.ts`, import.meta.url),
+          ),
+        ]),
+      ),
+    },
   },
 });

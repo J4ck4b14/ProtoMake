@@ -2,7 +2,7 @@ import type { EditorModel } from './model';
 export class PlayMode {
   private frame: HTMLIFrameElement | undefined;
   private token = '';
-  state: 'stopped' | 'running' | 'paused' = 'stopped';
+  state: 'stopped' | 'loading' | 'running' | 'paused' = 'stopped';
   constructor(
     private readonly host: HTMLElement,
     private readonly model: EditorModel,
@@ -24,9 +24,14 @@ export class PlayMode {
             kind: 'load',
             token: this.token,
             scene: structuredClone(this.model.scene),
+            project: structuredClone(this.model.project),
           },
           location.origin,
         );
+      if (data.kind === 'loaded') {
+        this.state = 'running';
+        this.changed();
+      }
       if (data.kind === 'error') this.report(data.message ?? 'Runtime error');
     });
   }
@@ -41,12 +46,12 @@ export class PlayMode {
     this.frame = frame;
     this.host.replaceChildren(frame);
     this.host.hidden = false;
-    this.state = 'running';
+    this.state = 'loading';
     this.model.notify();
     this.changed();
   }
   pause(): void {
-    if (this.state === 'stopped') return;
+    if (this.state === 'stopped' || this.state === 'loading') return;
     this.state = this.state === 'paused' ? 'running' : 'paused';
     this.send(this.state === 'paused' ? 'pause' : 'resume');
     this.changed();

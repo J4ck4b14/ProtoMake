@@ -19,7 +19,10 @@
       "@protomake/core": ["./packages/core/src/index.ts"],
       "@protomake/serialization": ["./packages/serialization/src/index.ts"],
       "@protomake/runtime": ["./packages/runtime/src/index.ts"],
-      "@protomake/editor": ["./packages/editor/src/index.ts"]
+      "@protomake/editor": ["./packages/editor/src/index.ts"],
+      "@protomake/assets": ["./packages/assets/src/index.ts"],
+      "@protomake/renderer": ["./packages/renderer/src/index.ts"],
+      "@protomake/renderer/pixi": ["./packages/renderer/src/pixi.ts"]
     }
   },
   "include": ["packages", "examples", "tests", "vite.config.ts"]
