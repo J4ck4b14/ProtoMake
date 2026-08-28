@@ -22,7 +22,10 @@
       "@protomake/editor": ["./packages/editor/src/index.ts"],
       "@protomake/assets": ["./packages/assets/src/index.ts"],
       "@protomake/renderer": ["./packages/renderer/src/index.ts"],
-      "@protomake/renderer/pixi": ["./packages/renderer/src/pixi.ts"]
+      "@protomake/renderer/pixi": ["./packages/renderer/src/pixi.ts"],
+      "@protomake/physics2d": ["./packages/physics2d/src/index.ts"],
+      "@protomake/input": ["./packages/input/src/index.ts"],
+      "@protomake/physics2d/rapier": ["./packages/physics2d/src/rapier.ts"]
     }
   },
   "include": ["packages", "examples", "tests", "vite.config.ts"]

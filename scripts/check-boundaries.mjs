@@ -1,9 +1,22 @@
 import { readdir, readFile } from 'node:fs/promises';
 const allowed = {
   core: [],
+  input: ['zod'],
+  physics2d: [
+    '@protomake/core',
+    '@protomake/runtime',
+    'zod',
+    '@dimforge/rapier2d-compat',
+  ],
   assets: ['@protomake/core', 'zod'],
   renderer: ['@protomake/core', '@protomake/assets', 'zod', 'pixi.js'],
-  serialization: ['@protomake/core', '@protomake/assets', 'zod'],
+  serialization: [
+    '@protomake/core',
+    '@protomake/assets',
+    '@protomake/physics2d',
+    '@protomake/input',
+    'zod',
+  ],
   runtime: ['@protomake/core'],
   editor: [
     '@protomake/core',
@@ -11,6 +24,8 @@ const allowed = {
     '@protomake/runtime',
     '@protomake/assets',
     '@protomake/renderer',
+    '@protomake/physics2d',
+    '@protomake/input',
   ],
 };
 let errors = 0;

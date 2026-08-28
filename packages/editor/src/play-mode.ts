@@ -1,6 +1,7 @@
 import type { EditorModel } from './model';
 export class PlayMode {
   private frame: HTMLIFrameElement | undefined;
+  debug = false;
   private token = '';
   state: 'stopped' | 'loading' | 'running' | 'paused' = 'stopped';
   constructor(
@@ -30,6 +31,7 @@ export class PlayMode {
         );
       if (data.kind === 'loaded') {
         this.state = 'running';
+        this.setDebug(this.debug);
         this.changed();
       }
       if (data.kind === 'error') this.report(data.message ?? 'Runtime error');
@@ -62,6 +64,13 @@ export class PlayMode {
   private send(kind: string): void {
     this.frame?.contentWindow?.postMessage(
       { kind, token: this.token },
+      location.origin,
+    );
+  }
+  setDebug(enabled: boolean): void {
+    this.debug = enabled;
+    this.frame?.contentWindow?.postMessage(
+      { kind: 'debug', token: this.token, enabled },
       location.origin,
     );
   }

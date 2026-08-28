@@ -12,6 +12,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@protomake/physics2d/rapier': fileURLToPath(
+        new URL('./packages/physics2d/src/rapier.ts', import.meta.url),
+      ),
       '@protomake/renderer/pixi': fileURLToPath(
         new URL('./packages/renderer/src/pixi.ts', import.meta.url),
       ),
@@ -22,6 +25,8 @@ export default defineConfig({
           'runtime',
           'editor',
           'assets',
+          'physics2d',
+          'input',
           'renderer',
         ].map((name) => [
           `@protomake/${name}`,

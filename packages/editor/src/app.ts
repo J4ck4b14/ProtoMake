@@ -1,3 +1,4 @@
+import { showSettings } from './settings';
 import { AssetsPanel, attachRenderer } from './assets-panel';
 import {
   serializeProject,
@@ -453,3 +454,9 @@ new AssetsPanel(assetHost, model, log);
 void attachRenderer(sceneArea, viewport, model, log).catch((error) =>
   log(`Renderer unavailable: ${String(error)}`, true),
 );
+
+menu.append(button('Settings', () => showSettings(model, log)));
+
+const debugControl = input('Physics debug', '', 'checkbox');
+debugControl.input.onchange = () => play.setDebug(debugControl.input.checked);
+toolbar.append(debugControl.row);

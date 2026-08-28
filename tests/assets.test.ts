@@ -74,7 +74,7 @@ it('migrates the original project schema to v2 without losing entities', () => {
   original.schemaVersion = 1;
   delete original.assets;
   const loaded = validateProject(original, e.registry);
-  expect(loaded.schemaVersion).toBe(2);
+  expect(loaded.schemaVersion).toBe(3);
   expect(loaded.assets).toEqual([]);
   expect(loaded.scenes[0]?.entities[0]?.name).toBe('Original');
 });

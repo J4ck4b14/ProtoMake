@@ -1,0 +1,16 @@
+{
+  "name": "@protomake/physics2d",
+  "version": "0.3.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./rapier": "./src/rapier.ts"
+  },
+  "dependencies": {
+    "@protomake/core": "0.1.0",
+    "@protomake/runtime": "0.1.0",
+    "zod": "4.3.6",
+    "@dimforge/rapier2d-compat": "0.19.3"
+  }
+}

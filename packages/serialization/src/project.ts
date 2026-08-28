@@ -1,3 +1,5 @@
+import { PhysicsSettingsSchema, defaultPhysics } from '@protomake/physics2d';
+import { InputMapSchema, defaultInput } from '@protomake/input';
 import { AssetSchema, AssetDatabase, assetReferences } from '@protomake/assets';
 import { z } from 'zod';
 import { guid, type ComponentRegistry } from '@protomake/core';
@@ -8,7 +10,7 @@ import {
   validateScene,
 } from './scene';
 import { MigrationChain } from './migrations';
-export const PROJECT_SCHEMA_VERSION = 2;
+export const PROJECT_SCHEMA_VERSION = 3;
 export const ProjectSchema = z.strictObject({
   schemaVersion: z.literal(PROJECT_SCHEMA_VERSION),
   id: GuidSchema,
@@ -17,6 +19,8 @@ export const ProjectSchema = z.strictObject({
   startupScene: GuidSchema.nullable(),
   scenes: z.array(SceneSchema),
   assets: z.array(AssetSchema),
+  physics: PhysicsSettingsSchema,
+  input: InputMapSchema,
 });
 export type ProjectData = z.infer<typeof ProjectSchema>;
 export const projectMigrations = new MigrationChain(PROJECT_SCHEMA_VERSION);
@@ -24,6 +28,12 @@ projectMigrations.register(1, (input) => ({
   ...(input as object),
   schemaVersion: 2,
   assets: [],
+}));
+projectMigrations.register(2, (input) => ({
+  ...(input as object),
+  schemaVersion: 3,
+  physics: defaultPhysics(),
+  input: defaultInput(),
 }));
 export function createProject(name: string): ProjectData {
   return ProjectSchema.parse({
@@ -34,6 +44,8 @@ export function createProject(name: string): ProjectData {
     startupScene: null,
     scenes: [],
     assets: [],
+    physics: defaultPhysics(),
+    input: defaultInput(),
   });
 }
 export function validateProject(

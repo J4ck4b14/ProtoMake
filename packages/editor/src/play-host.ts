@@ -1,3 +1,6 @@
+import { Physics2D } from '@protomake/physics2d/rapier';
+import { InputService, defaultInput } from '@protomake/input';
+import { defaultPhysics } from '@protomake/physics2d';
 import { instantiateScene, type ProjectData } from '@protomake/serialization';
 import { Engine } from '@protomake/runtime';
 import { PixiRenderer } from '@protomake/renderer/pixi';
@@ -9,6 +12,9 @@ let engine: Engine | undefined,
   renderer: PixiRenderer | undefined,
   last = performance.now(),
   loading = false;
+let physics: Physics2D | undefined,
+  input: InputService | undefined,
+  debug = false;
 document.body.style.cssText =
   'margin:0;background:#10161d;color:#dce5ed;font:11px system-ui;overflow:hidden';
 status.style.cssText =
@@ -33,6 +39,7 @@ window.addEventListener('message', (event) => {
       kind: string;
       scene?: unknown;
       project?: ProjectData;
+      enabled?: boolean;
     };
     if (data.kind === 'load') {
       if (loading) return;
@@ -45,12 +52,24 @@ window.addEventListener('message', (event) => {
       renderer = await PixiRenderer.create(canvas);
       await renderer.setAssets(data.project?.assets ?? []);
       renderer.resize(innerWidth, innerHeight);
+      physics = await Physics2D.create(
+        loaded.world,
+        data.project?.physics ?? defaultPhysics(),
+      );
+      input?.detach();
+      input = new InputService(data.project?.input ?? defaultInput());
+      input.attach(window);
       engine = new Engine(loaded.world);
+      engine.addSystem(physics);
       engine.start();
       last = performance.now();
       status.textContent = loaded.scene.name;
       loading = false;
       parent.postMessage({ kind: 'loaded', token }, location.origin);
+    } else if (data.kind === 'debug') {
+      debug = Boolean(data.enabled);
+      if (!debug)
+        renderer?.setDebugLines(new Float32Array(), new Float32Array());
     } else if (data.kind === 'pause') engine?.pause();
     else if (data.kind === 'resume') {
       last = performance.now();
@@ -63,7 +82,13 @@ window.addEventListener('resize', () =>
 );
 function frame(now: number): void {
   try {
+    input?.sample(navigator.getGamepads?.() ?? []);
     engine?.tick((now - last) / 1000);
+    input?.endFrame();
+    if (debug && physics && engine?.state !== 'stopped') {
+      const lines = physics.debug();
+      renderer?.setDebugLines(lines.vertices, lines.colors);
+    }
     if (engine) renderer?.render(engine.world);
   } catch (error) {
     report(error);

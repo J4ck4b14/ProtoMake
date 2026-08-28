@@ -13,6 +13,7 @@ import { renderList } from './order';
 import type { Renderer2D, View } from './adapter';
 export class PixiRenderer implements Renderer2D {
   private readonly root = new Container();
+  private readonly debugLines = new Graphics();
   private readonly mask = new Graphics();
   private readonly sprites = new Map<string, Sprite>();
   private readonly textures = new Map<
@@ -28,6 +29,7 @@ export class PixiRenderer implements Renderer2D {
     private readonly transparent: boolean,
   ) {
     app.stage.addChild(this.root);
+    this.root.addChild(this.debugLines);
     app.stage.addChild(this.mask);
     this.root.mask = this.mask;
   }
@@ -70,6 +72,11 @@ export class PixiRenderer implements Renderer2D {
     );
   }
   resize(width: number, height: number): void {
+    if (
+      this.width === Math.max(1, width) &&
+      this.height === Math.max(1, height)
+    )
+      return;
     this.width = Math.max(1, width);
     this.height = Math.max(1, height);
     this.app.renderer.resize(this.width, this.height);
@@ -152,7 +159,25 @@ export class PixiRenderer implements Renderer2D {
         sprite.destroy();
         this.sprites.delete(id);
       }
+    this.root.setChildIndex(this.debugLines, this.root.children.length - 1);
     this.app.render();
+  }
+  setDebugLines(vertices: Float32Array, colors: Float32Array): void {
+    this.debugLines.clear();
+    for (let i = 0; i < vertices.length; i += 4) {
+      const offset = i * 2;
+      this.debugLines
+        .moveTo(vertices[i]!, vertices[i + 1]!)
+        .lineTo(vertices[i + 2]!, vertices[i + 3]!)
+        .stroke({
+          width: 1.5,
+          color:
+            (((colors[offset] ?? 0) * 255) << 16) |
+            (((colors[offset + 1] ?? 1) * 255) << 8) |
+            ((colors[offset + 2] ?? 0) * 255),
+          alpha: 0.9,
+        });
+    }
   }
   destroy(): void {
     this.disposed = true;

@@ -1,3 +1,4 @@
+import { registerPhysics } from '@protomake/physics2d';
 import { registerRendering } from '@protomake/renderer';
 import {
   World,
@@ -44,6 +45,7 @@ export function editorRegistry(): ComponentRegistry {
   const registry = createRegistry();
   registry.register(NoteComponent);
   registerRendering(registry);
+  registerPhysics(registry);
   return registry;
 }
 interface Snapshot {
