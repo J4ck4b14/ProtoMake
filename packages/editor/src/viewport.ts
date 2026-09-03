@@ -34,6 +34,7 @@ export class SceneViewport {
         matrix: Matrix2D,
       ) => boolean)
     | undefined;
+  entityOrder: (() => number[]) | undefined;
   entityBounds:
     | ((id: string) => {
         width: number;
@@ -197,18 +198,20 @@ export class SceneViewport {
       }
     }
     if (!kind) {
-      const hit = [...this.model.world.all()].reverse().find((entity) => {
-        const size = this.entityBounds?.(entity.guid) ?? {
-          width: 48,
-          height: 48,
-        };
-        return hitBox(
-          this.shapeMatrix(entity.guid),
-          position,
-          size.width,
-          size.height,
-        );
-      });
+      const hit = this.ordered()
+        .reverse()
+        .find((entity) => {
+          const size = this.entityBounds?.(entity.guid) ?? {
+            width: 48,
+            height: 48,
+          };
+          return hitBox(
+            this.shapeMatrix(entity.guid),
+            position,
+            size.width,
+            size.height,
+          );
+        });
       if (hit) {
         if (e.shiftKey || e.ctrlKey || e.metaKey) this.model.toggle(hit.guid);
         else this.model.select([hit.guid]);
@@ -342,6 +345,11 @@ export class SceneViewport {
     );
     this.draw();
   }
+  private ordered() {
+    return this.entityOrder
+      ? this.entityOrder().map((id) => this.model.world.get(id))
+      : [...this.model.world.all()];
+  }
   private shapeMatrix(id: string): Matrix2D {
     const m = this.model.world.worldMatrix(this.model.entity(id)),
       size = this.entityBounds?.(id);
@@ -378,7 +386,7 @@ export class SceneViewport {
       c.lineTo(this.width, zero[1]);
       c.stroke();
     }
-    for (const entity of this.model.world.all()) {
+    for (const entity of this.ordered()) {
       const m = this.shapeMatrix(entity.guid),
         position = this.toScreen([m[4], m[5]]),
         selected = this.model.selection.has(entity.guid),

@@ -425,3 +425,28 @@ dialog .actions {
 .error {
   color: #ff9b9b;
 }
+
+.script-editor {
+  width: 850px;
+  max-height: 95vh;
+  overflow: auto;
+}
+.script-editor textarea {
+  width: 100%;
+  font: 12px/1.65 monospace;
+  tab-size: 2;
+  resize: vertical;
+}
+.script-diagnostics {
+  white-space: pre-wrap;
+  color: #f1b97b;
+  max-height: 110px;
+  overflow: auto;
+}
+.menu {
+  flex-wrap: wrap;
+}
+header {
+  height: auto;
+  min-height: 56px;
+}

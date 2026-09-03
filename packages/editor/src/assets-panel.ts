@@ -4,7 +4,8 @@ import {
   importFile,
   type AssetData,
 } from '@protomake/assets';
-import { SpriteRenderer } from '@protomake/renderer';
+import { SpriteRenderer, renderList } from '@protomake/renderer';
+import { compileProjectScripts } from '@protomake/scripting/compiler';
 import { PixiRenderer } from '@protomake/renderer/pixi';
 import { EditorModel } from './model';
 import type { SceneViewport } from './viewport';
@@ -35,6 +36,7 @@ export class AssetsPanel {
         const database = new AssetDatabase(this.model.project.assets);
         for (const asset of imported) database.import(asset);
         this.model.project.assets = database.all();
+        compileProjectScripts(this.model.project.assets);
       });
       this.report(`Imported ${imported.length} asset(s)`);
     } catch (error) {
@@ -85,6 +87,7 @@ export class AssetsPanel {
                 const database = new AssetDatabase(this.model.project.assets);
                 database.move(asset.id, path);
                 this.model.project.assets = database.all();
+                compileProjectScripts(this.model.project.assets);
               }),
             );
         })().catch((error) => this.report(String(error), true));
@@ -99,6 +102,7 @@ export class AssetsPanel {
               assetReferences(this.model.project.scenes, this.model.registry),
             );
             this.model.project.assets = database.all();
+            compileProjectScripts(this.model.project.assets);
             this.selected = undefined;
           });
         }),
@@ -134,6 +138,12 @@ export async function attachRenderer(
   area.prepend(canvas);
   const renderer = await PixiRenderer.create(canvas, true);
   let assetSignature = '';
+  viewport.entityOrder = () => [
+    ...[...model.world.all()]
+      .filter((e) => !model.world.components(e.id).has(SpriteRenderer.type))
+      .map((e) => e.id),
+    ...renderList(model.world).map((e) => e.id),
+  ];
   viewport.drawEntity = (_context, id) =>
     model.world.components(model.entity(id)).has(SpriteRenderer.type);
   viewport.entityBounds = (id) => {

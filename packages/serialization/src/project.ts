@@ -40,7 +40,7 @@ export function createProject(name: string): ProjectData {
     schemaVersion: PROJECT_SCHEMA_VERSION,
     id: guid(),
     name,
-    engineVersion: '0.1.0',
+    engineVersion: '0.4.0',
     startupScene: null,
     scenes: [],
     assets: [],
@@ -56,6 +56,43 @@ export function validateProject(
     ids = new Set<string>();
   for (const scene of project.scenes) {
     validateScene(scene, registry);
+    for (const entity of scene.entities)
+      for (const [type, data] of Object.entries(entity.components)) {
+        if (
+          type.endsWith('-collider') &&
+          data &&
+          typeof data === 'object' &&
+          'layer' in data &&
+          typeof data.layer === 'number' &&
+          data.layer >= project.physics.layers.length
+        )
+          throw new Error(
+            `${scene.name}/${entity.name}: physics layer ${data.layer} is not defined`,
+          );
+        if (
+          (type === 'protomake.sprite' || type === 'protomake.script') &&
+          data &&
+          typeof data === 'object'
+        ) {
+          const reference =
+            'texture' in data
+              ? data.texture
+              : 'script' in data
+                ? data.script
+                : '';
+          if (reference) {
+            const asset = project.assets.find((a) => a.id === reference);
+            if (
+              asset &&
+              ((type === 'protomake.sprite' && asset.kind !== 'image') ||
+                (type === 'protomake.script' && asset.mime !== 'text/typescript'))
+            )
+              throw new Error(
+                `${scene.name}/${entity.name}: incompatible asset type on ${type}`,
+              );
+          }
+        }
+      }
     if (ids.has(scene.id))
       throw new Error(`Project ${project.name}: duplicate scene ${scene.id}`);
     ids.add(scene.id);

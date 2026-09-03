@@ -1,11 +1,17 @@
 import { z } from 'zod';
+const BindingSchema = z
+  .string()
+  .regex(
+    /^(Key[A-Z]|Digit[0-9]|Arrow(?:Up|Down|Left|Right)|Space|Enter|Escape|Tab|Backspace|Delete|Insert|Home|End|PageUp|PageDown|(?:Shift|Control|Alt|Meta)(?:Left|Right)|F(?:[1-9]|1[0-2])|Numpad(?:[0-9]|Add|Subtract|Multiply|Divide|Decimal|Enter)|Comma|Period|Slash|Backslash|Semicolon|Quote|BracketLeft|BracketRight|Minus|Equal|Backquote|Mouse[0-4]|GamepadButton(?:[0-9]|[12][0-9]|3[01])|GamepadAxis(?:[0-9]|1[0-5])[+-])$/,
+    'Unknown input binding',
+  );
 export const InputActionSchema = z.strictObject({
   name: z.string().min(1),
   kind: z.enum(['button', 'axis', 'vector2']),
-  positiveX: z.array(z.string()),
-  negativeX: z.array(z.string()),
-  positiveY: z.array(z.string()),
-  negativeY: z.array(z.string()),
+  positiveX: z.array(BindingSchema),
+  negativeX: z.array(BindingSchema),
+  positiveY: z.array(BindingSchema),
+  negativeY: z.array(BindingSchema),
 });
 export type InputAction = z.infer<typeof InputActionSchema>;
 export const InputMapSchema = z

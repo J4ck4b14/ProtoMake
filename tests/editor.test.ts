@@ -16,12 +16,13 @@ describe('Milestone 1 acceptance', () => {
     editor.translate(80, 32);
     const before = serializeProject(editor.project, editor.registry);
     const storage = new ProjectStorage(new IDBFactory());
-    await storage.save(editor.project);
+    await storage.save(editor.project, editor.sceneId);
     editor.markSaved();
     expect(editor.dirty).toBe(false);
     const reopened = new EditorModel();
-    reopened.load(await storage.load(editor.project.id));
-    reopened.switchScene(editor.sceneId);
+    const session = await storage.loadSession(editor.project.id);
+    reopened.load(session.project);
+    reopened.switchScene(session.activeScene!);
     expect(serializeProject(reopened.project, reopened.registry)).toBe(before);
     expect(reopened.world.get(reopened.entity(child)).parent).toBe(
       reopened.entity(parent),

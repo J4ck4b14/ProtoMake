@@ -12,6 +12,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@protomake/scripting/compiler': fileURLToPath(
+        new URL('./packages/scripting/src/compiler.ts', import.meta.url),
+      ),
       '@protomake/physics2d/rapier': fileURLToPath(
         new URL('./packages/physics2d/src/rapier.ts', import.meta.url),
       ),
@@ -27,6 +30,7 @@ export default defineConfig({
           'assets',
           'physics2d',
           'input',
+          'scripting',
           'renderer',
         ].map((name) => [
           `@protomake/${name}`,

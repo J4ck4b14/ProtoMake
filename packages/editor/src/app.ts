@@ -1,3 +1,4 @@
+import { showScripts } from './scripts-panel';
 import { showSettings } from './settings';
 import { AssetsPanel, attachRenderer } from './assets-panel';
 import {
@@ -70,12 +71,7 @@ const viewport = new SceneViewport(canvas, model, (error) =>
     log(String(error), true),
   ),
   inspector = new Inspector(inspectorBody, model, run),
-  play = new PlayMode(
-    playHost,
-    model,
-    (message) => log(message, true),
-    refresh,
-  );
+  play = new PlayMode(playHost, model, log, refresh);
 let clipboard: SceneData | undefined;
 function canLeave(): boolean {
   return (
@@ -128,7 +124,7 @@ app.append(fileInput);
 async function save(): Promise<void> {
   if (model.locked) return;
   const snapshot = structuredClone(model.project);
-  await storage.save(snapshot);
+  await storage.save(snapshot, model.sceneId);
   model.markSaved(snapshot);
   log(`Saved ${snapshot.name}`);
 }
@@ -148,7 +144,13 @@ async function openProjects(): Promise<void> {
       button(project.name, () =>
         asyncRun(async () => {
           if (!canLeave()) return;
-          model.load(await storage.load(project.id));
+          const saved = await storage.loadSession(project.id);
+          model.load(saved.project);
+          if (
+            saved.activeScene &&
+            model.project.scenes.some((s) => s.id === saved.activeScene)
+          )
+            model.switchScene(saved.activeScene);
           dialog.close();
           log(`Opened ${project.name}`);
         }),
@@ -364,7 +366,10 @@ function refresh(): void {
     b.disabled = model.locked;
   }
   playButton.disabled = play.state !== 'stopped';
-  pause.disabled = play.state === 'stopped' || play.state === 'loading';
+  pause.disabled =
+    play.state === 'stopped' ||
+    play.state === 'loading' ||
+    play.state === 'faulted';
   pause.textContent = play.state === 'paused' ? 'Resume' : 'Pause';
   step.disabled = play.state !== 'paused';
   stop.disabled = play.state === 'stopped';
@@ -460,3 +465,5 @@ menu.append(button('Settings', () => showSettings(model, log)));
 const debugControl = input('Physics debug', '', 'checkbox');
 debugControl.input.onchange = () => play.setDebug(debugControl.input.checked);
 toolbar.append(debugControl.row);
+
+menu.append(button('Scripts', () => showScripts(model, log)));

@@ -1,17 +1,19 @@
 {
-  "name": "@protomake/editor",
+  "name": "@protomake/scripting",
   "version": "0.4.0",
   "private": true,
   "type": "module",
-  "exports": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./compiler": "./src/compiler.ts"
+  },
   "dependencies": {
     "@protomake/core": "0.1.0",
-    "@protomake/serialization": "0.1.0",
     "@protomake/runtime": "0.1.0",
     "@protomake/assets": "0.2.0",
-    "@protomake/renderer": "0.2.0",
-    "@protomake/physics2d": "0.3.0",
     "@protomake/input": "0.3.0",
-    "@protomake/scripting": "0.4.0"
+    "@protomake/physics2d": "0.3.0",
+    "typescript": "5.9.3",
+    "zod": "4.3.6"
   }
 }

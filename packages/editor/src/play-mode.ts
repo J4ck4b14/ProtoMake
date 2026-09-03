@@ -3,11 +3,11 @@ export class PlayMode {
   private frame: HTMLIFrameElement | undefined;
   debug = false;
   private token = '';
-  state: 'stopped' | 'loading' | 'running' | 'paused' = 'stopped';
+  state: 'stopped' | 'loading' | 'running' | 'paused' | 'faulted' = 'stopped';
   constructor(
     private readonly host: HTMLElement,
     private readonly model: EditorModel,
-    private readonly report: (message: string) => void,
+    private readonly report: (message: string, error?: boolean) => void,
     private readonly changed: () => void,
   ) {
     window.addEventListener('message', (event) => {
@@ -34,7 +34,13 @@ export class PlayMode {
         this.setDebug(this.debug);
         this.changed();
       }
-      if (data.kind === 'error') this.report(data.message ?? 'Runtime error');
+      if (data.kind === 'log') this.report(data.message ?? '');
+      if (data.kind === 'faulted') {
+        this.state = 'faulted';
+        this.changed();
+      }
+      if (data.kind === 'error')
+        this.report(data.message ?? 'Runtime error', true);
     });
   }
   start(): void {
@@ -53,7 +59,12 @@ export class PlayMode {
     this.changed();
   }
   pause(): void {
-    if (this.state === 'stopped' || this.state === 'loading') return;
+    if (
+      this.state === 'stopped' ||
+      this.state === 'loading' ||
+      this.state === 'faulted'
+    )
+      return;
     this.state = this.state === 'paused' ? 'running' : 'paused';
     this.send(this.state === 'paused' ? 'pause' : 'resume');
     this.changed();

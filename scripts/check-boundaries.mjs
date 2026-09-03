@@ -1,6 +1,15 @@
 import { readdir, readFile } from 'node:fs/promises';
 const allowed = {
   core: [],
+  scripting: [
+    '@protomake/core',
+    '@protomake/runtime',
+    '@protomake/assets',
+    '@protomake/input',
+    '@protomake/physics2d',
+    'typescript',
+    'zod',
+  ],
   input: ['zod'],
   physics2d: [
     '@protomake/core',
@@ -24,6 +33,7 @@ const allowed = {
     '@protomake/runtime',
     '@protomake/assets',
     '@protomake/renderer',
+    '@protomake/scripting',
     '@protomake/physics2d',
     '@protomake/input',
   ],

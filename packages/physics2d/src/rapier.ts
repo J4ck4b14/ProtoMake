@@ -35,7 +35,7 @@ interface BodyRecord {
   mode: BodyData['mode'];
   sx: number;
   sy: number;
-  signature: string;
+  signature: readonly unknown[];
 }
 let initialized: Promise<void> | undefined;
 export class Physics2D {
@@ -52,9 +52,7 @@ export class Physics2D {
     readonly settings: PhysicsSettings,
     private readonly physics: RAPIER.World,
     private readonly queue: RAPIER.EventQueue,
-  ) {
-    this.sync();
-  }
+  ) {}
   static async create(
     world: World,
     settings: PhysicsSettings,
@@ -62,12 +60,19 @@ export class Physics2D {
     initialized ??= RAPIER.init();
     await initialized;
     const validated = PhysicsSettingsSchema.parse(settings);
-    return new Physics2D(
+    const service = new Physics2D(
       world,
       validated,
       new RAPIER.World({ x: validated.gravityX, y: validated.gravityY }),
       new RAPIER.EventQueue(true),
     );
+    try {
+      service.sync();
+      return service;
+    } catch (error) {
+      service.destroy();
+      throw error;
+    }
   }
   private affine(id: number): {
     x: number;
@@ -95,13 +100,13 @@ export class Physics2D {
       sy: (m[0] * m[3] - m[1] * m[2] < 0 ? -1 : 1) * sy,
     };
   }
-  private signature(id: number): string {
-    return JSON.stringify([
+  private signature(id: number): readonly unknown[] {
+    return [
       this.world.read(id, Rigidbody2D),
       this.world.read(id, BoxCollider2D),
       this.world.read(id, CircleCollider2D),
       this.world.read(id, CapsuleCollider2D),
-    ]);
+    ];
   }
   private remove(id: number): void {
     const record = this.bodies.get(id);
@@ -123,9 +128,15 @@ export class Physics2D {
     for (const id of this.bodies.keys())
       if (!candidates.has(id)) this.remove(id);
     for (const id of candidates) {
-      const signature = this.signature(id),
+      const transform = this.affine(id),
+        signature = this.signature(id),
         existing = this.bodies.get(id);
-      if (existing?.signature === signature) {
+      if (
+        existing &&
+        existing.signature.every((v, i) => v === signature[i]) &&
+        Math.abs(existing.sx - transform.sx) < 1e-6 &&
+        Math.abs(existing.sy - transform.sy) < 1e-6
+      ) {
         existing.body.setEnabled(this.world.isActive(id));
         continue;
       }
@@ -134,7 +145,6 @@ export class Physics2D {
           ...Rigidbody2D.defaults(),
           mode: 'static',
         },
-        transform = this.affine(id),
         desc =
           data.mode === 'dynamic'
             ? RAPIER.RigidBodyDesc.dynamic()
@@ -302,12 +312,25 @@ export class Physics2D {
       throw new Error('Impulse must be finite');
     this.body(id).body.applyImpulse({ x, y }, true);
   }
+  movePosition(id: string, x: number, y: number): void {
+    const record = this.body(id);
+    if (record.mode === 'dynamic') {
+      this.teleport(id, x, y);
+      return;
+    }
+    if (!Number.isFinite(x) || !Number.isFinite(y))
+      throw new Error('Position must be finite');
+    const numeric = this.world.find(id)!,
+      m = this.world.worldMatrix(numeric);
+    this.writeWorld(numeric, [m[0], m[1], m[2], m[3], x, y]);
+  }
   teleport(id: string, x: number, y: number): void {
     if (!Number.isFinite(x) || !Number.isFinite(y))
       throw new Error('Position must be finite');
     const record = this.body(id);
     record.body.setTranslation({ x, y }, true);
-    record.body.setNextKinematicTranslation({ x, y });
+    if (record.mode === 'kinematic')
+      record.body.setNextKinematicTranslation({ x, y });
     this.writeWorld(
       this.world.find(id)!,
       compose(x, y, record.body.rotation(), record.sx, record.sy),

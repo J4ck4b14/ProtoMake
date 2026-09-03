@@ -25,7 +25,9 @@
       "@protomake/renderer/pixi": ["./packages/renderer/src/pixi.ts"],
       "@protomake/physics2d": ["./packages/physics2d/src/index.ts"],
       "@protomake/input": ["./packages/input/src/index.ts"],
-      "@protomake/physics2d/rapier": ["./packages/physics2d/src/rapier.ts"]
+      "@protomake/physics2d/rapier": ["./packages/physics2d/src/rapier.ts"],
+      "@protomake/scripting": ["./packages/scripting/src/index.ts"],
+      "@protomake/scripting/compiler": ["./packages/scripting/src/compiler.ts"]
     }
   },
   "include": ["packages", "examples", "tests", "vite.config.ts"]

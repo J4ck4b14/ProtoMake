@@ -133,3 +133,19 @@ it('input bindings normalize diagonals, track edges and clear on focus loss', ()
   expect(input.isPressed('Move')).toBe(false);
   expect(() => input.getAxis('Missing')).toThrow();
 });
+
+it('rejects unknown physical bindings and samples a connected gamepad', () => {
+  const actions = defaultInput();
+  actions[0]!.positiveX = ['Banana'];
+  expect(() => new InputService(actions)).toThrow(/Unknown input/);
+  const input = new InputService(defaultInput());
+  input.sample([
+    {
+      connected: true,
+      axes: [0.6, 0],
+      buttons: [{ value: 1 }],
+    } as unknown as Gamepad,
+  ]);
+  expect(input.getAxis('Move')).toBeGreaterThan(0.4);
+  expect(input.wasPressed('Jump')).toBe(true);
+});

@@ -34,4 +34,4 @@ console.log(world.read(actor, Health));
 
 This is project/example logic using the public API. Core contains no Health component. A type can be registered only once; payload writes pass its schema. Defaults use a factory. Runtime reads are frozen; replace a value with `set` instead of mutating it. `read` checks that the supplied definition uses the registered schema before returning its typed value. Missing optional components return undefined; dead entities throw. Transform is required and cannot be removed.
 
-Inspector metadata currently supports string, number and boolean paths. It is a data contract only: no Inspector UI is present. More field kinds should arrive alongside working editor consumers. A component's schema defines its serialization representation in v1; custom binary codecs are not implemented.
+Inspector metadata supports string, number, boolean, color, enum, asset-reference and entity-reference paths. The editor generates working controls from it. Script fields extend the generic Inspector with statically parsed metadata. A component's schema defines its serialization representation in v1; custom binary codecs are not implemented.

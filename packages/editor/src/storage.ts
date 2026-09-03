@@ -5,6 +5,7 @@ export interface ProjectSummary {
   updated: number;
 }
 interface StoredProject extends ProjectSummary {
+  activeScene?: string;
   project: ProjectData;
 }
 export class ProjectStorage {
@@ -43,13 +44,14 @@ export class ProjectStorage {
       };
     });
   }
-  async save(project: ProjectData): Promise<void> {
+  async save(project: ProjectData, activeScene?: string): Promise<void> {
     await this.transaction('readwrite', (store) =>
       store.put({
         id: project.id,
         name: project.name,
         updated: Date.now(),
         project: structuredClone(project),
+        ...(activeScene ? { activeScene } : {}),
       } satisfies StoredProject),
     );
   }
@@ -61,6 +63,19 @@ export class ProjectStorage {
     return records
       .map(({ id, name, updated }) => ({ id, name, updated }))
       .sort((a, b) => b.updated - a.updated);
+  }
+  async loadSession(
+    id: string,
+  ): Promise<{ project: ProjectData; activeScene?: string }> {
+    const record = await this.transaction<StoredProject | undefined>(
+      'readonly',
+      (store) => store.get(id),
+    );
+    if (!record) throw new Error('Saved project not found');
+    return {
+      project: structuredClone(record.project),
+      ...(record.activeScene ? { activeScene: record.activeScene } : {}),
+    };
   }
   async load(id: string): Promise<ProjectData> {
     const record = await this.transaction<StoredProject | undefined>(

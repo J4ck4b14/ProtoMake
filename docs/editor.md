@@ -1,4 +1,4 @@
-# ProtoMake editor — Milestone 1
+# ProtoMake editor — Milestones 1–4
 
 Run `npm ci` and `npm run dev` from the directory containing package.json. The root page now opens the editor; `/foundation.html` keeps the original Milestone 0 harness.
 
@@ -8,6 +8,10 @@ The Inspector edits registered component properties. Transform exposes its canon
 
 Project Browser creates, opens, renames, duplicates and deletes scenes, and sets the startup scene. Project name edits are undoable. Save/Ctrl+S writes to IndexedDB under the current browser origin, retaining other projects. Open lists saved projects, including saved-copy deletion. Export JSON makes a portable backup; Import JSON validates before replacing the current model. Closing/reloading prompts for unsaved changes. Changing browser, origin, port or clearing browser data changes the available saved projects; export first when moving installations.
 
-Play creates a separate iframe containing a deserialized world. Pause/Step/Resume control its engine; Stop destroys that context and unlocks authored editing. Milestone 1 Play runs the lifecycle but does not render a game yet. Project code is not executed in this milestone.
+Play creates a separate iframe containing a deserialized world. Pause/Step/Resume control its engine; Stop destroys that context and unlocks authored editing. Play renders through Pixi, simulates through Rapier and executes compiled project scripts. Click the game viewport to focus input. Script edits require Stop and rebuild on the next Play.
 
 Automated acceptance covers save/reopen equivalence through an IndexedDB implementation, command undo/redo, transform gestures, component editing and isolation. DOM tests exercise the actual inspector and viewport event handlers with a mocked canvas context; they do not claim GPU or visual validation.
+
+Assets imports images/text/scripts, places image sprites, moves or renames assets without changing their UUID, and blocks referenced deletion. Layer/order integers define deterministic sprite sorting. The highest-priority enabled Camera2D controls the game view; editor navigation stays independent.
+
+Settings edits gravity, named physics layers, their symmetric collision matrix and JSON input definitions. Physics debug draws runtime collider geometry while Play is active. Scripts opens the source editor with compile/save/attach actions. Exposed fields appear in Inspector after attachment; see docs/scripting.md.

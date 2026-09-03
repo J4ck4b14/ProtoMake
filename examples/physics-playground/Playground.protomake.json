@@ -1,0 +1,455 @@
+{
+  "schemaVersion": 3,
+  "id": "0690adb5-d3ec-4b03-a317-eaee54ca62d0",
+  "name": "ProtoMake \u2014 Physics playground",
+  "engineVersion": "0.4.0",
+  "startupScene": "ec1c34dd-5f72-4e67-a921-5b2b2f2b7cb2",
+  "scenes": [
+    {
+      "id": "ec1c34dd-5f72-4e67-a921-5b2b2f2b7cb2",
+      "schemaVersion": 1,
+      "name": "Physics playground",
+      "entities": [
+        {
+          "id": "1d4c713d-ca92-45f8-9511-5aed2e1fffbe",
+          "name": "Player",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -250, 40]
+            },
+            "protomake.sprite": {
+              "texture": "fd61ff08-42ac-4045-82e9-07007737794a",
+              "width": 36,
+              "height": 42,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "dynamic",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "width": 36,
+              "height": 42,
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 2
+            },
+            "protomake.script": {
+              "script": "dba98b58-fab0-4432-a612-1c4c25d6f3cd",
+              "values": {}
+            }
+          }
+        },
+        {
+          "id": "dbba21c3-082e-4f11-8b74-79d882e1357e",
+          "name": "Floor",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 220]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "width": 900,
+              "height": 32,
+              "tint": "#648a9f",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "width": 900,
+              "height": 32,
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 1
+            }
+          }
+        },
+        {
+          "id": "53dca386-e398-4718-b13f-5423889e8336",
+          "name": "Step",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -170, 145]
+            },
+            "protomake.sprite": {
+              "texture": "fa75ebd9-22e4-4e0f-9469-60487e54e153",
+              "width": 100,
+              "height": 22,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "width": 100,
+              "height": 22,
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 1
+            }
+          }
+        },
+        {
+          "id": "756c26da-67c5-4384-ad29-a2841cb8cadb",
+          "name": "Moving platform",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 30, 65]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "width": 130,
+              "height": 20,
+              "tint": "#e8b278",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "kinematic",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "width": 130,
+              "height": 20,
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 1
+            },
+            "protomake.script": {
+              "script": "078e7248-6e1e-445e-994c-524bf92f7496",
+              "values": {}
+            }
+          }
+        },
+        {
+          "id": "ce8323cd-93c9-4098-bec9-dad5a6d3ea4b",
+          "name": "Upper ledge",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 270, -10]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "width": 140,
+              "height": 22,
+              "tint": "#8ca1c7",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "width": 140,
+              "height": 22,
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 1
+            }
+          }
+        },
+        {
+          "id": "c28d88b8-b3cf-40c2-9643-a442f77eb7d1",
+          "name": "Trigger",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 300, 164]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "width": 90,
+              "height": 80,
+              "tint": "#547d70",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "width": 90,
+              "height": 80,
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": true,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 3
+            },
+            "protomake.script": {
+              "script": "796add1a-8b24-4db3-a399-3c46b5595c8d",
+              "values": {
+                "target": "1d4c713d-ca92-45f8-9511-5aed2e1fffbe",
+                "color": "#8bffb3"
+              }
+            }
+          }
+        },
+        {
+          "id": "40a77a55-3711-4edd-8e88-486b8b060c66",
+          "name": "Pulse marker",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 270, -65]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "width": 32,
+              "height": 32,
+              "tint": "#ffcf72",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "fc8e3582-239c-4c7e-97b3-1991d6001735",
+              "values": {}
+            }
+          }
+        },
+        {
+          "id": "c1cf98bb-5607-43ac-ab09-dbdfdb31db46",
+          "name": "Camera",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 70]
+            },
+            "protomake.camera": {
+              "zoom": 0.8,
+              "background": "#101a25",
+              "priority": 0,
+              "viewportX": 0,
+              "viewportY": 0,
+              "viewportWidth": 1,
+              "viewportHeight": 1
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "fd61ff08-42ac-4045-82e9-07007737794a",
+      "path": "Assets/Images/Actor.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAA+UlEQVR4nO2aTQrCMBCFxyJuXLjyBB5E8EKCBxG8UMGDeAJXLty40dWEaZtEI61vIu9b9Te8jylJy1SEYJnlTl5v9+evguRYr5bJnNETXoL3iYkMDtjwi/YwdaaPeOyOYbsv0dgdj+FFuln6T0czuFp8hVdSmYKAmnkMr2g2W4VoBWqCAmgogKZ6gXnpDZv9OXr8ctpCxqm+AhRAQwE01QsUT6Ol09zU41RfAQqgoQAaCqChAJrilThG6uPkHWOsxqyAyHjvNd9QfQUogIYCaCiAJgho88w21Lyh2WyjL1oBjxKpTB0Ba+ZJItdm/b9Gt8WLSO5XA4LmBVqsR2Mf0f2NAAAAAElFTkSuQmCC",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "id": "fa75ebd9-22e4-4e0f-9469-60487e54e153",
+      "path": "Assets/Images/Tile.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2aMQ6CQBBFv8TOwspLeAuN8RJW9l7AE3ABeyovYQzewktQUVBjYYasK0vj6l/Mfx0sGf7LUOxkAQSXydBiVTftr4IMsZjPgjl7F2IFX++PAICyyGOU6xWZ+jfc8IfzLcqLP61z2q0APLP5Epl78Y3wMXCz+F9H9vY00gpvhDJ1AmaWYnjDsrld6O3AmJAAGwmwkQAbCbCRABsJsJEAm248q+qmtRk2dcoi7+bj/+oAEHciu18vAIDlZhutpg34f9MBCbCRABsJsJEAGwmwkQAbCbDpBGx/bfvtFPFnASDQgRQlQpleBFyzlCTcLP4x6+gPukf/q4Fg8wAj8VX1UctQrQAAAABJRU5ErkJggg==",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "id": "078e7248-6e1e-445e-994c-524bf92f7496",
+      "path": "Assets/Scripts/MovingPlatform.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = {\n  speed: { type: 'number', default: 1.2 },\n  distance: { type: 'number', default: 90 },\n} as const;\nexport default class MovingPlatform {\n  speed = 1.2;\n  distance = 90;\n  private origin: readonly [number, number] = [0, 0];\n  start(ctx: ScriptContext) {\n    this.origin = ctx.position();\n  }\n  fixedUpdate(ctx: ScriptContext) {\n    ctx.setPosition(\n      this.origin[0] + Math.sin(ctx.elapsed * this.speed) * this.distance,\n      this.origin[1],\n    );\n  }\n}\n",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "dba98b58-fab0-4432-a612-1c4c25d6f3cd",
+      "path": "Assets/Scripts/PlayerController.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = {\n  speed: { type: 'number', default: 220 },\n  jumpSpeed: { type: 'number', default: 440 },\n} as const;\nexport default class PlayerController {\n  speed = 220;\n  jumpSpeed = 440;\n  private jumpReady = true;\n  fixedUpdate(ctx: ScriptContext) {\n    const position = ctx.position();\n    const move = ctx.input.getVector('Move');\n    let vy = ctx.physics.velocity(ctx.entity)[1];\n    if (!ctx.input.isPressed('Jump')) this.jumpReady = true;\n    const ground = ctx.physics.raycast(position, [0, 1], 23, ctx.entity);\n    if (ctx.input.isPressed('Jump') && this.jumpReady && ground && vy >= -1) {\n      vy = -this.jumpSpeed;\n      this.jumpReady = false;\n    }\n    ctx.physics.setVelocity(ctx.entity, move[0] * this.speed, vy);\n    if (position[1] > 600) {\n      ctx.setPosition(-250, 40);\n      ctx.physics.setVelocity(ctx.entity, 0, 0);\n      ctx.log('Respawned');\n    }\n  }\n}\n",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "fc8e3582-239c-4c7e-97b3-1991d6001735",
+      "path": "Assets/Scripts/Pulse.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = {\n  speed: { type: 'number', default: 2 },\n  minimumOpacity: { type: 'number', default: 0.25 },\n} as const;\nexport default class Pulse {\n  speed = 2;\n  minimumOpacity = 0.25;\n  update(ctx: ScriptContext) {\n    const sprite = ctx.get<Record<string, unknown>>('protomake.sprite');\n    if (!sprite) return;\n    const wave = (Math.sin(ctx.elapsed * this.speed) + 1) / 2;\n    ctx.set('protomake.sprite', {\n      ...sprite,\n      opacity: this.minimumOpacity + (1 - this.minimumOpacity) * wave,\n    });\n  }\n}\n",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "796add1a-8b24-4db3-a399-3c46b5595c8d",
+      "path": "Assets/Scripts/TriggerReaction.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = {\n  target: { type: 'entity', default: '' },\n  color: { type: 'color', default: '#8bffb3' },\n} as const;\nexport default class TriggerReaction {\n  target = '';\n  color = '#8bffb3';\n  onTriggerEnter(ctx: ScriptContext) {\n    const id = this.target || ctx.entity;\n    const sprite = ctx.get<Record<string, unknown>>('protomake.sprite', id);\n    if (sprite) ctx.set('protomake.sprite', { ...sprite, tint: this.color }, id);\n    ctx.log('Trigger entered: target tint changed in runtime only.');\n  }\n  onTriggerExit(ctx: ScriptContext) {\n    ctx.log('Trigger exited.');\n  }\n}\n",
+      "width": 0,
+      "height": 0
+    }
+  ],
+  "physics": {
+    "gravityX": 0,
+    "gravityY": 980,
+    "layers": ["Default", "World", "Actors", "Triggers"],
+    "matrix": [
+      [true, true, true, true],
+      [true, true, true, true],
+      [true, true, true, true],
+      [true, true, true, true]
+    ]
+  },
+  "input": [
+    {
+      "name": "Move",
+      "kind": "vector2",
+      "positiveX": ["KeyD", "ArrowRight", "GamepadAxis0+"],
+      "negativeX": ["KeyA", "ArrowLeft", "GamepadAxis0-"],
+      "positiveY": ["KeyS", "ArrowDown", "GamepadAxis1+"],
+      "negativeY": ["KeyW", "ArrowUp", "GamepadAxis1-"]
+    },
+    {
+      "name": "Jump",
+      "kind": "button",
+      "positiveX": ["Space", "GamepadButton0"],
+      "negativeX": [],
+      "positiveY": [],
+      "negativeY": []
+    },
+    {
+      "name": "Interact",
+      "kind": "button",
+      "positiveX": ["KeyE", "Mouse0"],
+      "negativeX": [],
+      "positiveY": [],
+      "negativeY": []
+    }
+  ]
+}

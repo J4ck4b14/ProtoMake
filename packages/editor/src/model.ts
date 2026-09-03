@@ -1,3 +1,5 @@
+import { scriptFields } from '@protomake/scripting/compiler';
+import { ScriptBehaviour } from '@protomake/scripting';
 import { registerPhysics } from '@protomake/physics2d';
 import { registerRendering } from '@protomake/renderer';
 import {
@@ -46,6 +48,7 @@ export function editorRegistry(): ComponentRegistry {
   registry.register(NoteComponent);
   registerRendering(registry);
   registerPhysics(registry);
+  registry.register(ScriptBehaviour);
   return registry;
 }
 interface Snapshot {
@@ -341,6 +344,27 @@ export class EditorModel {
           ).local;
           local[4]! += 24;
           local[5]! += 24;
+        }
+        for (const [type, data] of Object.entries(copy.components)) {
+          const paths = this.registry
+            .get(type)
+            .inspector.filter((f) => f.kind === 'entity')
+            .map((f) => f.path);
+          if (type === ScriptBehaviour.type) {
+            const script = this.project.assets.find(
+              (a) => a.id === getPath(data, 'script'),
+            );
+            if (script)
+              for (const [name, field] of Object.entries(
+                scriptFields(script.data, script.path),
+              ))
+                if (field.type === 'entity') paths.push(`values.${name}`);
+          }
+          for (const path of paths) {
+            const previous = getPath(data, path);
+            if (typeof previous === 'string' && ids.has(previous))
+              setPath(data, path, ids.get(previous)!);
+          }
         }
         combined.entities.push(copy);
       }

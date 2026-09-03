@@ -1,3 +1,5 @@
+import { scriptFields } from '@protomake/scripting/compiler';
+import { ScriptBehaviour } from '@protomake/scripting';
 import { EditorModel, getPath } from './model';
 import { node, button, input } from './dom';
 export class Inspector {
@@ -73,8 +75,39 @@ export class Inspector {
           button('Remove', () => this.run(() => model.removeComponent(type))),
         );
       section.append(header);
-      for (const field of definition.inspector) {
-        const value = getPath(data, field.path);
+      const inspectorFields = [...definition.inspector];
+      if (type === ScriptBehaviour.type) {
+        const script = model.project.assets.find(
+          (a) => a.id === getPath(data, 'script'),
+        );
+        if (script) {
+          try {
+            const fields = scriptFields(script.data, script.path);
+            for (const [name, field] of Object.entries(fields))
+              inspectorFields.push({
+                path: `values.${name}`,
+                label: name,
+                kind: field.type,
+              });
+          } catch (error) {
+            section.append(node('p', 'error', String(error)));
+          }
+        }
+      }
+      for (const field of inspectorFields) {
+        let value = getPath(data, field.path);
+        if (
+          value === undefined &&
+          type === ScriptBehaviour.type &&
+          field.path.startsWith('values.')
+        ) {
+          const script = model.project.assets.find(
+            (a) => a.id === getPath(data, 'script'),
+          );
+          if (script)
+            value = scriptFields(script.data, script.path)[field.path.slice(7)]
+              ?.default;
+        }
         if (
           field.kind === 'asset' ||
           field.kind === 'enum' ||
@@ -84,15 +117,23 @@ export class Inspector {
             select = node('select');
           select.setAttribute('aria-label', field.label);
           select.append(new Option('None', ''));
-          if (field.kind === 'asset')
-            for (const asset of model.project.assets)
-              select.append(new Option(asset.path, asset.id));
-          else if (field.kind === 'entity')
+          if (field.kind === 'asset') {
+            for (const asset of model.project.assets) {
+              const suitable =
+                type === ScriptBehaviour.type && field.path === 'script'
+                  ? asset.mime === 'text/typescript'
+                  : type === 'protomake.sprite'
+                    ? asset.kind === 'image'
+                    : true;
+              if (suitable) select.append(new Option(asset.path, asset.id));
+            }
+          } else if (field.kind === 'entity') {
             for (const entity of model.world.all())
               select.append(new Option(entity.name, entity.guid));
-          else
+          } else {
             for (const option of field.options ?? [])
               select.append(new Option(option, option));
+          }
           select.value = String(value ?? '');
           select.onchange = () =>
             this.run(() => model.setProperty(type, field.path, select.value));

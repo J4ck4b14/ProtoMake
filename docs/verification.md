@@ -1,19 +1,19 @@
-# Milestone 0 verification
+# Verification through Milestone 4
 
-The automated gate is `npm run typecheck && npm run lint && npm test && npm run build`.
+The required gate is `npm run typecheck && npm run lint && npm test && npm run build`. Clean installation is verified with `npm ci`.
 
-The test suite covers entity/component lifetime, immutable snapshots, registry validation, activity inheritance, hierarchy cycles and missing parents, exact affine reparenting, atomic singular-parent rejection, deep iterative traversal, deterministic scene round trips, runtime-world isolation, corrupt project/scene rejection, migration chains, events and lifecycle timing/error cleanup.
+The 71 automated tests include:
 
-The browser smoke procedure is:
+- Core identity/component lifetime, immutable snapshots, affine hierarchy, cyclic/singular-parent rejection and deterministic serialization.
+- Editor history, whole-gesture undo/cancel, subtree duplication, scene lifecycle, saved-project reopen and independent active-scene persistence.
+- Actual Inspector and viewport event handlers, plus full editor startup/create/edit/save/open/settings/script-compilation through DOM controls.
+- Asset identity after moves, dependency and compatibility checks, image metadata, deterministic sorting and project schema migrations.
+- Actual Rapier/WASM falling, landing, jumping, sensors, collision matrix, raycasts, shapes and destroyed-body cleanup.
+- Named input edges, diagonal normalization, invalid bindings and synthetic gamepad state.
+- Actual TypeScript compilation and execution of project modules, module resolution errors, multiple independent mechanics, trigger script callbacks, overrides, lifecycle transitions, duplicated entity references and contextual runtime faults.
 
-1. Run the development server and open its URL.
-2. Click Run acceptance check. Require PASS for two entities and preserved hierarchy.
-3. Start the runtime and observe fixed updates increase.
-4. Pause, record the count, Step and require exactly one extra update.
-5. Resume, then Stop and require stopped state.
-6. Check the browser reports no uncaught errors and the page fits an 800px-wide desktop viewport.
-7. Repeat against `npm run preview` to exercise production output.
+DOM tests use jsdom, a fake IndexedDB implementation and mocked graphics. They verify application logic and controls, not WebGL pixels, real file dialogs or physical input devices. GPU/browser visual checks and hardware-dependent behavior are covered by TESTING-CHECKLIST.md.
 
-The browser procedure remains pending: the local browser binary was unavailable and the remote browser connection failed during navigation. No visual verification or successful browser interaction is claimed. Vite development startup, a clean npm ci, all 36 automated tests, typecheck, lint/format/boundary checks and the production build succeeded. Unit/integration tests are reproducible with the declared dependency set.
+Vite development startup and the production build are checked locally. Production HTTP smoke verifies the editor/Play HTML and emitted assets are served. This is a build of the editor, not the Milestone 7 creator-game exporter. Remote GitHub CI and deployment have not been performed.
 
-A remote GitHub CI run has not been performed. Publishing packages, building creator games, rendering sprites and editing scenes are outside this milestone.
+Rapier's compat initialization may print an upstream deprecation warning even though the adapter uses its published no-argument init API. Large production chunks contain the in-browser TypeScript compiler and embedded Rapier WASM; bundle-size warnings do not mean a failed build.
