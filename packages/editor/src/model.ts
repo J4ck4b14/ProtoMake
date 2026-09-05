@@ -1,19 +1,17 @@
+import { runtimeRegistry } from '@protomake/player';
+import { PrefabLink } from '@protomake/prefabs';
+import { captureOverrides } from './prefab-actions';
 import { scriptFields } from '@protomake/scripting/compiler';
 import { ScriptBehaviour } from '@protomake/scripting';
-import { registerPhysics } from '@protomake/physics2d';
-import { registerRendering } from '@protomake/renderer';
 import {
   World,
   guid,
-  createRegistry,
   compose,
   multiply,
   inverse,
   IDENTITY,
   type Guid,
   type Matrix2D,
-  type ComponentRegistry,
-  type ComponentDefinition,
 } from '@protomake/core';
 import {
   createProject,
@@ -25,32 +23,8 @@ import {
   type SceneData,
 } from '@protomake/serialization';
 import { History } from './history';
-export const NoteComponent: ComponentDefinition<{ text: string }> = {
-  type: 'editor.note',
-  displayName: 'Author note',
-  defaults: () => ({ text: '' }),
-  schema: {
-    parse(value) {
-      if (
-        !value ||
-        typeof value !== 'object' ||
-        !('text' in value) ||
-        typeof value.text !== 'string'
-      )
-        throw new Error('Note text must be a string');
-      return { text: value.text };
-    },
-  },
-  inspector: [{ path: 'text', label: 'Note', kind: 'string' }],
-};
-export function editorRegistry(): ComponentRegistry {
-  const registry = createRegistry();
-  registry.register(NoteComponent);
-  registerRendering(registry);
-  registerPhysics(registry);
-  registry.register(ScriptBehaviour);
-  return registry;
-}
+export { NoteComponent } from '@protomake/player';
+export const editorRegistry = runtimeRegistry;
 interface Snapshot {
   project: ProjectData;
   sceneId: Guid;
@@ -109,7 +83,16 @@ export class EditorModel {
   }
   private flush(): void {
     const index = this.project.scenes.findIndex((s) => s.id === this.sceneId);
-    this.project.scenes[index] = captureScene(this.world, this.scene);
+    const scene = captureScene(this.world, this.scene);
+    captureOverrides(this, scene);
+    this.project.scenes[index] = scene;
+    for (const e of scene.entities)
+      if (e.components[PrefabLink.type])
+        this.world.set(
+          this.entity(e.id),
+          PrefabLink.type,
+          e.components[PrefabLink.type],
+        );
   }
   private record(label: string, before: Snapshot): void {
     const after = this.snapshot();
@@ -170,6 +153,7 @@ export class EditorModel {
     this.gesture = undefined;
     try {
       this.flush();
+      validateProject(this.project, this.registry);
       this.record(label, before);
     } catch (error) {
       this.restore(before);
@@ -257,6 +241,7 @@ export class EditorModel {
     if (this.project.scenes.length === 1)
       throw new Error('Keep at least one scene');
     this.change('Delete scene', () => {
+      delete this.project.sceneFolders[this.sceneId];
       this.project.scenes = this.project.scenes.filter(
         (s) => s.id !== this.sceneId,
       );
@@ -320,6 +305,13 @@ export class EditorModel {
     }
     const scene = captureScene(this.world, { id: guid(), name: 'Clipboard' });
     scene.entities = scene.entities.filter((e) => included.has(e.id));
+    for (const e of scene.entities) {
+      const link = e.components[PrefabLink.type] as
+        | { root: string }
+        | undefined;
+      if (link && !included.has(link.root))
+        delete e.components[PrefabLink.type];
+    }
     for (const e of scene.entities)
       if (e.parent !== null && !included.has(e.parent)) {
         e.parent = null;
@@ -337,6 +329,10 @@ export class EditorModel {
       for (const e of source.entities) {
         const copy = structuredClone(e);
         copy.id = ids.get(e.id)!;
+        const prefab = copy.components[PrefabLink.type] as
+          | { root: string }
+          | undefined;
+        if (prefab) prefab.root = ids.get(prefab.root) ?? prefab.root;
         copy.parent = e.parent === null ? null : ids.get(e.parent)!;
         if (copy.parent === null) {
           const local = (

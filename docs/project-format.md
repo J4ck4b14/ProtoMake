@@ -1,12 +1,13 @@
 # Project and scene formats
 
-The current project schema is **v3**; the scene schema remains **v1**. Engine release 0.4.0 is independent of these schema numbers.
+The current project schema is **v4**; the scene schema remains **v1**. Engine release 0.7.0 is independent of these schema numbers.
 
 | Project version | Added data                                                                           | Migration                              |
 | --------------- | ------------------------------------------------------------------------------------ | -------------------------------------- |
 | 1               | Project identity, name, informational engine version, startup scene, embedded scenes | Original Milestone 0 format            |
 | 2               | Embedded GUID-addressed image/text assets                                            | v1 → v2 adds an empty asset collection |
 | 3               | Gravity, physics layers/matrix and input actions                                     | v2 → v3 adds working defaults          |
+| 4               | Folder paths, scene folder assignments, audio mixer buses                            | v3 → v4 adds defaults                  |
 
 Scene v1 contains schemaVersion, UUID id, name and entities. Each entity has UUID id, name, enabled, nullable parent UUID and component payloads keyed by stable type ID. Numeric runtime handles never enter serialized data. Transform stores a six-number affine matrix. New registered component types do not require changing the outer scene envelope.
 
@@ -18,4 +19,6 @@ Canonical scene serialization sorts entities by UUID and object keys lexically. 
 
 IndexedDB stores the complete project transactionally. The active editor scene is stored alongside the project record, separate from the game's startup scene. Selection, viewport and undo history are session state. JSON export contains the project and asset bytes; it does not contain editor history or browser storage internals.
 
-`examples/physics-playground/Playground.protomake.json` is a complete current project. Its checked-in Images and Scripts directories also provide convenient individual files for import and editing. The JSON is the portable authored project; it is not generated engine geometry. `dist/` and node_modules are disposable and excluded from delivery.
+`examples/milestones-5-7/Workshop.protomake.json` is a complete current project. The previous physics-playground example remains a migration fixture. Its checked-in Images and Scripts directories also provide convenient individual files for import and editing. The JSON is the portable authored project; it is not generated engine geometry. `dist/` and node_modules are disposable and excluded from delivery.
+
+Milestone 5–7 migration: schema 3 → 4 adds `folders`, `sceneFolders` (scene GUID → folder path), and `mixer`. Existing v1–v3 projects migrate sequentially. Panel sizes are local preferences and never enter project JSON. Prefabs, AnimationClips and Animator controllers are typed text assets; AudioClips embed their imported bytes. Current engineVersion is 0.7.0.

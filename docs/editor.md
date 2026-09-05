@@ -15,3 +15,9 @@ Automated acceptance covers save/reopen equivalence through an IndexedDB impleme
 Assets imports images/text/scripts, places image sprites, moves or renames assets without changing their UUID, and blocks referenced deletion. Layer/order integers define deterministic sprite sorting. The highest-priority enabled Camera2D controls the game view; editor navigation stays independent.
 
 Settings edits gravity, named physics layers, their symmetric collision matrix and JSON input definitions. Physics debug draws runtime collider geometry while Play is active. Scripts opens the source editor with compile/save/attach actions. Exposed fields appear in Inspector after attachment; see docs/scripting.md.
+
+## Workspace and organization
+
+Panel dividers support pointer dragging, keyboard arrows and double-click reset. Sizes persist per browser in local storage; Reset layout restores defaults. Asset folders support empty folders, subtree moves, drag-to-folder rows and dependency-safe deletion. Project scenes have explicit folder assignments. Hierarchy Group selection creates a normal parent transform. Folder and grouping changes participate in project history; layout preferences do not.
+
+Prefab actions and override visualization are documented in [prefabs](prefabs.md). Frame/controller forms and Mixer are in [animation/audio](animation-audio.md). Build ZIP and production Preview build are in [web build](web-build.md).

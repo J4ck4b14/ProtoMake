@@ -13,7 +13,7 @@ export const AssetSchema = z
           !p.split('/').some((s) => !s || s === '.' || s === '..'),
         'Use a relative path without traversal',
       ),
-    kind: z.enum(['image', 'text']),
+    kind: z.enum(['image', 'text', 'audio']),
     mime: z.enum([
       'image/png',
       'image/jpeg',
@@ -21,6 +21,12 @@ export const AssetSchema = z
       'text/plain',
       'application/json',
       'text/typescript',
+      'application/x-protomake-prefab',
+      'application/x-protomake-animation',
+      'application/x-protomake-animator',
+      'audio/wav',
+      'audio/mpeg',
+      'audio/ogg',
     ]),
     data: z.string(),
     width: z.number().int().nonnegative(),
@@ -38,7 +44,16 @@ export const AssetSchema = z
           code: 'custom',
           message: 'Invalid image metadata or data URL',
         });
-    } else if (asset.mime.startsWith('image/'))
+    } else if (asset.kind === 'audio') {
+      if (
+        !asset.mime.startsWith('audio/') ||
+        !asset.data.startsWith(`data:${asset.mime};base64,`)
+      )
+        ctx.addIssue({ code: 'custom', message: 'Invalid audio data URL' });
+    } else if (
+      asset.mime.startsWith('image/') ||
+      asset.mime.startsWith('audio/')
+    )
       ctx.addIssue({ code: 'custom', message: 'Text cannot use image MIME' });
   });
 export type AssetData = z.infer<typeof AssetSchema>;
@@ -136,21 +151,27 @@ export async function importFile(file: File): Promise<AssetData> {
     throw new Error('Import limit is 20 MiB per file');
   const extension = file.name.split('.').at(-1)?.toLowerCase();
   const mime =
-    extension === 'png'
-      ? 'image/png'
-      : extension === 'jpg' || extension === 'jpeg'
-        ? 'image/jpeg'
-        : extension === 'webp'
-          ? 'image/webp'
-          : extension === 'json'
-            ? 'application/json'
-            : extension === 'ts'
-              ? 'text/typescript'
-              : extension === 'txt'
-                ? 'text/plain'
-                : undefined;
+    extension === 'wav'
+      ? 'audio/wav'
+      : extension === 'mp3'
+        ? 'audio/mpeg'
+        : extension === 'ogg'
+          ? 'audio/ogg'
+          : extension === 'png'
+            ? 'image/png'
+            : extension === 'jpg' || extension === 'jpeg'
+              ? 'image/jpeg'
+              : extension === 'webp'
+                ? 'image/webp'
+                : extension === 'json'
+                  ? 'application/json'
+                  : extension === 'ts'
+                    ? 'text/typescript'
+                    : extension === 'txt'
+                      ? 'text/plain'
+                      : undefined;
   if (!mime) throw new Error(`Unsupported file type: ${file.name}`);
-  if (!mime.startsWith('image/'))
+  if (!mime.startsWith('image/') && !mime.startsWith('audio/'))
     return AssetSchema.parse({
       id: guid(),
       path: `Assets/${file.name}`,
@@ -167,6 +188,16 @@ export async function importFile(file: File): Promise<AssetData> {
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
+  if (mime.startsWith('audio/'))
+    return AssetSchema.parse({
+      id: guid(),
+      path: `Assets/${file.name}`,
+      kind: 'audio',
+      mime,
+      data,
+      width: 0,
+      height: 0,
+    });
   const image = await loadImage(data);
   return AssetSchema.parse({
     id: guid(),

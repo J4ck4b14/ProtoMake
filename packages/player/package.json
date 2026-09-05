@@ -1,0 +1,23 @@
+{
+  "name": "@protomake/player",
+  "version": "0.7.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./session": "./src/session.ts"
+  },
+  "dependencies": {
+    "@protomake/core": "*",
+    "@protomake/serialization": "*",
+    "@protomake/runtime": "*",
+    "@protomake/renderer": "*",
+    "@protomake/physics2d": "*",
+    "@protomake/input": "*",
+    "@protomake/scripting": "*",
+    "@protomake/prefabs": "*",
+    "@protomake/animation": "*",
+    "@protomake/audio": "*",
+    "@protomake/assets": "*"
+  }
+}

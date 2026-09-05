@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ProtoMake game</title>
+    <style>
+      body {
+        margin: 0;
+        background: #10161d;
+        color: #dce5ed;
+        font: 16px system-ui;
+        overflow: hidden;
+      }
+      canvas {
+        display: block;
+      }
+      #overlay {
+        position: fixed;
+        inset: 0;
+        display: grid;
+        place-content: center;
+        text-align: center;
+        background: #10161dee;
+      }
+      #overlay[hidden] {
+        display: none;
+      }
+      button {
+        font: inherit;
+        padding: 12px 32px;
+        border: 0;
+        border-radius: 6px;
+        background: #f3ac66;
+        color: #17212b;
+        cursor: pointer;
+      }
+      #status {
+        max-width: 80vw;
+        white-space: pre-wrap;
+      }
+    </style>
+  </head>
+  <body>
+    <main id="game"></main>
+    <section id="overlay">
+      <p id="status">Loading…</p>
+      <button id="start" disabled>Start</button>
+    </section>
+    <script type="module" src="/packages/player/src/main.ts"></script>
+  </body>
+</html>

@@ -1,3 +1,8 @@
+import { buildGame, downloadBuild, previewBuild } from './build-game';
+import { showMixer } from './media-editor';
+import { PrefabLink } from '@protomake/prefabs';
+import { folders } from './folders';
+import { installLayout } from './layout';
 import { showScripts } from './scripts-panel';
 import { showSettings } from './settings';
 import { AssetsPanel, attachRenderer } from './assets-panel';
@@ -223,6 +228,18 @@ function renderHierarchy(): void {
   const actions = node('div', 'actions');
   actions.append(
     button('+ Entity', () => run(() => model.createEntity())),
+    button('Group selection', () =>
+      run(() => {
+        const roots = model.roots();
+        model.change('Group selection', () => {
+          const group = model.world.create('Group');
+          for (const id of roots)
+            model.world.setParent(model.entity(id), group, 'world');
+          model.selection.clear();
+          model.selection.add(model.world.get(group).guid);
+        });
+      }),
+    ),
     button('+ Child', () =>
       run(() => model.createEntity('Child', [...model.selection][0] ?? null)),
     ),
@@ -245,7 +262,7 @@ function renderHierarchy(): void {
       row = node(
         'button',
         `tree-row ${model.selection.has(entity.guid) ? 'selected' : ''} ${model.world.isActive(id) ? '' : 'muted'}`,
-        `${model.world.children(id).length ? '▾' : '◇'}  ${entity.name}`,
+        `${model.world.read(id, PrefabLink) ? '◆' : model.world.children(id).length ? '▾' : '◇'}  ${entity.name}`,
       );
     row.type = 'button';
     row.style.paddingLeft = `${12 + depth * 14}px`;
@@ -324,10 +341,30 @@ function renderProject(): void {
       }),
     ),
   );
+  const folderSelect = node('select');
+  folderSelect.setAttribute('aria-label', 'Scene folder');
+  folderSelect.append(new Option('Project root', ''));
+  for (const path of folders(model))
+    folderSelect.append(new Option(path, path));
+  folderSelect.value = model.project.sceneFolders[model.sceneId] ?? '';
+  folderSelect.onchange = () =>
+    run(() =>
+      model.change('Move scene to folder', () => {
+        if (folderSelect.value)
+          model.project.sceneFolders[model.sceneId] = folderSelect.value;
+        else delete model.project.sceneFolders[model.sceneId];
+      }),
+    );
+  actions.append(folderSelect);
   const scenes = node('div', 'scene-list');
-  for (const scene of model.project.scenes) {
+  for (const scene of [...model.project.scenes].sort(
+    (a, b) =>
+      (model.project.sceneFolders[a.id] ?? '').localeCompare(
+        model.project.sceneFolders[b.id] ?? '',
+      ) || a.name.localeCompare(b.name),
+  )) {
     const b = button(
-      `${scene.id === model.project.startupScene ? '◆' : '◇'} ${scene.name}`,
+      `${scene.id === model.project.startupScene ? '◆' : '◇'} ${model.project.sceneFolders[scene.id] ? model.project.sceneFolders[scene.id] + '/' : ''}${scene.name}`,
       () => run(() => model.switchScene(scene.id)),
     );
     b.classList.toggle('selected', scene.id === model.sceneId);
@@ -467,3 +504,43 @@ debugControl.input.onchange = () => play.setDebug(debugControl.input.checked);
 toolbar.append(debugControl.row);
 
 menu.append(button('Scripts', () => showScripts(model, log)));
+
+const resetLayout = installLayout(app, workspace, bottom);
+menu.append(button('Reset layout', resetLayout));
+
+menu.append(button('Mixer', () => showMixer(model)));
+
+let building = false;
+menu.append(
+  button('Build ZIP', () =>
+    asyncRun(async () => {
+      if (building) return;
+      building = true;
+      try {
+        log('Building game…');
+        const files = await buildGame(model);
+        downloadBuild(files, model.project.name);
+        log(`Build passed: ${files.length} static files`);
+      } finally {
+        building = false;
+      }
+    }),
+  ),
+  button('Preview build', () => {
+    if (building) return;
+    const tab = window.open('about:blank', '_blank');
+    asyncRun(async () => {
+      building = true;
+      try {
+        const files = await buildGame(model);
+        await previewBuild(files, tab);
+        log('Opened standalone production preview');
+      } catch (e) {
+        tab?.close();
+        throw e;
+      } finally {
+        building = false;
+      }
+    });
+  }),
+);

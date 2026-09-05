@@ -450,3 +450,109 @@ header {
   height: auto;
   min-height: 56px;
 }
+
+/* Explicit tracks keep every panel independently resizable. */
+#app {
+  min-width: 760px;
+}
+.workspace {
+  grid-template-columns: var(--left-size, 230px) 6px minmax(160px, 1fr) 6px var(
+      --right-size,
+      290px
+    );
+  min-height: 200px;
+}
+.bottom {
+  flex: 0 0 var(--bottom-size, 250px);
+  height: var(--bottom-size, 250px);
+  grid-template-columns:
+    var(--project-size, 300px) 6px var(--console-size, 220px)
+    6px minmax(180px, 1fr);
+  min-height: 0;
+}
+.panel,
+.scene-area {
+  min-width: 0;
+  min-height: 0;
+}
+.splitter {
+  background: #263542;
+  z-index: 5;
+  touch-action: none;
+}
+.splitter:hover,
+.splitter:focus-visible {
+  background: #f3ac66;
+}
+.splitter.vertical {
+  cursor: col-resize;
+}
+.splitter.horizontal {
+  cursor: row-resize;
+  height: 6px;
+  flex: 0 0 6px;
+}
+.resizing {
+  user-select: none;
+}
+.resizing iframe {
+  pointer-events: none;
+}
+.folder-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  flex-wrap: wrap;
+}
+.folder-nav select {
+  flex: 1;
+}
+.asset-list {
+  display: flex;
+  flex-direction: column;
+}
+.asset-list button {
+  max-width: 100%;
+  text-align: left;
+}
+.prefab-info {
+  border: 1px solid #5988aa;
+  padding: 8px;
+  margin: 8px 0;
+}
+.override {
+  border-left: 3px solid #f3ac66;
+  padding-left: 5px;
+}
+.animation-editor {
+  width: 1000px;
+  max-height: 92vh;
+  overflow: auto;
+}
+.animation-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 0;
+  flex-wrap: wrap;
+}
+.animation-row .field {
+  grid-template-columns: 1fr;
+  flex: 1;
+  min-width: 100px;
+}
+.animation-row img {
+  width: 42px;
+  height: 42px;
+  object-fit: contain;
+}
+.animation-editor h3 {
+  margin: 18px 0 8px;
+  color: #f3ac66;
+}
+.transition {
+  padding: 10px;
+  border: 1px solid #405160;
+  margin-bottom: 8px;
+}

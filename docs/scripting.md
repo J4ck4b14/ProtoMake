@@ -53,3 +53,7 @@ The browser compiler reports syntax, metadata and module-link errors; it does **
 Project code runs only when Play loads modules. The same-origin iframe gives a separate runtime world, globals and teardown context. It is not a security sandbox: trusted project code has browser capabilities, can access the parent origin, and may block the tab if it loops indefinitely. Only run trusted projects. Importing JSON and inspecting metadata does not execute project source.
 
 Rebuild workflow is Stop → edit/save → Play. Each Play starts a fresh module graph and runtime. Stateful hot reload, multiple script slots per entity and external-package bundling are deferred.
+
+## Animation and audio services (Milestone 6)
+
+ScriptContext now provides `setParameter`, `trigger`, `animationState`, `playAudio`, `pauseAudio`, `stopAudio` and `setBus`. These use the same runtime services in editor Play and standalone exports. See [animation/audio](animation-audio.md) for signatures and examples.

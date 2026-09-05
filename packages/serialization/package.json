@@ -9,6 +9,9 @@
     "zod": "4.3.6",
     "@protomake/assets": "0.2.0",
     "@protomake/physics2d": "0.3.0",
-    "@protomake/input": "0.3.0"
+    "@protomake/input": "0.3.0",
+    "@protomake/prefabs": "*",
+    "@protomake/animation": "*",
+    "@protomake/audio": "*"
   }
 }

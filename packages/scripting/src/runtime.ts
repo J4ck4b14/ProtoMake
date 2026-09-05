@@ -3,7 +3,27 @@ import type { EngineContext, System } from '@protomake/runtime';
 import type { InputService } from '@protomake/input';
 import type { Physics2D, ContactEvent } from '@protomake/physics2d/rapier';
 import { ScriptBehaviour, type ScriptFields } from './component';
+export interface MediaServices {
+  animation?: {
+    setParameter(id: Guid, name: string, value: boolean | number): void;
+    trigger(id: Guid, name: string): void;
+    state(id: Guid): string;
+  };
+  audio?: {
+    play(id: Guid, resume?: boolean): void;
+    pauseSource(id: Guid): void;
+    stopSource(id: Guid): void;
+    setBus(name: string, volume: number, muted?: boolean): void;
+  };
+}
 export interface ScriptContext {
+  setParameter(name: string, value: boolean | number, entity?: Guid): void;
+  trigger(name: string, entity?: Guid): void;
+  animationState(entity?: Guid): string;
+  playAudio(entity?: Guid, resume?: boolean): void;
+  pauseAudio(entity?: Guid): void;
+  stopAudio(entity?: Guid): void;
+  setBus(name: string, volume: number, muted?: boolean): void;
   readonly entity: Guid;
   readonly world: World;
   readonly input: InputService;
@@ -57,6 +77,7 @@ export class ScriptSystem implements System {
     private readonly fields: ReadonlyMap<string, ScriptFields>,
     private readonly log: (message: string) => void,
     private readonly loadScene: (id: string) => void,
+    private readonly media: MediaServices = {},
   ) {}
   private context(id: Guid): ScriptContext {
     const clock = () => this.time,
@@ -67,6 +88,31 @@ export class ScriptSystem implements System {
         return found;
       };
     return {
+      setParameter: (name, value, stable = id) => {
+        if (!this.media.animation)
+          throw new Error('Animation service unavailable');
+        this.media.animation.setParameter(stable, name, value);
+      },
+      trigger: (name, stable = id) => {
+        if (!this.media.animation)
+          throw new Error('Animation service unavailable');
+        this.media.animation.trigger(stable, name);
+      },
+      animationState: (stable = id) => {
+        if (!this.media.animation)
+          throw new Error('Animation service unavailable');
+        return this.media.animation.state(stable);
+      },
+      playAudio: (stable = id, resume = false) => {
+        if (!this.media.audio) throw new Error('Audio service unavailable');
+        this.media.audio.play(stable, resume);
+      },
+      pauseAudio: (stable = id) => this.media.audio?.pauseSource(stable),
+      stopAudio: (stable = id) => this.media.audio?.stopSource(stable),
+      setBus: (name, volume, muted = false) => {
+        if (!this.media.audio) throw new Error('Audio service unavailable');
+        this.media.audio.setBus(name, volume, muted);
+      },
       entity: id,
       world: this.world,
       input: this.input,

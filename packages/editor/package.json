@@ -1,6 +1,6 @@
 {
   "name": "@protomake/editor",
-  "version": "0.4.0",
+  "version": "0.7.0",
   "private": true,
   "type": "module",
   "exports": "./src/index.ts",
@@ -12,6 +12,10 @@
     "@protomake/renderer": "0.2.0",
     "@protomake/physics2d": "0.3.0",
     "@protomake/input": "0.3.0",
-    "@protomake/scripting": "0.4.0"
+    "@protomake/scripting": "0.4.0",
+    "@protomake/prefabs": "*",
+    "@protomake/animation": "*",
+    "@protomake/audio": "*",
+    "@protomake/player": "*"
   }
 }

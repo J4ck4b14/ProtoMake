@@ -242,7 +242,7 @@ export function compileProjectScripts(
 }
 export function moduleSources(
   compiled: readonly CompiledScript[],
-  createURL: (code: string) => string,
+  createURL: (code: string, id: string) => string,
 ): Map<string, string> {
   const urls = new Map<string, string>(),
     byPath = new Map(compiled.map((s) => [s.path, s]));
@@ -276,7 +276,7 @@ export function moduleSources(
     let code = script.code;
     for (const r of replacements.reverse())
       code = code.slice(0, r.start) + JSON.stringify(r.url) + code.slice(r.end);
-    const url = createURL(code);
+    const url = createURL(code, script.id);
     urls.set(script.id, url);
     return url;
   }

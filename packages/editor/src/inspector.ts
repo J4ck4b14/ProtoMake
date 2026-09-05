@@ -1,3 +1,9 @@
+import { PrefabLink } from '@protomake/prefabs';
+import {
+  revertPrefab,
+  applyPrefabOverride,
+  unpackPrefab,
+} from './prefab-actions';
 import { scriptFields } from '@protomake/scripting/compiler';
 import { ScriptBehaviour } from '@protomake/scripting';
 import { EditorModel, getPath } from './model';
@@ -30,6 +36,37 @@ export class Inspector {
         ids.length === 1 ? 'ENTITY' : `${ids.length} ENTITIES SELECTED`,
       ),
     );
+    const link = model.world.read(entity.id, PrefabLink);
+    if (link) {
+      const info = node('section', 'prefab-info'),
+        asset = model.project.assets.find((a) => a.id === link.prefab);
+      info.append(
+        node('strong', '', `Prefab: ${asset?.path ?? 'Missing'}`),
+        node('p', '', `${link.overrides.length} overrides on this entity`),
+      );
+      info.append(
+        button('Revert instance', () =>
+          this.run(() => revertPrefab(model, entity.guid)),
+        ),
+        button('Unpack instance', () =>
+          this.run(() => unpackPrefab(model, entity.guid)),
+        ),
+      );
+      for (const patch of link.overrides) {
+        const row = node('div', 'override');
+        row.append(
+          node('span', '', patch.path.join(' → ')),
+          button('Revert', () =>
+            this.run(() => revertPrefab(model, entity.guid, patch.path)),
+          ),
+          button('Apply to base', () =>
+            this.run(() => applyPrefabOverride(model, entity.guid, patch)),
+          ),
+        );
+        info.append(row);
+      }
+      this.host.append(info);
+    }
     const name = input('Name', entity.name);
     name.input.onchange = () =>
       this.run(() =>
@@ -63,6 +100,7 @@ export class Inspector {
     parentLabel.append(node('span', '', 'Parent'), parent);
     this.host.append(parentLabel);
     for (const [type, data] of model.world.components(entity.id)) {
+      if (type === PrefabLink.type) continue;
       const definition = model.registry.get(type),
         section = node('section', 'component'),
         header = node('div', 'component-header');
@@ -122,9 +160,13 @@ export class Inspector {
               const suitable =
                 type === ScriptBehaviour.type && field.path === 'script'
                   ? asset.mime === 'text/typescript'
-                  : type === 'protomake.sprite'
-                    ? asset.kind === 'image'
-                    : true;
+                  : type === 'protomake.animator'
+                    ? asset.mime === 'application/x-protomake-animator'
+                    : type === 'protomake.audio-source'
+                      ? asset.kind === 'audio'
+                      : type === 'protomake.sprite'
+                        ? asset.kind === 'image'
+                        : true;
               if (suitable) select.append(new Option(asset.path, asset.id));
             }
           } else if (field.kind === 'entity') {
@@ -166,6 +208,15 @@ export class Inspector {
                   : control.input.value,
             ),
           );
+        if (
+          link?.overrides.some(
+            (p) =>
+              p.path[0] === 'components' &&
+              p.path[1] === type &&
+              p.path.slice(2).join('.') === field.path,
+          )
+        )
+          control.row.classList.add('override');
         section.append(control.row);
       }
       this.host.append(section);
@@ -173,7 +224,10 @@ export class Inspector {
     const add = node('select');
     add.setAttribute('aria-label', 'Component type');
     for (const definition of model.registry.all())
-      if (!model.world.components(entity.id).has(definition.type))
+      if (
+        definition.type !== PrefabLink.type &&
+        !model.world.components(entity.id).has(definition.type)
+      )
         add.append(new Option(definition.displayName, definition.type));
     if (add.options.length) {
       this.host.append(

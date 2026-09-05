@@ -64,7 +64,7 @@ it('round-trips imported assets and rejects traversal paths', () => {
   ).toEqual(e.project);
   expect(() => new AssetDatabase([image('../bad.png')])).toThrow();
 });
-it('migrates the original project schema to v2 without losing entities', () => {
+it('migrates the original project schema to the current version without losing entities', () => {
   const e = new EditorModel();
   e.createEntity('Original');
   const original = structuredClone(e.project) as unknown as Record<
@@ -74,7 +74,7 @@ it('migrates the original project schema to v2 without losing entities', () => {
   original.schemaVersion = 1;
   delete original.assets;
   const loaded = validateProject(original, e.registry);
-  expect(loaded.schemaVersion).toBe(3);
+  expect(loaded.schemaVersion).toBe(4);
   expect(loaded.assets).toEqual([]);
   expect(loaded.scenes[0]?.entities[0]?.name).toBe('Original');
 });

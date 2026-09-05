@@ -10,8 +10,12 @@
 | `@protomake/runtime`       | Core                                                                 | Time and ordered system lifecycle                                                |
 | `@protomake/physics2d`     | Core, runtime types, Zod, Rapier adapter                             | Physics configuration, components and simulation                                 |
 | `@protomake/renderer`      | Core, assets, Zod, Pixi adapter                                      | Sprite/camera data and rendering contract                                        |
-| `@protomake/serialization` | Core, assets, physics/input schemas, Zod                             | Strict project/scene validation and migrations                                   |
+| `@protomake/serialization` | Core, assets, physics/input/prefab/animation/audio schemas, Zod      | Strict project/scene validation and migrations                                   |
 | `@protomake/scripting`     | Core, runtime, assets, input/physics types, TypeScript compiler, Zod | Script data, compilation/linking and behavior lifecycle                          |
+| `@protomake/prefabs`       | Core, Zod                                                            | Linked hierarchy identity, property patches and propagation                      |
+| `@protomake/animation`     | Core, assets, runtime types, renderer, Zod                           | Clips, controllers, parameter evaluation and playback                            |
+| `@protomake/audio`         | Core, assets, runtime types, Zod                                     | AudioSource, decoded buffers and Web Audio bus routing                           |
+| `@protomake/player`        | Runtime engine packages                                              | Shared GameSession composition and standalone player                             |
 | `@protomake/editor`        | Public engine packages                                               | Authoring model, viewport, Inspector, persistence, project scripts and Play host |
 
 The import-boundary checker runs during lint. Adapter and compiler subpaths keep schema contracts distinct from implementation. Editor UI is DOM; game rendering is Pixi. Core/runtime have no editor DOM knowledge. The Play host coordinates rendering, simulation, scripting and input without implementing those systems itself.
@@ -34,7 +38,7 @@ Reparent with `local` preserves the local matrix; `world` preserves the full wor
 
 The host passes seconds to `Engine.tick`; no hidden animation-frame singleton exists. Systems register only while stopped and run in insertion order. Startup and reverse teardown define service lifetime. Fixed update occurs before update, then late update. Timing bounds prevent an unbounded catch-up loop. The browser example owns requestAnimationFrame.
 
-`instantiateScene` creates a new independent world from validated serialized data. The isolation test verifies mutation cannot reach authored state. This establishes the data boundary for future Play Mode; the editor now executes Play in a separate iframe. This is data/lifetime isolation, not a hostile-code security boundary.
+`instantiateScene` creates a new independent world from validated serialized data. The isolation test verifies mutation cannot reach authored state. The editor executes Play in a separate iframe. This is data/lifetime isolation, not a hostile-code security boundary.
 
 ## Trust and extensibility
 
@@ -47,3 +51,7 @@ Project TS source stays in authored assets and executes on Play only. Static fie
 EditorModel owns authored project/world state, selection and command history. History stores before/after snapshots for transactions; pointer gestures mutate only the working world until committed as one command. Invalid operations restore the prior snapshot. Asset bytes are serialized only on authoring/storage operations, never as part of the runtime frame loop.
 
 SceneViewport owns camera navigation, selection geometry and gizmos. Inspector derives controls from component metadata, extending ScriptBehaviour fields from static project metadata. ProjectStorage owns IndexedDB transactions and separate active-scene metadata. PlayMode exchanges cloned project data with an iframe; removing it discards runtime changes.
+
+## Production boundary
+
+The player registry subpath contains component data contracts without importing rendering adapters or the compiler. GameSession composes services for both hosts. Editor Play compiles source to Blob modules; Build compiles it to static ES module files. The standalone player imports those files directly and has no editor UI or TypeScript compiler dependency. scripts/build-player.mjs checks its bundled module graph before writing the runtime manifest.

@@ -1,0 +1,1071 @@
+{
+  "schemaVersion": 4,
+  "id": "0690adb5-d3ec-4b03-a317-eaee54ca62d0",
+  "name": "ProtoMake · Prefabs, Animation & Audio",
+  "engineVersion": "0.7.0",
+  "startupScene": "ec1c34dd-5f72-4e67-a921-5b2b2f2b7cb2",
+  "scenes": [
+    {
+      "schemaVersion": 1,
+      "id": "ec1c34dd-5f72-4e67-a921-5b2b2f2b7cb2",
+      "name": "Physics playground",
+      "entities": [
+        {
+          "id": "1d4c713d-ca92-45f8-9511-5aed2e1fffbe",
+          "name": "Player",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -250, 40]
+            },
+            "protomake.sprite": {
+              "texture": "a6e27c98-a947-4f0a-8377-b7e249033258",
+              "width": 36,
+              "height": 42,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "dynamic",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 2,
+              "width": 36,
+              "height": 42
+            },
+            "protomake.script": {
+              "script": "dba98b58-fab0-4432-a612-1c4c25d6f3cd",
+              "values": {}
+            },
+            "protomake.animator": {
+              "controller": "4490c5fd-3525-4bcd-bb1c-8e7376497522",
+              "speed": 1
+            },
+            "protomake.audio-source": {
+              "clip": "0ba19900-a31b-424b-b702-00f001b6bbc4",
+              "loop": false,
+              "volume": 0.7,
+              "rate": 1,
+              "bus": "SFX",
+              "playOnAwake": false
+            }
+          }
+        },
+        {
+          "id": "2427afaf-9e47-44e0-bb3b-0c1cf77380d6",
+          "name": "Enemy 06",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 40, -130]
+            },
+            "protomake.sprite": {
+              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+              "values": {
+                "speed": 1
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "root": "2427afaf-9e47-44e0-bb3b-0c1cf77380d6",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 06"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 40, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "40a77a55-3711-4edd-8e88-486b8b060c66",
+          "name": "Pulse marker",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 270, -65]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "width": 32,
+              "height": 32,
+              "tint": "#ffcf72",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "fc8e3582-239c-4c7e-97b3-1991d6001735",
+              "values": {}
+            }
+          }
+        },
+        {
+          "id": "4412e6c7-0b73-4646-b27a-08c877568b80",
+          "name": "Enemy 01",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -360, -130]
+            },
+            "protomake.sprite": {
+              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+              "values": {
+                "speed": 1
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "root": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "overrides": []
+            }
+          }
+        },
+        {
+          "id": "53dca386-e398-4718-b13f-5423889e8336",
+          "name": "Step",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -170, 145]
+            },
+            "protomake.sprite": {
+              "texture": "fa75ebd9-22e4-4e0f-9469-60487e54e153",
+              "width": 100,
+              "height": 22,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 1,
+              "width": 100,
+              "height": 22
+            }
+          }
+        },
+        {
+          "id": "5665f034-ae06-4f30-a7c7-987a299222dc",
+          "name": "Enemy 02",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -280, -130]
+            },
+            "protomake.sprite": {
+              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+              "values": {
+                "speed": 1
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "root": "5665f034-ae06-4f30-a7c7-987a299222dc",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 02"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, -280, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "5f1804a2-9774-44d0-8e5a-44a7b008360c",
+          "name": "Enemy 07",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 120, -130]
+            },
+            "protomake.sprite": {
+              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+              "values": {
+                "speed": 1
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "root": "5f1804a2-9774-44d0-8e5a-44a7b008360c",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 07"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 120, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "66a8c713-dc6d-4e7a-ac0c-4021d9214b83",
+          "name": "Enemy 03",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -200, -130]
+            },
+            "protomake.sprite": {
+              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+              "values": {
+                "speed": 1
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "root": "66a8c713-dc6d-4e7a-ac0c-4021d9214b83",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 03"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, -200, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "756c26da-67c5-4384-ad29-a2841cb8cadb",
+          "name": "Moving platform",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 30, 65]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "width": 130,
+              "height": 20,
+              "tint": "#e8b278",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "kinematic",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 1,
+              "width": 130,
+              "height": 20
+            },
+            "protomake.script": {
+              "script": "078e7248-6e1e-445e-994c-524bf92f7496",
+              "values": {}
+            }
+          }
+        },
+        {
+          "id": "7aba3b42-10d2-47d1-9546-c4cd17de0281",
+          "name": "Enemy 04",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -120, -130]
+            },
+            "protomake.sprite": {
+              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+              "values": {
+                "speed": 1
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "root": "7aba3b42-10d2-47d1-9546-c4cd17de0281",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 04"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, -120, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "83f6edc0-a47e-43f1-9582-21d73b1360ee",
+          "name": "Enemy 05",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -40, -130]
+            },
+            "protomake.sprite": {
+              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+              "values": {
+                "speed": 1
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "root": "83f6edc0-a47e-43f1-9582-21d73b1360ee",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 05"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, -40, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "a3de6bf7-9004-4440-958d-7649d748e357",
+          "name": "Enemy 09",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 280, -130]
+            },
+            "protomake.sprite": {
+              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+              "values": {
+                "speed": 1
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "root": "a3de6bf7-9004-4440-958d-7649d748e357",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 09"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 280, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "af95bae2-a0e9-48ec-9a23-c0591f5ac5b3",
+          "name": "Enemy 10",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 360, -130]
+            },
+            "protomake.sprite": {
+              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+              "values": {
+                "speed": 3
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "root": "af95bae2-a0e9-48ec-9a23-c0591f5ac5b3",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 10"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 360, -130]
+                },
+                {
+                  "path": ["components", "protomake.script", "values", "speed"],
+                  "removed": false,
+                  "value": 3
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "be6b1ae6-b95c-4b3f-b7a6-12e896accc76",
+          "name": "Enemy 08",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 200, -130]
+            },
+            "protomake.sprite": {
+              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.script": {
+              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+              "values": {
+                "speed": 1
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
+              "root": "be6b1ae6-b95c-4b3f-b7a6-12e896accc76",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 08"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 200, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "c1cf98bb-5607-43ac-ab09-dbdfdb31db46",
+          "name": "Camera",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 70]
+            },
+            "protomake.camera": {
+              "zoom": 0.8,
+              "background": "#101a25",
+              "priority": 0,
+              "viewportX": 0,
+              "viewportY": 0,
+              "viewportWidth": 1,
+              "viewportHeight": 1
+            }
+          }
+        },
+        {
+          "id": "c28d88b8-b3cf-40c2-9643-a442f77eb7d1",
+          "name": "Trigger",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 300, 164]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "width": 90,
+              "height": 80,
+              "tint": "#547d70",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": true,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 3,
+              "width": 90,
+              "height": 80
+            },
+            "protomake.script": {
+              "script": "796add1a-8b24-4db3-a399-3c46b5595c8d",
+              "values": {
+                "target": "1d4c713d-ca92-45f8-9511-5aed2e1fffbe",
+                "color": "#8bffb3"
+              }
+            }
+          }
+        },
+        {
+          "id": "ce8323cd-93c9-4098-bec9-dad5a6d3ea4b",
+          "name": "Upper ledge",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 270, -10]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "width": 140,
+              "height": 22,
+              "tint": "#8ca1c7",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 1,
+              "width": 140,
+              "height": 22
+            }
+          }
+        },
+        {
+          "id": "dbba21c3-082e-4f11-8b74-79d882e1357e",
+          "name": "Floor",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 220]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "width": 900,
+              "height": 32,
+              "tint": "#648a9f",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.7,
+              "restitution": 0,
+              "layer": 1,
+              "width": 900,
+              "height": 32
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "fd61ff08-42ac-4045-82e9-07007737794a",
+      "path": "Assets/Images/Actor.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAA+UlEQVR4nO2aTQrCMBCFxyJuXLjyBB5E8EKCBxG8UMGDeAJXLty40dWEaZtEI61vIu9b9Te8jylJy1SEYJnlTl5v9+evguRYr5bJnNETXoL3iYkMDtjwi/YwdaaPeOyOYbsv0dgdj+FFuln6T0czuFp8hVdSmYKAmnkMr2g2W4VoBWqCAmgogKZ6gXnpDZv9OXr8ctpCxqm+AhRAQwE01QsUT6Ol09zU41RfAQqgoQAaCqChAJrilThG6uPkHWOsxqyAyHjvNd9QfQUogIYCaCiAJgho88w21Lyh2WyjL1oBjxKpTB0Ba+ZJItdm/b9Gt8WLSO5XA4LmBVqsR2Mf0f2NAAAAAElFTkSuQmCC",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "id": "fa75ebd9-22e4-4e0f-9469-60487e54e153",
+      "path": "Assets/Images/Tile.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAABAElEQVR4nO2aMQ6CQBBFv8TOwspLeAuN8RJW9l7AE3ABeyovYQzewktQUVBjYYasK0vj6l/Mfx0sGf7LUOxkAQSXydBiVTftr4IMsZjPgjl7F2IFX++PAICyyGOU6xWZ+jfc8IfzLcqLP61z2q0APLP5Epl78Y3wMXCz+F9H9vY00gpvhDJ1AmaWYnjDsrld6O3AmJAAGwmwkQAbCbCRABsJsJEAm248q+qmtRk2dcoi7+bj/+oAEHciu18vAIDlZhutpg34f9MBCbCRABsJsJEAGwmwkQAbCbDpBGx/bfvtFPFnASDQgRQlQpleBFyzlCTcLP4x6+gPukf/q4Fg8wAj8VX1UctQrQAAAABJRU5ErkJggg==",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "id": "078e7248-6e1e-445e-994c-524bf92f7496",
+      "path": "Assets/Scripts/MovingPlatform.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = {\n  speed: { type: 'number', default: 1.2 },\n  distance: { type: 'number', default: 90 },\n} as const;\nexport default class MovingPlatform {\n  speed = 1.2;\n  distance = 90;\n  private origin: readonly [number, number] = [0, 0];\n  start(ctx: ScriptContext) {\n    this.origin = ctx.position();\n  }\n  fixedUpdate(ctx: ScriptContext) {\n    ctx.setPosition(\n      this.origin[0] + Math.sin(ctx.elapsed * this.speed) * this.distance,\n      this.origin[1],\n    );\n  }\n}\n",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "dba98b58-fab0-4432-a612-1c4c25d6f3cd",
+      "path": "Assets/Scripts/PlayerController.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = {\n  speed: { type: 'number', default: 220 },\n  jumpSpeed: { type: 'number', default: 440 },\n} as const;\nexport default class PlayerController {\n  speed = 220;\n  jumpSpeed = 440;\n  private jumpReady = true;\n  fixedUpdate(ctx: ScriptContext) {\n    const position = ctx.position();\n    const move = ctx.input.getVector('Move');\n    ctx.setParameter('moving', Math.abs(move[0]) > 0.1);\n    let vy = ctx.physics.velocity(ctx.entity)[1];\n    if (!ctx.input.isPressed('Jump')) this.jumpReady = true;\n    const ground = ctx.physics.raycast(position, [0, 1], 23, ctx.entity);\n    if (ctx.input.isPressed('Jump') && this.jumpReady && ground && vy >= -1) {\n      vy = -this.jumpSpeed;\n      this.jumpReady = false;\n      ctx.playAudio();\n    }\n    ctx.physics.setVelocity(ctx.entity, move[0] * this.speed, vy);\n    if (position[1] > 600) {\n      ctx.setPosition(-250, 40);\n      ctx.physics.setVelocity(ctx.entity, 0, 0);\n      ctx.log('Respawned');\n    }\n  }\n}\n",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "fc8e3582-239c-4c7e-97b3-1991d6001735",
+      "path": "Assets/Scripts/Pulse.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = {\n  speed: { type: 'number', default: 2 },\n  minimumOpacity: { type: 'number', default: 0.25 },\n} as const;\nexport default class Pulse {\n  speed = 2;\n  minimumOpacity = 0.25;\n  update(ctx: ScriptContext) {\n    const sprite = ctx.get<Record<string, unknown>>('protomake.sprite');\n    if (!sprite) return;\n    const wave = (Math.sin(ctx.elapsed * this.speed) + 1) / 2;\n    ctx.set('protomake.sprite', {\n      ...sprite,\n      opacity: this.minimumOpacity + (1 - this.minimumOpacity) * wave,\n    });\n  }\n}\n",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "796add1a-8b24-4db3-a399-3c46b5595c8d",
+      "path": "Assets/Scripts/TriggerReaction.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = {\n  target: { type: 'entity', default: '' },\n  color: { type: 'color', default: '#8bffb3' },\n} as const;\nexport default class TriggerReaction {\n  target = '';\n  color = '#8bffb3';\n  onTriggerEnter(ctx: ScriptContext) {\n    const id = this.target || ctx.entity;\n    const sprite = ctx.get<Record<string, unknown>>('protomake.sprite', id);\n    if (sprite) ctx.set('protomake.sprite', { ...sprite, tint: this.color }, id);\n    ctx.log('Trigger entered: target tint changed in runtime only.');\n  }\n  onTriggerExit(ctx: ScriptContext) {\n    ctx.log('Trigger exited.');\n  }\n}\n",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "a6e27c98-a947-4f0a-8377-b7e249033258",
+      "path": "Assets/Images/Frame-1.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAA3klEQVR4nO2ZwQ3CMAxFDeqVLdiCNZihGzAFGzADa7AFWzAAnCIhlMQOUvLt9L9jFSn/9fvgqiKEbJtdy+HXfX33CvLN4Xwz5zIdHBX8F4vIXjuACm+9uyqADG/NUBTwED5Ry6KOkHeyAp7efqKUac4GIkEBNMuIS46XR/b583pqOpMjfAMUQEMBNNl92+MqIZL/PgjfAAXQUAANBdCEF+i+TpfWZA1tjU6EbyC8QPcRso7Cv4RvgAJo5hRo+UMyilKmORsQ8dVCLUu1AQ8SWgZ1hJASlrvD/2YlZOt8ABTuOvXIf7+TAAAAAElFTkSuQmCC",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "id": "f9715c82-5e44-4bc5-bb10-4fdc7b6ffce8",
+      "path": "Assets/Images/Frame-2.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAA10lEQVR4nO2Z0QkCQQxEc2IRlmIrgo1YgY0ItmIpdnF+LYhkN1lld5Jz3uexsPOcwIVThBBCyA8sPYfXx3UdFeSd5Xhx53IdnBX8E4/IzjqACu+9uymADO/NUBWIEL7QymKOUHRUgUi/fqGWKX0D+xmXHE439fnzfu46o5G+AQqgoQAadVmK+B4Q0Ze79A1QAA0F0FAATXqB4et0bU22sNboQvoG0gsMHyHvKHxL+gYogGabAj2ft2dRy7TNBkRitdDK0mwggoSVwRwhpITn7vT/kRHy77wA8mo7OF5rPTAAAAAASUVORK5CYII=",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "id": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+      "path": "Assets/Images/Frame-3.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAA2klEQVR4nO2ZwQkCMRBFR9lSrMWrYBOLFYlNCF6txV70FBBJMhMh+TPZ/45LIP/tn8MsK0LIttm1HL48X+9eQb65Hg/mXKaDo4L/YhHZawdQ4a13VwWQ4a0ZigIewidqWdQR8k5WwNPbT5QyzdlAJCiAZhlxyX09ZZ+fb4+mMznCN0ABNBRAk923Pa4SIvnvg/ANUAANBdBQAE14ge7rdGlN1tDW6ET4BsILdB8h6yj8S/gGKIBmToGWPySjKGWaswERXy3UslQb8CChZVBHCClhuTv8b1ZCts4HMS0676o3EgwAAAAASUVORK5CYII=",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "id": "4e18995a-6de5-46d9-80fb-2a7430951ad1",
+      "path": "Assets/Images/Frame-4.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAYAAABXAvmHAAAA2klEQVR4nO2ZwQ0CMQwEDeJHBTTCgxLogsroghJ40AgV8IZXJISc2AElax87z1Ok7LCWzjpECCGE/MCq5/Dl/niOCvLOcbd153IdnBX8E4/I2jqACu+9uymADO/NUBWIEL7QymKOUHRUgUi/fqGWKX0DmxmXnA579fn5eus6o5G+AQqgoQAadVmK+B4Q0Ze79A1QAA0F0FAATXqB4et0bU22sNboQvoG0gsMHyHvKHxL+gYogGaZAj2ft2dRy7TMBkRitdDK0mwggoSVwRwhpITn7vT/kRHy77wAgjQ7fIizfqkAAAAASUVORK5CYII=",
+      "width": 48,
+      "height": 48
+    },
+    {
+      "id": "0ba19900-a31b-424b-b702-00f001b6bbc4",
+      "path": "Assets/Audio/Jump.wav",
+      "kind": "audio",
+      "mime": "audio/wav",
+      "data": "data:audio/wav;base64,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MwA4ADsAPQA9ADsANwAyACoAIQAXAAsAAADz/+b/2v/P/8b/vv+5/7b/tv+5/7//x//R/93/6//6/wcAFgAkADAAOgBDAEgASgBKAEcAQQA5AC4AIgAVAAcA+//u/+L/2P/P/8n/xP/D/8P/xv/L/9H/2f/i/+z/9v///wgAEAAYAB4AIwAnACkAKgApACgAJQAhAB0AGAATAA4ACAACAP7/+P/z/+7/6v/m/+P/4f/f/97/3v/f/+H/5P/n/+z/8v/4//7/BAALABEAGAAdACIAJgAoACkAKAAmACIAHgAXABAACQAAAPn/8f/p/+P/3f/Z/9f/1v/X/9n/3f/i/+n/8P/3////BgANABQAGgAeACIAIwAkACMAIAAdABgAEwAOAAgAAQD9//f/8v/u/+v/6f/o/+f/6P/p/+v/7f/w//P/9//7//7/AQAEAAcACQALAA0ADwAQABAAEAAQAA8ADgANAAsACQAHAAUAAgAAAP3/+v/4//X/8//x//D/7//v/+//8P/x//T/9v/5//z/AAADAAYACQAMAA8AEQASABIAEgARAA8ADQALAAcABAAAAP7/+//4//X/8//x//D/8P/x//L/8//1//j/+v/9/wAAAgAEAAYACAAKAAsACwALAAsACgAJAAgABgAEAAIAAQAAAP7//f/8//v/+v/6//r/+v/6//r/+//7//z//f/+////AAAAAAAAAQACAAMAAwAEAAQABAAEAAQABAAEAAMAAwACAAEAAQAAAAAA///+//3//f/8//z//P/8//z//P/9//3//v///wAAAAAAAAEAAgACAAMAAwADAAMAAwADAAIAAgABAAEAAAAAAAAA//////7//v/+//7//v/+/////////wAAAAAAAAAAAAAAAAAAAQABAAEAAQABAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "54c0af84-53a2-43b0-88d6-9a53d8f95141",
+      "path": "Assets/Animations/Rest.animation.json",
+      "kind": "text",
+      "mime": "application/x-protomake-animation",
+      "data": "{\"version\":1,\"name\":\"Rest\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"a6e27c98-a947-4f0a-8377-b7e249033258\",\"duration\":0.35},{\"texture\":\"f9715c82-5e44-4bc5-bb10-4fdc7b6ffce8\",\"duration\":0.35}]}",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "2c3138ca-61d2-4805-8a53-c358c7b724cf",
+      "path": "Assets/Animations/Moving.animation.json",
+      "kind": "text",
+      "mime": "application/x-protomake-animation",
+      "data": "{\"version\":1,\"name\":\"Moving\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"8c4ab89e-79fc-47ba-bce2-fced39f9b28e\",\"duration\":0.09},{\"texture\":\"4e18995a-6de5-46d9-80fb-2a7430951ad1\",\"duration\":0.09}]}",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "4490c5fd-3525-4bcd-bb1c-8e7376497522",
+      "path": "Assets/Animations/Player.animator.json",
+      "kind": "text",
+      "mime": "application/x-protomake-animator",
+      "data": "{\"version\":1,\"initial\":\"Rest\",\"parameters\":{\"moving\":{\"type\":\"bool\",\"default\":false}},\"states\":[{\"name\":\"Rest\",\"clip\":\"54c0af84-53a2-43b0-88d6-9a53d8f95141\",\"speed\":1},{\"name\":\"Moving\",\"clip\":\"2c3138ca-61d2-4805-8a53-c358c7b724cf\",\"speed\":1}],\"transitions\":[{\"from\":\"Rest\",\"to\":\"Moving\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"moving\",\"operator\":\"==\",\"value\":true}]},{\"from\":\"Moving\",\"to\":\"Rest\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"moving\",\"operator\":\"==\",\"value\":false}]}]}",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+      "path": "Assets/Scripts/Enemy.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = {speed:{type:'number',default:1}} as const;\nexport default class Enemy {\n speed=1;\n private x=0; private y=0;\n start(ctx:ScriptContext){[this.x,this.y]=ctx.position();}\n update(ctx:ScriptContext){ctx.setPosition(this.x+Math.sin(ctx.elapsed*this.speed)*10,this.y);}\n}\n",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+      "path": "Assets/Prefabs/Enemy.prefab.json",
+      "kind": "text",
+      "mime": "application/x-protomake-prefab",
+      "data": "{\"schemaVersion\":1,\"id\":\"08f650ba-f014-47a5-b4b4-0e3475642b7d\",\"name\":\"Assets/Prefabs/Enemy.prefab.json\",\"entities\":[{\"id\":\"4412e6c7-0b73-4646-b27a-08c877568b80\",\"name\":\"Enemy 01\",\"enabled\":true,\"parent\":null,\"components\":{\"protomake.transform\":{\"local\":[1,0,0,1,-360,-130]},\"protomake.sprite\":{\"texture\":\"8c4ab89e-79fc-47ba-bce2-fced39f9b28e\",\"width\":30,\"height\":34,\"tint\":\"#ffffff\",\"opacity\":1,\"visible\":true,\"flipX\":false,\"flipY\":false,\"anchorX\":0.5,\"anchorY\":0.5,\"layer\":0,\"order\":0},\"protomake.script\":{\"script\":\"1cc04d87-4097-4586-8a65-6e6f5fb84b50\",\"values\":{\"speed\":1}}}}]}",
+      "width": 0,
+      "height": 0
+    }
+  ],
+  "physics": {
+    "gravityX": 0,
+    "gravityY": 980,
+    "layers": ["Default", "World", "Actors", "Triggers"],
+    "matrix": [
+      [true, true, true, true],
+      [true, true, true, true],
+      [true, true, true, true],
+      [true, true, true, true]
+    ]
+  },
+  "input": [
+    {
+      "name": "Move",
+      "kind": "vector2",
+      "positiveX": ["KeyD", "ArrowRight", "GamepadAxis0+"],
+      "negativeX": ["KeyA", "ArrowLeft", "GamepadAxis0-"],
+      "positiveY": ["KeyS", "ArrowDown", "GamepadAxis1+"],
+      "negativeY": ["KeyW", "ArrowUp", "GamepadAxis1-"]
+    },
+    {
+      "name": "Jump",
+      "kind": "button",
+      "positiveX": ["Space", "GamepadButton0"],
+      "negativeX": [],
+      "positiveY": [],
+      "negativeY": []
+    },
+    {
+      "name": "Interact",
+      "kind": "button",
+      "positiveX": ["KeyE", "Mouse0"],
+      "negativeX": [],
+      "positiveY": [],
+      "negativeY": []
+    }
+  ],
+  "mixer": [
+    {
+      "name": "Master",
+      "volume": 1,
+      "muted": false
+    },
+    {
+      "name": "Music",
+      "volume": 1,
+      "muted": false
+    },
+    {
+      "name": "SFX",
+      "volume": 1,
+      "muted": false
+    },
+    {
+      "name": "UI",
+      "volume": 1,
+      "muted": false
+    },
+    {
+      "name": "Ambience",
+      "volume": 1,
+      "muted": false
+    }
+  ],
+  "folders": [
+    "Assets",
+    "Assets/Images",
+    "Assets/Audio",
+    "Assets/Animations",
+    "Assets/Scripts",
+    "Assets/Prefabs",
+    "Assets/Empty folder",
+    "Scenes"
+  ],
+  "sceneFolders": {
+    "ec1c34dd-5f72-4e67-a921-5b2b2f2b7cb2": "Scenes"
+  }
+}

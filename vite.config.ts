@@ -12,6 +12,9 @@ export default defineConfig({
   },
   resolve: {
     alias: {
+      '@protomake/player/session': fileURLToPath(
+        new URL('./packages/player/src/session.ts', import.meta.url),
+      ),
       '@protomake/scripting/compiler': fileURLToPath(
         new URL('./packages/scripting/src/compiler.ts', import.meta.url),
       ),
@@ -23,6 +26,10 @@ export default defineConfig({
       ),
       ...Object.fromEntries(
         [
+          'player',
+          'prefabs',
+          'animation',
+          'audio',
           'core',
           'serialization',
           'runtime',

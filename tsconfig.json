@@ -27,7 +27,12 @@
       "@protomake/input": ["./packages/input/src/index.ts"],
       "@protomake/physics2d/rapier": ["./packages/physics2d/src/rapier.ts"],
       "@protomake/scripting": ["./packages/scripting/src/index.ts"],
-      "@protomake/scripting/compiler": ["./packages/scripting/src/compiler.ts"]
+      "@protomake/scripting/compiler": ["./packages/scripting/src/compiler.ts"],
+      "@protomake/prefabs": ["./packages/prefabs/src/index.ts"],
+      "@protomake/animation": ["./packages/animation/src/index.ts"],
+      "@protomake/audio": ["./packages/audio/src/index.ts"],
+      "@protomake/player": ["./packages/player/src/index.ts"],
+      "@protomake/player/session": ["./packages/player/src/session.ts"]
     }
   },
   "include": ["packages", "examples", "tests", "vite.config.ts"]

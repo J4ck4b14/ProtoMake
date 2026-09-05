@@ -1,3 +1,9 @@
+import { editMedia, attachMedia } from './media-editor';
+import { CLIP_MIME, CONTROLLER_MIME } from '@protomake/animation';
+import { PREFAB_MIME } from '@protomake/prefabs';
+import { createPrefab, placePrefab, editPrefab } from './prefab-actions';
+import { editData } from './data-editor';
+import { folders, createFolder, moveFolder, deleteFolder } from './folders';
 import {
   AssetDatabase,
   assetReferences,
@@ -11,6 +17,7 @@ import { EditorModel } from './model';
 import type { SceneViewport } from './viewport';
 import { node, button, ask } from './dom';
 export class AssetsPanel {
+  private folder = 'Assets';
   private selected: string | undefined;
   constructor(
     private readonly host: HTMLElement,
@@ -31,7 +38,11 @@ export class AssetsPanel {
     if (!files || this.model.locked) return;
     try {
       const imported: AssetData[] = [];
-      for (const file of files) imported.push(await importFile(file));
+      for (const file of files) {
+        const asset = await importFile(file);
+        asset.path = [this.folder, file.name].filter(Boolean).join('/');
+        imported.push(asset);
+      }
       this.model.change('Import assets', () => {
         const database = new AssetDatabase(this.model.project.assets);
         for (const asset of imported) database.import(asset);
@@ -43,17 +54,136 @@ export class AssetsPanel {
       this.report(String(error), true);
     }
   }
+  private moveAsset(id: string, folder: string): void {
+    this.model.change('Move asset', () => {
+      const db = new AssetDatabase(this.model.project.assets);
+      const asset = db.get(id);
+      if (!asset) throw new Error('Missing asset');
+      db.move(id, folder + '/' + asset.path.split('/').at(-1));
+      this.model.project.assets = db.all();
+      compileProjectScripts(this.model.project.assets);
+    });
+  }
   render(): void {
     this.host.replaceChildren(node('h2', '', 'Assets'));
     const file = node('input');
     file.type = 'file';
     file.multiple = true;
-    file.accept = '.png,.jpg,.jpeg,.webp,.json,.txt,.ts';
+    file.accept = '.png,.jpg,.jpeg,.webp,.json,.txt,.ts,.wav,.mp3,.ogg';
     file.hidden = true;
     file.onchange = () => void this.import(file.files);
+    const nav = node('div', 'folder-nav'),
+      select = node('select');
+    select.setAttribute('aria-label', 'Asset folder');
+    select.append(new Option('Project root', ''));
+    for (const path of folders(this.model))
+      select.append(new Option(path, path));
+    select.value = this.folder;
+    if (select.selectedIndex < 0) {
+      this.folder = '';
+      select.value = '';
+    }
+    select.onchange = () => {
+      this.folder = select.value;
+      this.selected = undefined;
+      this.render();
+    };
+    const query = async (
+      label: string,
+      value: string,
+      action: (path: string) => void,
+    ) => {
+      try {
+        const path = await ask(label, value);
+        if (path) this.run(() => action(path));
+      } catch (e) {
+        this.report(String(e), true);
+      }
+    };
+    nav.append(
+      select,
+      button(
+        '+ Folder',
+        () =>
+          void query(
+            'New folder path',
+            this.folder ? this.folder + '/New folder' : 'New folder',
+            (path) => createFolder(this.model, path),
+          ),
+      ),
+      button(
+        'Rename folder',
+        () =>
+          void query('Folder path', this.folder, (path) => {
+            moveFolder(this.model, this.folder, path);
+            this.folder = path;
+            this.render();
+          }),
+      ),
+      button('Delete folder', () =>
+        this.run(() => {
+          deleteFolder(this.model, this.folder);
+          this.folder = '';
+          this.render();
+        }),
+      ),
+    );
     const actions = node('div', 'actions');
     actions.append(
       button('Import files', () => file.click()),
+      button('+ Animation clip', () =>
+        this.run(() => editMedia(this.model, CLIP_MIME)),
+      ),
+      button('+ Animator', () =>
+        this.run(() => editMedia(this.model, CONTROLLER_MIME)),
+      ),
+      button('Edit animation', () =>
+        this.run(() => {
+          const asset = this.model.project.assets.find(
+            (a) => a.id === this.selected,
+          );
+          if (!asset || ![CLIP_MIME, CONTROLLER_MIME].includes(asset.mime))
+            throw new Error('Select an animation clip or controller');
+          editMedia(
+            this.model,
+            asset.mime as typeof CLIP_MIME | typeof CONTROLLER_MIME,
+            asset.id,
+          );
+        }),
+      ),
+      button('Attach media', () =>
+        this.run(() => attachMedia(this.model, this.selected ?? '')),
+      ),
+      button(
+        'Create prefab',
+        () =>
+          void query(
+            'Prefab path',
+            `${this.folder || 'Assets'}/Entity.prefab.json`,
+            (path) => createPrefab(this.model, path),
+          ),
+      ),
+      button('Instantiate prefab', () =>
+        this.run(() => placePrefab(this.model, this.selected ?? '')),
+      ),
+      button('Edit prefab base', () =>
+        this.run(() => {
+          const asset = this.model.project.assets.find(
+            (a) => a.id === this.selected && a.mime === PREFAB_MIME,
+          );
+          if (!asset) throw new Error('Select a prefab asset');
+          editData(
+            'Prefab base',
+            asset.path,
+            JSON.parse(asset.data),
+            (path, data) => {
+              if (path !== asset.path)
+                throw new Error('Use Move / rename to rename assets');
+              editPrefab(this.model, asset.id, data);
+            },
+          );
+        }),
+      ),
       button('Place sprite', () =>
         this.run(() => {
           const asset = this.model.project.assets.find(
@@ -109,11 +239,33 @@ export class AssetsPanel {
       ),
     );
     const list = node('div', 'asset-list');
-    for (const asset of this.model.project.assets) {
-      const b = button(asset.path, () => {
+    const direct = folders(this.model).filter(
+      (path) => path.split('/').slice(0, -1).join('/') === this.folder,
+    );
+    for (const path of direct) {
+      const b = button('▸ ' + path.split('/').at(-1), () => {
+        this.folder = path;
+        this.render();
+      });
+      b.ondragover = (e) => e.preventDefault();
+      b.ondrop = (e) => {
+        e.preventDefault();
+        const id = e.dataTransfer?.getData('application/x-protomake-asset');
+        if (id) this.run(() => this.moveAsset(id, path));
+      };
+      list.append(b);
+    }
+    for (const asset of [...this.model.project.assets]
+      .filter((a) => a.path.split('/').slice(0, -1).join('/') === this.folder)
+      .sort((a, b) => a.path.localeCompare(b.path))) {
+      const b = button(asset.path.split('/').at(-1)!, () => {
         this.selected = asset.id;
         this.render();
       });
+      b.title = asset.path;
+      b.draggable = !this.model.locked;
+      b.ondragstart = (e) =>
+        e.dataTransfer?.setData('application/x-protomake-asset', asset.id);
       b.classList.toggle('selected', this.selected === asset.id);
       if (asset.kind === 'image') {
         const image = node('img');
@@ -123,7 +275,7 @@ export class AssetsPanel {
       }
       list.append(b);
     }
-    this.host.append(actions, list, file);
+    this.host.append(nav, actions, list, file);
     if (this.model.locked)
       for (const b of this.host.querySelectorAll('button')) b.disabled = true;
   }

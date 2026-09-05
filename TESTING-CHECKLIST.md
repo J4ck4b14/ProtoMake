@@ -1,95 +1,57 @@
-# ProtoMake Milestones 1–4: hands-on acceptance
+# ProtoMake 0.7 hands-on acceptance
 
-Work through this in order. A failure is useful: record what you did, expected vs actual behavior, and any Console error. Stop before Milestone 5 until these checks are satisfactory.
+Start with the new Milestones 5–7 checks below, then briefly regress editing/save/physics. The automated tests do not establish rendered pixels, audible output, actual downloads or browser Service Worker behavior.
 
-## 1. Boot and load the example
+## 1. Start and import
 
-- Extract this archive into a separate folder. Run `npm ci` and `npm run dev` beside package.json. Open the URL printed by this run, not a stale tab pointing to the Milestone 0 server.
-- You should see Hierarchy, Scene, Inspector, Project, Assets and Console panels.
-- Click **Import JSON** and choose `examples/physics-playground/Playground.protomake.json`.
-- You should see eight entities: Player, Floor, Step, Moving platform, Upper ledge, Trigger, Pulse marker and Camera. Assets should include two PNGs and four TypeScript files.
-- Press F to frame the scene. Resize the browser at normal desktop widths; the Scene should resize and the panels remain usable.
+Extract into a fresh folder. Run `npm ci` then `npm run dev` beside package.json and package-lock.json. The first command to start the editor now builds the standalone player first; wait for Vite's URL. Import `examples/milestones-5-7/Workshop.protomake.json` with **Import JSON**.
 
-Expected: no red errors on load. Empty non-rendering entities are editor markers; they are not sprites in Play.
+Expected: the physics playground plus **Enemy 01–10**, all linked to one prefab. The Assets folder selector includes Images, Audio, Animations, Scripts, Prefabs and an empty folder. Existing v1–v3 projects migrate automatically when opened; export a backup before replacing your working copy.
 
-## 2. Play, physics and isolation
+## 2. Resize and organize
 
-- Press **Play**, wait for loading, then click the game viewport to focus it.
-- Move with A/D or left/right arrows. Jump with Space. The player should fall onto the floor, stop at solid geometry and jump onto the step/platform. Holding jump must not produce repeated mid-air jumps.
-- The moving platform should move side-to-side. The small marker above the upper ledge should pulse in opacity.
-- Walk into the green trigger on the right. It should allow passage, change the player's tint and log entry/exit messages in the editor Console.
-- Enable **Physics debug** while playing. Lines should match collider geometry. Toggle it off and confirm they disappear.
-- Pause. Physics and scripted movement should stop. Step should advance one fixed interval. Resume should continue. Click outside the game while holding movement, then return; no key should remain stuck.
-- Stop. The player, platform, tint and other runtime changes must return to the authored scene. Repeat Play/Stop three times and watch for errors or duplicated behavior.
+- Drag both vertical dividers beside the Scene and the horizontal divider above the bottom panels. Resize Project, Console and Assets using their bottom-row vertical dividers.
+- Focus a divider with Tab and use arrow keys. Double-click a divider to reset it, or use **Reset layout** for everything. Reload: the chosen sizes should remain.
+- In Assets, create a folder, enter it and import an image. Create a child folder; drag an asset onto its folder row. Use **Move / rename** to move a selected asset to a different full relative path.
+- Rename a folder that contains assets. IDs and existing references must remain intact. Deleting a populated folder should fail; deleting an empty one should succeed. Undo/Redo and save/reopen.
+- Assign the active scene a folder using **Scene folder** in Project. Its path should appear in the sorted scene list and survive reopening.
+- In Hierarchy, select plain entities and **Group selection**. Use children/parenting to organize scene objects. Groups are transform entities, not asset folders.
 
-Expected: runtime changes never become authored changes automatically. Sprite flip is visual; collider geometry is configured separately.
+Expected: resizing affects only your local layout, not the scene or Undo history. Very narrow screens retain a desktop minimum width. An asset folder rename that would break imports from outside that folder is rejected with a script diagnostic.
 
-## 3. Editor selection and transforms
+## 3. Prefabs
 
-- Select Player in Hierarchy, then select it in the scene. Both selections must agree.
-- Shift-click several entities; drag a marquee from empty space. Ctrl/Cmd+A selects all.
-- Use **W / Move**: drag the red X arrow, green Y arrow and center square separately. Only the selected axis should move for an axis drag.
-- Use **E / Rotate** and drag the ring. Use **R / Scale** and drag the square handles.
-- Test snapping, Alt to bypass it, the grid toggle, wheel zoom and middle-mouse/Space dragging to pan. F should frame the selection.
-- Undo each drag once: the entire gesture should revert in one step. Redo should restore it. Escape during a drag should cancel it.
-- Create a plain entity and a child. Reparent using the Inspector and hierarchy drag/drop. Unparent to scene root. World placement should stay unchanged.
-- Duplicate a parent subtree; edit the duplicate and confirm the original is independent. Delete it and Undo.
+- Select **Enemy 10**. Its exposed script speed is **3**; the other enemies use **1**. The Inspector shows the prefab path and overrides.
+- Select **Enemy 01**, change Sprite Renderer tint and click **Apply to base** beside that tint override. Every enemy should inherit the tint; Enemy 10 must keep speed 3 and all instances must keep their individual positions.
+- Undo once, then Redo. Save/reopen and verify the same result.
+- On Enemy 10, click **Revert** beside speed. It should become 1. Undo restores 3.
+- Select the prefab asset under Assets/Prefabs and click **Instantiate prefab**. Move it, duplicate it, then change the base again: both copies should remain linked.
+- Create a plain parent/child hierarchy, select its root and **Create prefab**. Instantiate it and confirm both entities and their relationship appear.
+- **Unpack instance** should preserve appearance but stop inheritance. Deleting/reparenting linked children should require unpacking; deleting a whole instance should work and Undo should restore it.
 
-Expected: cycles and invalid transforms report errors without half-applying a change. Physics entities with shear or zero scale are rejected at Play; test arbitrary affine hierarchy edits on plain entities first.
+## 4. Animation and sound
 
-## 4. Persistence and scenes
+- Play, then click the game viewport. Move with A/D or arrows; jump with Space.
+- At rest, the player alternates between two warm-colored frames. While moving, it alternates faster between two blue frames. Stopping returns to the resting state. Jumping plays a short tone through its AudioSource.
+- Pause: movement, animation and sound freeze. Step advances one simulation interval; sound stays suspended until Resume. Stop restores authored positions/properties. Repeat Play/Stop and check for duplicate audio or leftover movement.
+- Stop. Under Assets/Animations, select a clip and **Edit animation**. Reorder frames, change duration/FPS, loop and speed. Save and Play again.
+- Edit the Animator controller. Inspect initial state, named states, bool parameter `moving` and both transition rules. Change a state clip or condition, save and verify the result. Invalid state/clip/parameter references should fail rather than save silently.
+- Create your own clip with **+ Animation clip**, then **+ Animator**. Select a Sprite Renderer entity and **Attach media** with the controller selected.
+- Import your own WAV/MP3/OGG, attach it, enable Play on awake and looping. Test volume, playback rate and the Music bus. In **Mixer**, mute Music: only that bus should mute; Master should mute everything. Add a custom bus and assign it to the source.
 
-- Create a second scene, add/rename entities, and add an Author note component. Edit the note, reset it, remove it, Undo and Redo.
-- Rename the scene, duplicate it, delete the duplicate and Undo. Switch back to the first scene and verify its data remains intact.
-- Save while the second scene is active. Reload the page, click Open and select the project.
-- The same project and active scene should reopen with matching entities, parents, properties and assets.
-- Export JSON, create a fresh project, then import the exported file. Check the scene again.
+Expected: gamepad and real audio-device/codec behavior require your hardware. The workshop's animation and audio are ordinary project data and script calls, not engine special cases.
 
-Expected: Save clears the unsaved indicator only on success. New projects do not erase other saved projects. Browser storage is local to its origin; exported JSON is your portable backup.
+## 5. Standalone game build
 
-## 5. Rendering and asset references
+- Stop Play; set the desired startup scene. Click **Build ZIP**. Expect a successful Console result and a downloaded ZIP.
+- Click **Preview build**, allow its popup if needed and click Start. Test movement, animation, jumping sound, collisions and the trigger. Hide the tab and return: Resume should be offered.
+- Extract the downloaded ZIP to an empty directory and serve it independently, or upload the entire directory to static hosting. Test it with the ProtoMake editor closed. Test a subdirectory URL as well as a root URL.
+- The download must contain index.html, assets/, scripts/, scripts.json, project.protomake.json, BUILD-REPORT.json and DEPLOY.txt. No npm install should be required on the game host.
+- To test the bundled example locally, run `npm run preview:game` from the repository and open the printed URL. This serves only `examples/milestones-5-7/web-build/`.
+- Break a script's syntax or remove a required asset in a copied project and build: expect a clear error before a ZIP is created. Restore the project afterward.
 
-- Import `Images/Actor.png` and `Images/Tile.png` from the example folder into a **new project** (so their paths do not collide with existing assets).
-- Select each asset and use **Place sprite**. Import one of your own PNG/JPEG/WebP files too.
-- Change sprite width/height, tint, opacity, flipX/flipY and anchorX/anchorY. Overlap sprites and change layer/order: higher values should appear in front. Clicking overlaps should select the visually topmost sprite.
-- Select an asset, choose **Move / rename**, and move it to another relative Assets path. Existing sprites must retain it.
-- Try deleting a referenced asset. The editor should report which entity uses it. Delete an unreferenced asset and confirm it is removed.
-- Add Camera 2D to an entity, change its zoom/background/viewport and press Play. Camera zoom controls the game view independently of editor navigation.
+## 6. Regression and report
 
-Expected: image files decode, persist and render in both Scene and Play. Missing/incompatible references are errors, not silently dropped content.
+Briefly check multi-selection, move/rotate/scale, undo/redo, save/reopen, JSON round trip, physics debug, input focus loss and Play isolation.
 
-## 6. Physics and input configuration
-
-- In the example select Player and vary gravityScale, damping and velocity defaults. Stop/Edit/Play between changes.
-- Change a collider to a sensor and verify it reports contact without blocking. In a test scene try Circle Collider and Capsule Collider on uniformly scaled entities.
-- Open Settings. Temporarily change gravity Y to zero. Play: the player should no longer fall under gravity.
-- Restore gravity. Disable the **Actors ↔ World** pair in the collision matrix. Play: the player should pass through World-layer platforms. Restore it afterward.
-- In input definitions change Jump's `Space` binding to `KeyJ`. Play: J should jump and Space should stop jumping. Undo settings or restore Space.
-- If you have a gamepad, test its left stick and bottom face button. This needs your hardware; the automated gamepad test uses a synthetic device state.
-
-Expected: the two halves of the matrix update together; undefined layers, duplicate action names and unknown bindings are rejected.
-
-## 7. Create your own script
-
-- Create/select a plain entity and add Sprite Renderer. Keep its texture empty for a visible tinted rectangle.
-- Click **Scripts**, leave New script selected and give it a new path such as `Assets/Scripts/MyMover.ts`.
-- Compile and Save the provided MovingPlatform template. Then **Attach to selection** and Close.
-- In Inspector edit `speed` and `distance`. Play: the rectangle should move. Stop: it should return to its authored transform.
-- Reopen the script, change its motion, Save and Play again. The changed source should be compiled afresh.
-- Test a completely different behavior: create another script from `examples/physics-playground/Scripts/Pulse.ts` under a new path and attach it to another sprite. Both behaviors must work without editing packages/.
-- For an error check, remove a closing brace and press Compile. Expect a source-specific diagnostic. Restore it. Then temporarily throw `new Error('Acceptance test')` inside update, Save and Play. Expect a contextual runtime error and stopped/faulted execution. Stop, remove the throw and retry.
-- On the example's Trigger entity, change the exposed `target` entity reference and check the chosen sprite receives the tint.
-
-Expected: fields come from static `export const fields` metadata. Script source is project data. Stop/Edit/Play is the supported rebuild loop; there is no state-preserving hot reload yet.
-
-## Send back
-
-For each failed check, send:
-
-- The numbered section and shortest reproduction steps.
-- What you expected and what happened.
-- A screenshot plus the editor Console message (and browser Console if the editor did not start).
-- Browser/OS, and whether `npm run dev` or `npm run preview` was used.
-- Your exported `.protomake.json` if the problem depends on the project.
-
-If all sections pass, the next work is Milestone 5 (prefabs), followed by 6 (animation/audio), then 7 (creator-game web export).
+For any failure send the numbered check, shortest reproduction, expected vs actual result, Console text/screenshot, browser/OS, and exported project if relevant. Distinguish editor Play, Preview build and independently hosted game. Milestone implementation is not a substitute for this manual acceptance run.

@@ -1,6 +1,15 @@
 import { readdir, readFile } from 'node:fs/promises';
 const allowed = {
   core: [],
+  prefabs: ['@protomake/core', 'zod'],
+  animation: [
+    '@protomake/core',
+    '@protomake/assets',
+    '@protomake/runtime',
+    '@protomake/renderer',
+    'zod',
+  ],
+  audio: ['@protomake/core', '@protomake/assets', '@protomake/runtime', 'zod'],
   scripting: [
     '@protomake/core',
     '@protomake/runtime',
@@ -20,6 +29,9 @@ const allowed = {
   assets: ['@protomake/core', 'zod'],
   renderer: ['@protomake/core', '@protomake/assets', 'zod', 'pixi.js'],
   serialization: [
+    '@protomake/prefabs',
+    '@protomake/animation',
+    '@protomake/audio',
     '@protomake/core',
     '@protomake/assets',
     '@protomake/physics2d',
@@ -27,7 +39,24 @@ const allowed = {
     'zod',
   ],
   runtime: ['@protomake/core'],
+  player: [
+    '@protomake/core',
+    '@protomake/serialization',
+    '@protomake/runtime',
+    '@protomake/renderer',
+    '@protomake/physics2d',
+    '@protomake/input',
+    '@protomake/scripting',
+    '@protomake/prefabs',
+    '@protomake/animation',
+    '@protomake/audio',
+    '@protomake/assets',
+  ],
   editor: [
+    '@protomake/player',
+    '@protomake/prefabs',
+    '@protomake/animation',
+    '@protomake/audio',
     '@protomake/core',
     '@protomake/serialization',
     '@protomake/runtime',

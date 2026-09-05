@@ -1,36 +1,25 @@
-import { Physics2D } from '@protomake/physics2d/rapier';
-import { InputService } from '@protomake/input';
+import { runtimeRegistry } from '@protomake/player';
+import { GameSession } from '@protomake/player/session';
 import {
-  instantiateScene,
   validateProject,
   type ProjectData,
   type SceneData,
 } from '@protomake/serialization';
-import { Engine } from '@protomake/runtime';
-import { PixiRenderer } from '@protomake/renderer/pixi';
-import {
-  ScriptSystem,
-  type ScriptModule,
-  type ScriptFields,
-} from '@protomake/scripting';
+import type { ScriptModule, ScriptFields } from '@protomake/scripting';
 import {
   compileProjectScripts,
   moduleSources,
 } from '@protomake/scripting/compiler';
-import { editorRegistry } from './model';
 const token = location.hash.slice(1),
   status = document.getElementById('status')!,
   host = document.getElementById('game')!;
-let engine: Engine | undefined,
-  renderer: PixiRenderer | undefined,
-  physics: Physics2D | undefined,
-  input: InputService | undefined,
+let session: GameSession | undefined,
   project: ProjectData | undefined,
   last = performance.now(),
   loading = false,
   debug = false,
   pendingScene: string | undefined;
-let urls: Map<string, string> = new Map();
+let urls = new Map<string, string>();
 document.body.style.cssText =
   'margin:0;background:#10161d;color:#dce5ed;font:11px system-ui;overflow:hidden';
 status.style.cssText =
@@ -42,20 +31,25 @@ function report(error: unknown): void {
   send('error', String(error));
   status.textContent = String(error);
 }
+function fault(error: unknown): void {
+  report(error);
+  try {
+    session?.destroy();
+  } catch (e) {
+    report(e);
+  }
+  session = undefined;
+  send('faulted');
+}
 async function loadScene(scene: SceneData): Promise<void> {
-  if (!project) throw new Error('No loaded project');
+  if (!project) throw new Error('No project');
   loading = true;
   try {
-    engine?.stop();
-    engine = undefined;
-    input?.detach();
-    physics?.destroy();
-    renderer?.destroy();
+    session?.destroy();
+    session = undefined;
     for (const url of urls.values()) URL.revokeObjectURL(url);
     urls.clear();
-    const registry = editorRegistry(),
-      loaded = instantiateScene(scene, registry),
-      canvas = document.createElement('canvas');
+    const canvas = document.createElement('canvas');
     host.replaceChildren(canvas);
     const compiled = compileProjectScripts(project.assets);
     urls = moduleSources(compiled, (code) =>
@@ -70,16 +64,10 @@ async function loadScene(scene: SceneData): Promise<void> {
     const fields = new Map<string, ScriptFields>(
       compiled.map((s) => [s.id, s.fields]),
     );
-    renderer = await PixiRenderer.create(canvas);
-    await renderer.setAssets(project.assets);
-    renderer.resize(innerWidth, innerHeight);
-    physics = await Physics2D.create(loaded.world, project.physics);
-    input = new InputService(project.input);
-    input.attach(window);
-    const scripts = new ScriptSystem(
-      loaded.world,
-      input,
-      physics,
+    session = await GameSession.create(
+      canvas,
+      project,
+      scene,
       modules,
       fields,
       (message) => send('log', message),
@@ -87,20 +75,9 @@ async function loadScene(scene: SceneData): Promise<void> {
         pendingScene = id;
       },
     );
-    engine = new Engine(loaded.world);
-    // Reverse shutdown must destroy behaviours before freeing the physics service they may use.
-    engine.addSystem({
-      id: 'physics-lifetime',
-      stop: () => physics?.destroy(),
-    });
-    engine.addSystem(scripts);
-    engine.addSystem({
-      id: 'physics-step',
-      fixedUpdate: (context) => physics!.fixedUpdate(context),
-    });
-    engine.start();
+    session.resize(innerWidth, innerHeight);
     last = performance.now();
-    status.textContent = `${scene.name} · click the game to focus input`;
+    status.textContent = `${scene.name} · click game to focus input and enable sound`;
     send('loaded');
   } finally {
     loading = false;
@@ -123,78 +100,51 @@ window.addEventListener('message', (event) => {
     };
     if (data.kind === 'load') {
       if (loading) return;
-      project = validateProject(data.project, editorRegistry());
+      project = validateProject(data.project, runtimeRegistry());
       const scene = project.scenes.find((s) => s.id === data.scene?.id);
-      if (!scene) throw new Error('Play scene missing from project');
+      if (!scene) throw new Error('Play scene missing');
       await loadScene(scene);
-    } else if (data.kind === 'debug') {
-      debug = Boolean(data.enabled);
-      if (!debug)
-        renderer?.setDebugLines(new Float32Array(), new Float32Array());
-    } else if (data.kind === 'pause') {
-      engine?.pause();
-      input?.clear();
-    } else if (data.kind === 'resume') {
+    } else if (data.kind === 'debug') debug = Boolean(data.enabled);
+    else if (data.kind === 'pause') await session?.pause();
+    else if (data.kind === 'resume') {
       last = performance.now();
-      engine?.resume();
-    } else if (data.kind === 'step') {
-      input?.sample(navigator.getGamepads?.() ?? []);
-      engine?.step();
-      input?.endFrame();
-    }
+      await session?.resume();
+    } else if (data.kind === 'step') session?.step();
   })().catch(fault);
 });
-function fault(error: unknown): void {
-  report(error);
-  try {
-    engine?.stop();
-  } catch (cleanup) {
-    report(cleanup);
-  }
-  send('faulted');
-}
-window.addEventListener('error', (event) =>
-  report(`${event.filename}:${event.lineno} ${event.message}`),
+window.addEventListener('error', (e) =>
+  report(`${e.filename}:${e.lineno} ${e.message}`),
 );
-window.addEventListener('unhandledrejection', (event) => report(event.reason));
+window.addEventListener('unhandledrejection', (e) => report(e.reason));
 window.addEventListener('resize', () =>
-  renderer?.resize(innerWidth, innerHeight),
+  session?.resize(innerWidth, innerHeight),
 );
+window.addEventListener('pointerdown', () => {
+  if (session?.engine.state === 'running')
+    void session.audio.unlock().catch(fault);
+});
+window.addEventListener('pagehide', () => session?.destroy());
 for (const level of ['log', 'warn', 'error'] as const) {
   const original = console[level].bind(console);
   console[level] = (...values: unknown[]) => {
     original(...values);
-    send(
-      level === 'error' ? 'error' : 'log',
-      values.map((v) => String(v)).join(' '),
-    );
+    send(level === 'error' ? 'error' : 'log', values.map(String).join(' '));
   };
 }
 function frame(now: number): void {
   try {
     if (!loading) {
-      if (engine?.state === 'running') {
-        input?.sample(navigator.getGamepads?.() ?? []);
-        engine.tick((now - last) / 1000);
-        input?.endFrame();
-      }
-      if (debug && physics && engine && engine.state !== 'stopped') {
-        const lines = physics.debug();
-        renderer?.setDebugLines(lines.vertices, lines.colors);
-      }
-      if (engine) renderer?.render(engine.world);
+      session?.tick((now - last) / 1000, debug);
       if (pendingScene && project) {
-        const request = pendingScene;
+        const id = pendingScene;
         pendingScene = undefined;
-        const scene = project.scenes.find(
-          (s) => s.id === request || s.name === request,
-        );
-        if (!scene) throw new Error(`Missing scene ${request}`);
+        const scene = project.scenes.find((s) => s.id === id || s.name === id);
+        if (!scene) throw new Error(`Missing scene ${id}`);
         void loadScene(scene).catch(fault);
       }
     }
-  } catch (error) {
-    fault(error);
+  } catch (e) {
+    fault(e);
   }
   last = now;
   requestAnimationFrame(frame);
