@@ -1,3 +1,10 @@
+import { editMedia } from './media-editor';
+import {
+  Animator,
+  CONTROLLER_MIME,
+  CLIP_MIME,
+  AnimatorControllerSchema,
+} from '@protomake/animation';
 import { PrefabLink } from '@protomake/prefabs';
 import {
   revertPrefab,
@@ -113,6 +120,33 @@ export class Inspector {
           button('Remove', () => this.run(() => model.removeComponent(type))),
         );
       section.append(header);
+      if (type === Animator.type) {
+        const controller = model.project.assets.find(
+          (a) =>
+            a.id === getPath(data, 'controller') && a.mime === CONTROLLER_MIME,
+        );
+        if (controller) {
+          section.append(
+            button('Edit controller', () =>
+              this.run(() => editMedia(model, CONTROLLER_MIME, controller.id)),
+            ),
+          );
+          const clips = new Set(
+            AnimatorControllerSchema.parse(
+              JSON.parse(controller.data),
+            ).states.map((s) => s.clip),
+          );
+          for (const id of clips) {
+            const asset = model.project.assets.find((a) => a.id === id);
+            if (asset)
+              section.append(
+                button(`Edit clip: ${asset.path.split('/').at(-1)}`, () =>
+                  this.run(() => editMedia(model, CLIP_MIME, id)),
+                ),
+              );
+          }
+        }
+      }
       const inspectorFields = [...definition.inspector];
       if (type === ScriptBehaviour.type) {
         const script = model.project.assets.find(
@@ -195,6 +229,9 @@ export class Inspector {
                 : 'text',
         );
         if (field.kind === 'number') control.input.step = 'any';
+        if (field.path === 'restitution')
+          control.input.title =
+            '0 absorbs bounce; 1 is elastic. Values above 1 add energy.';
         if (field.kind === 'boolean') control.input.checked = Boolean(value);
         control.input.onchange = () =>
           this.run(() =>

@@ -30,3 +30,11 @@ The delivery archive includes a generated example at `examples/milestones-5-7/we
 Collection deliberately retains **all** project scenes and assets because scripts may address them dynamically. This is conservative dependency collection, not an unused-asset optimizer. Builds can be larger than necessary. No minification/obfuscation of project script modules or source maps are offered yet; the engine/player bundle is production-minified.
 
 The player and editor Play share GameSession service composition. On hidden tabs, standalone gameplay pauses and presents Resume. Arbitrary user scripts are trusted code: the runtime cannot recover from infinite loops or safely execute malicious projects. Full semantic checking of project scripts remains the external TypeScript editor/tsc's responsibility.
+
+## Startup patch
+
+The original 0.7 export could deadlock: its entry module awaited startup while a dynamically loaded Pixi renderer imported shared exports from that same entry. Startup now runs inside an async function without blocking module evaluation. Production builds reject top-level await in player chunks to prevent this regression.
+
+The loading screen now has a spinner, current stage and elapsed seconds, and keeps Start hidden until initialization completes. Individual asynchronous stages time out after 30 seconds; an independent HTML watchdog reports a 35-second stall even if the engine module never starts. Errors provide Reload. These indicators cannot recover a main thread blocked by an infinite user script.
+
+Rebuild previously exported games with the patched editor. The bundled web-build example has already been rebuilt. Fully stop the old development server before starting this archive; do not mix files from old and new exports.

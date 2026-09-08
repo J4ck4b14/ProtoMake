@@ -260,9 +260,20 @@ export class AssetsPanel {
       .sort((a, b) => a.path.localeCompare(b.path))) {
       const b = button(asset.path.split('/').at(-1)!, () => {
         this.selected = asset.id;
-        this.render();
+        for (const row of list.querySelectorAll('button'))
+          row.classList.remove('selected');
+        b.classList.add('selected');
       });
-      b.title = asset.path;
+      b.ondblclick = () =>
+        this.run(() => {
+          if (asset.mime === CLIP_MIME || asset.mime === CONTROLLER_MIME)
+            editMedia(this.model, asset.mime, asset.id);
+        });
+      b.title =
+        asset.path +
+        ([CLIP_MIME, CONTROLLER_MIME].includes(asset.mime)
+          ? ' · Double-click to edit'
+          : '');
       b.draggable = !this.model.locked;
       b.ondragstart = (e) =>
         e.dataTransfer?.setData('application/x-protomake-asset', asset.id);

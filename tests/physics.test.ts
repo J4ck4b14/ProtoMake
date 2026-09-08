@@ -149,3 +149,29 @@ it('rejects unknown physical bindings and samples a connected gamepad', () => {
   expect(input.getAxis('Move')).toBeGreaterThan(0.4);
   expect(input.wasPressed('Jump')).toBe(true);
 });
+
+it('supports energy-adding restitution above one in the actual physics simulation', async () => {
+  const e = new EditorModel();
+  const player = body(e, 'Bouncer', 0, 0);
+  const floor = body(e, 'Floor', 0, 160, 'static');
+  for (const id of [player, floor])
+    e.world.set(e.entity(id), BoxCollider2D.type, {
+      ...e.world.read(e.entity(id), BoxCollider2D)!,
+      restitution: 1.5,
+    });
+  const physics = await Physics2D.create(e.world, defaultPhysics());
+  try {
+    let bounced = false;
+    let peak = 0;
+    for (let i = 0; i < 100; i++) {
+      physics.step(1 / 60);
+      if (physics.velocity(player)[1] < 0) bounced = true;
+      if (bounced)
+        peak = Math.min(peak, e.world.worldPosition(e.entity(player))[1]);
+    }
+    expect(bounced).toBe(true);
+    expect(peak).toBeLessThan(-40);
+  } finally {
+    physics.destroy();
+  }
+});

@@ -10,6 +10,43 @@ const result = await build({
   resolve: config.config.resolve,
   base: './',
   publicDir: false,
+  plugins: [
+    {
+      name: 'prevent-player-startup-deadlock',
+      generateBundle(_options, bundle) {
+        const hasTopLevelAwait = (node) => {
+          if (!node || typeof node !== 'object') return false;
+          if (
+            [
+              'FunctionDeclaration',
+              'FunctionExpression',
+              'ArrowFunctionExpression',
+            ].includes(node.type)
+          )
+            return false;
+          if (
+            node.type === 'AwaitExpression' ||
+            (node.type === 'ForOfStatement' && node.await)
+          )
+            return true;
+          return Object.values(node).some((value) =>
+            Array.isArray(value)
+              ? value.some(hasTopLevelAwait)
+              : hasTopLevelAwait(value),
+          );
+        };
+        for (const chunk of Object.values(bundle)) {
+          if (
+            chunk.type === 'chunk' &&
+            hasTopLevelAwait(this.parse(chunk.code))
+          )
+            this.error(
+              `Top-level await can deadlock the player renderer: ${chunk.fileName}`,
+            );
+        }
+      },
+    },
+  ],
   build: {
     outDir: 'public/player',
     emptyOutDir: true,

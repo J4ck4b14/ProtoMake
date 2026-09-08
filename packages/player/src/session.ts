@@ -1,3 +1,4 @@
+import { loadStage } from './loading';
 import { Engine } from '@protomake/runtime';
 import { Physics2D } from '@protomake/physics2d/rapier';
 import { InputService } from '@protomake/input';
@@ -32,6 +33,7 @@ export class GameSession {
     fields: ReadonlyMap<string, ScriptFields>,
     log: (message: string) => void,
     loadScene: (id: string) => void,
+    progress: (stage: string) => void = () => {},
   ): Promise<GameSession> {
     const { world } = instantiateScene(scene, runtimeRegistry());
     let renderer: PixiRenderer | undefined,
@@ -40,13 +42,33 @@ export class GameSession {
       input: InputService | undefined,
       engine: Engine | undefined;
     try {
-      renderer = await PixiRenderer.create(canvas);
-      await renderer.setAssets(project.assets);
-      physics = await Physics2D.create(world, project.physics);
+      renderer = await loadStage(
+        'Starting graphics',
+        () => PixiRenderer.create(canvas),
+        progress,
+        (value) => value.destroy(),
+      );
+      const graphics = renderer;
+      await loadStage(
+        'Loading images',
+        () => graphics.setAssets(project.assets),
+        progress,
+      );
+      physics = await loadStage(
+        'Starting physics',
+        () => Physics2D.create(world, project.physics),
+        progress,
+        (value) => value.destroy(),
+      );
       input = new InputService(project.input);
       input.attach(window);
       const animation = new AnimationSystem(world, project.assets);
-      audio = await AudioSystem.create(world, project.assets, project.mixer);
+      audio = await loadStage(
+        'Decoding audio',
+        () => AudioSystem.create(world, project.assets, project.mixer),
+        progress,
+        (value) => value.stop(),
+      );
       engine = new Engine(world);
       const physicsService = physics;
       engine.addSystem({
@@ -72,6 +94,7 @@ export class GameSession {
         fixedUpdate: (context) => physicsService.fixedUpdate(context),
       });
       const session = new GameSession(engine, renderer, physics, input, audio);
+      progress('Starting scene');
       engine.start();
       return session;
     } catch (error) {

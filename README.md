@@ -1,8 +1,8 @@
-# ProtoMake 0.7.0
+# ProtoMake 0.7.0 — preview and authoring patch
 
 A reusable, browser-native 2D engine and visual editor for human-authored projects.
 
-**Milestones 0–7 are implemented; the new 5–7 work is ready for hands-on acceptance.** This is a development checkpoint, not a finished general-purpose engine release.
+**Milestones 0–7 are implemented.** This patch addresses the reported standalone startup hang and animation editing discoverability. This is a development checkpoint, not a finished general-purpose engine release.
 
 ## Start here
 
@@ -52,7 +52,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 90 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking and input feel remain part of the browser acceptance checklist.
+The suite includes 95 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking and input feel remain part of the browser acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 

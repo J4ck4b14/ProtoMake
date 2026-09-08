@@ -6,6 +6,8 @@ Import images, then **+ Animation clip** in Assets. Add/remove/reorder frames, c
 
 Create **+ Animator** after at least one clip exists. Its form edits named states, clip choices, state speed, initial state, parameters and transitions. State names are project data. A single-state Animator is also the basic clip player. Select a controller asset and **Attach media** to a selected entity with a Sprite Renderer; or add Animator in the Inspector and choose its controller.
 
+**Reopen and edit:** double-click an existing clip or Animator in Assets, or select it and choose **Edit animation**. The Animator section in the entity Inspector also provides **Edit controller** and **Edit clip** shortcuts. Saving updates the same asset ID, preserving references; Undo restores the previous edit. Stop Play before authoring.
+
 Parameters support bool, float, int and trigger. Transition conditions are ANDed. Rules are evaluated in authored order; the first matching rule wins, at most once per rendered engine update. `Any state` matches every state. Blank exit time allows an immediate transition; a numeric value waits for that many clip cycles. Referenced triggers are consumed only by a taken transition. Transitions cut to the first frame of their destination. There is no cross-fade/blend tree, skeletal animation, atlas slicing or timeline editor in this checkpoint.
 
 The effective speed is Animator × state × clip speed. Disabling the entity suspends its animation; re-enabling retains playback state. Stop destroys runtime playback state. Animations run after script update, so a parameter written by a script can affect that frame.

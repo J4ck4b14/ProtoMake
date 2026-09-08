@@ -55,3 +55,11 @@ Expected: gamepad and real audio-device/codec behavior require your hardware. Th
 Briefly check multi-selection, move/rotate/scale, undo/redo, save/reopen, JSON round trip, physics debug, input focus loss and Play isolation.
 
 For any failure send the numbered check, shortest reproduction, expected vs actual result, Console text/screenshot, browser/OS, and exported project if relevant. Distinguish editor Play, Preview build and independently hosted game. Milestone implementation is not a substitute for this manual acceptance run.
+
+## Preview and authoring patch acceptance
+
+- Run `npm run preview:game` and open the printed URL. Loading should advance through stages, then show the project title and Start. Start should enter the game; check movement, jumping, animation and sound. Changing tabs should offer Resume.
+- In the editor import the Workshop JSON, choose Preview build and repeat. Also extract a fresh Build ZIP and serve it over HTTP. Old exports do not receive this patch automatically.
+- Double-click an existing animation clip in Assets, change frame durations and save. Reopen it to check persistence, then Undo and check playback. Repeat for an Animator state or transition. Verify the entity's Animator Inspector shortcuts open its existing controller and clips.
+- Set both a dynamic collider and its floor to restitution 1.5. The bounce should gain height. Restore ordinary values afterwards. Finite, nonnegative values remain required.
+- If startup still fails, send the displayed stage/error, browser/version, and the first red browser Console message. Spinner motion proves only that the UI is responsive; stage text and timeout reveal loading progress or a stall.

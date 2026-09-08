@@ -16,9 +16,12 @@ export function editMedia(
   mime: typeof CLIP_MIME | typeof CONTROLLER_MIME,
   id?: string,
 ): void {
+  if (model.locked)
+    throw new Error('Stop Play before editing animation assets');
   const asset = model.project.assets.find(
     (a) => a.id === id && a.mime === mime,
   );
+  if (id && !asset) throw new Error('Animation asset no longer exists');
   const images = model.project.assets.filter((a) => a.kind === 'image');
   const clips = model.project.assets.filter((a) => a.mime === CLIP_MIME);
   if (!asset && mime === CLIP_MIME && !images.length)

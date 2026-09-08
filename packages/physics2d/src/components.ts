@@ -58,7 +58,7 @@ const common = {
   offsetY: finite,
   sensor: z.boolean(),
   friction: finite.nonnegative(),
-  restitution: finite.min(0).max(1),
+  restitution: finite.nonnegative(),
   layer: z.number().int().min(0).max(15),
 };
 const commonDefaults = {

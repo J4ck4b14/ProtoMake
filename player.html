@@ -35,6 +35,37 @@
         color: #17212b;
         cursor: pointer;
       }
+      [hidden] {
+        display: none !important;
+      }
+      #spinner {
+        width: 28px;
+        height: 28px;
+        border: 3px solid #405160;
+        border-top-color: #f3ac66;
+        border-radius: 50%;
+        margin: 0 auto;
+        animation: spin 0.85s linear infinite;
+      }
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        #spinner {
+          animation: none;
+        }
+      }
+      #detail {
+        font-size: 12px;
+        color: #aebdcc;
+        max-width: 80vw;
+      }
+      button:disabled {
+        opacity: 0.45;
+        cursor: wait;
+      }
       #status {
         max-width: 80vw;
         white-space: pre-wrap;
@@ -43,10 +74,84 @@
   </head>
   <body>
     <main id="game"></main>
-    <section id="overlay">
-      <p id="status">Loading…</p>
-      <button id="start" disabled>Start</button>
+    <section id="overlay" aria-busy="true">
+      <div id="spinner" aria-hidden="true"></div>
+      <p id="status" role="status" aria-live="polite">Loading engine…</p>
+      <p id="detail">Preparing the player</p>
+      <button id="start" hidden disabled>Start</button>
+      <button id="retry" hidden>Reload</button>
     </section>
+    <script>
+      // Runs independently of the ES module graph, including when its download fails.
+      (() => {
+        const overlay = document.getElementById('overlay'),
+          status = document.getElementById('status'),
+          detail = document.getElementById('detail'),
+          spinner = document.getElementById('spinner'),
+          start = document.getElementById('start'),
+          retry = document.getElementById('retry');
+        let stage = 'Loading engine',
+          since = Date.now(),
+          busy = true,
+          failed = false;
+        const showError = (message) => {
+          failed = true;
+          busy = false;
+          overlay.hidden = false;
+          overlay.setAttribute('aria-busy', 'false');
+          spinner.hidden = true;
+          start.hidden = true;
+          retry.hidden = false;
+          status.textContent = 'Unable to start';
+          detail.textContent = message;
+        };
+        retry.onclick = () => location.reload();
+        window.addEventListener('protomake:loading', (event) => {
+          const data = event.detail;
+          if (data.phase === 'error') {
+            showError(data.stage);
+            return;
+          }
+          if (failed) return;
+          busy = data.phase === 'loading';
+          since = Date.now();
+          stage = data.stage;
+          overlay.setAttribute('aria-busy', String(busy));
+          spinner.hidden = !busy;
+          start.hidden = busy;
+          status.textContent = stage + (busy ? '…' : '');
+          detail.textContent = busy ? 'Working…' : 'Ready to play';
+        });
+        window.addEventListener(
+          'error',
+          (event) => {
+            if (busy)
+              showError(
+                event.message ||
+                  'A player file could not be loaded. Check that the entire export is served over HTTP(S).',
+              );
+          },
+          true,
+        );
+        setInterval(() => {
+          if (!busy) return;
+          const seconds = Math.floor((Date.now() - since) / 1000);
+          detail.textContent = seconds + ' s at this stage';
+          if (seconds >= 35) {
+            showError(
+              'Timed out: ' +
+                stage +
+                '. Reload to retry. If it repeats, send this stage and the browser Console error.',
+            );
+            window.dispatchEvent(
+              new CustomEvent('protomake:startup-timeout', {
+                detail: detail.textContent,
+              }),
+            );
+          }
+        }, 1000);
+      })();
+    </script>
     <script type="module" src="/packages/player/src/main.ts"></script>
   </body>
 </html>
