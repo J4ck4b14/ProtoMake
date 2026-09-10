@@ -1,9 +1,7 @@
-# Follow-up requests
+# Completion scope
 
-This patch fixes preview startup and improves access to existing animation assets. The Animator remains a form-based state machine; a visual state graph and richer animation timeline/preview require a separate authoring pass.
+ProtoMake 0.8 includes the accepted startup patch, animation playback and scrub controls, a proportional frame timeline, an automatically laid out state graph with connections and transition priority controls, and ambient/point/spot/rectangular area lights with per-sprite shading. Existing media can be reopened and edited without changing asset identity. Removing a state cleans its transitions; removing a parameter removes affected transitions instead of silently making them unconditional.
 
-Lighting is requested but not implemented: ambient, point, spot and rectangular/area lights, with controls for color, intensity, range, falloff, orientation and cone/area size as applicable. Renderer/material support and shadow behavior need design before exposing components.
+The release includes editable shooter, platformer and two-player local fighting projects, standalone builds, raw assets/scripts and the three-prototype workshop. See `examples/prototypes/README.md` and `docs/ProtoMake-Prototype-Workshop.docx`.
 
-Restitution now accepts finite values above one for deliberately energy-adding arcade bounces. Other constraints remain; review them individually according to runtime support rather than removing validation globally.
-
-After the polishing pass is accepted, prepare a workshop document for three prototypes: a shooter, a platformer and a fighting game. Use the verified editor workflow, include assets and project scripts, explain inputs/scenes/prefabs/animation/audio/physics, and provide intermediate checks plus export instructions. This is a requested future deliverable, not a completed tutorial.
+The scope remains a reusable 2D web engine development release. Lighting does not include shadows or normal maps; the Animator is a sprite state machine with cut transitions, not skeletal animation or blend trees. Its graph layout is automatic, not freely draggable. The fighter is local two-player only. Online play, gamepad controls for these new prototypes, persistent game saves and mobile touch controls are outside this release. Engine project saves remain supported.

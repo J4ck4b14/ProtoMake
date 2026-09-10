@@ -556,3 +556,71 @@ header {
   border: 1px solid #405160;
   margin-bottom: 8px;
 }
+
+.clip-preview {
+  display: grid;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+.clip-preview > img {
+  width: 144px;
+  height: 144px;
+  object-fit: contain;
+  image-rendering: pixelated;
+  background: repeating-conic-gradient(#26313d 0% 25%, #19212b 0% 50%) 50% /
+    20px 20px;
+}
+.frame-timeline {
+  display: flex;
+  gap: 3px;
+  min-height: 36px;
+  overflow: auto;
+}
+.frame-timeline button {
+  min-width: 30px;
+}
+.graph-states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.graph-state {
+  display: grid;
+  gap: 6px;
+  padding: 12px;
+  border: 1px solid #526271;
+  border-radius: 8px;
+}
+.graph-state.selected {
+  border-color: #f3ac66;
+}
+.graph-edges {
+  display: grid;
+  gap: 6px;
+  margin: 12px 0 24px;
+}
+.graph-edges button {
+  text-align: left;
+  white-space: normal;
+}
+
+.graph-states {
+  position: relative;
+  min-width: 660px;
+  display: block;
+}
+.graph-states > svg {
+  position: absolute;
+  inset: 0;
+  width: 660px;
+  height: 100%;
+}
+.graph-state {
+  position: absolute;
+  width: 180px;
+  padding: 8px;
+  background: #17212b;
+}
+.animator-graph {
+  overflow-x: auto;
+}

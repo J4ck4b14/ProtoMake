@@ -7,6 +7,7 @@ export default ts.config(
       'node_modules/**',
       'public/player/**',
       'examples/milestones-5-7/web-build/**',
+      'examples/prototypes/web/**',
     ],
   },
   js.configs.recommended,

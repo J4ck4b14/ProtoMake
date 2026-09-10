@@ -1,3 +1,7 @@
 node_modules
 dist
 package-lock.json
+
+public/player
+examples/milestones-5-7/web-build
+examples/prototypes/web

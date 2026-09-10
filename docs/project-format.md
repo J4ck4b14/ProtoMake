@@ -1,6 +1,6 @@
 # Project and scene formats
 
-The current project schema is **v4**; the scene schema remains **v1**. Engine release 0.7.0 is independent of these schema numbers.
+The current project schema is **v4**; the scene schema remains **v1**. Engine release 0.8.0 is independent of these schema numbers.
 
 | Project version | Added data                                                                           | Migration                              |
 | --------------- | ------------------------------------------------------------------------------------ | -------------------------------------- |
@@ -21,4 +21,6 @@ IndexedDB stores the complete project transactionally. The active editor scene i
 
 `examples/milestones-5-7/Workshop.protomake.json` is a complete current project. The previous physics-playground example remains a migration fixture. Its checked-in Images and Scripts directories also provide convenient individual files for import and editing. The JSON is the portable authored project; it is not generated engine geometry. `dist/` and node_modules are disposable and excluded from delivery.
 
-Milestone 5–7 migration: schema 3 → 4 adds `folders`, `sceneFolders` (scene GUID → folder path), and `mixer`. Existing v1–v3 projects migrate sequentially. Panel sizes are local preferences and never enter project JSON. Prefabs, AnimationClips and Animator controllers are typed text assets; AudioClips embed their imported bytes. Current engineVersion is 0.7.0.
+Milestone 5–7 migration: schema 3 → 4 adds `folders`, `sceneFolders` (scene GUID → folder path), and `mixer`. Existing v1–v3 projects migrate sequentially. Panel sizes are local preferences and never enter project JSON. Prefabs, AnimationClips and Animator controllers are typed text assets; AudioClips embed their imported bytes. Current engineVersion is 0.8.0.
+
+Release 0.8 adds the optional defaulted sprite `lit` field and registered `protomake.light` component. Existing projects without lights render as before. This does not change the enclosing project schema version.

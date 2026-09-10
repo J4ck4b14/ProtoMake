@@ -1,0 +1,9 @@
+# Sprite lighting
+
+Add **Light 2D** to an entity. Its type can be ambient, point, spot or area. Color and intensity apply to every type. Point lights use range and falloff; spots add inner/outer full cone angles in degrees; rectangular area lights use width and height plus range outside the rectangle. A spot faces local +X; rotate its Transform to aim it. Light size/range use world units and do not inherit Transform scale. Position and direction inherit the hierarchy.
+
+The renderer samples illumination at each sprite's visual center, multiplies its RGB tint by the sum of light contributions, and clamps channel gains to one. Point attenuation is `(1 - distance/range)^falloff` inside range and zero outside; spots additionally blend from inner to outer cone; area lights measure distance from the nearest point on their rotated rectangle. Ambient light has no distance attenuation. Intensity has no arbitrary upper cap, but this LDR tint model clips combined gains at one.
+
+This is flat, per-sprite 2D lighting. It does not provide per-pixel gradients on a single large sprite, normal maps, shadows, occlusion, HDR bloom or physically based area emission. Break a large surface into tiles when spatial variation is needed. The background color is not lit. Sprites with **lit** unchecked bypass lighting, useful for HUD and emissive signs. A scene with no active lights retains its original appearance; an active light with intensity zero still opts the scene into lighting. Add ambient fill before darkening a scene.
+
+Selected lights show a range/cone/rectangle outline in the scene viewport. The area outline shows the emitting rectangle, not its outer falloff. Editor, Play and export use the same illumination calculation. Light entities remain ordinary serialized entities and can be parented, duplicated or included in prefabs. Existing projects default sprite `lit` to true without changing their appearance when no lights exist.

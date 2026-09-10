@@ -10,8 +10,8 @@
     "@protomake/assets": "0.2.0",
     "@protomake/physics2d": "0.3.0",
     "@protomake/input": "0.3.0",
-    "@protomake/prefabs": "*",
-    "@protomake/animation": "*",
-    "@protomake/audio": "*"
+    "@protomake/prefabs": "0.6.0",
+    "@protomake/animation": "0.6.0",
+    "@protomake/audio": "0.6.0"
   }
 }

@@ -1,3 +1,5 @@
+import { clipPreview } from './animation-preview';
+import { animatorGraph } from './animator-graph';
 import {
   AnimationClipSchema,
   AnimatorControllerSchema,
@@ -52,7 +54,10 @@ export function animationEditor(
     clips = assets
       .filter((a) => a.mime === CLIP_MIME)
       .map((a) => ({ id: a.id, name: a.path }));
+  let stopPreview = () => {};
+  let selected = controller?.initial ?? '';
   function renderClip(c: AnimationClip): void {
+    stopPreview = clipPreview(body, c, assets);
     const name = input('Clip name', c.name),
       loop = input('Loop', '', 'checkbox');
     name.input.onchange = () => {
@@ -96,6 +101,7 @@ export function animationEditor(
         }),
         number('Seconds', frame.duration, (v) => {
           frame.duration = v;
+          render();
         }),
         button('↑', () => {
           if (i > 0) {
@@ -124,6 +130,28 @@ export function animationEditor(
     );
   }
   function renderController(c: AnimatorController): void {
+    animatorGraph(
+      body,
+      c,
+      selected,
+      (name) => {
+        selected = name;
+        render();
+        body
+          .querySelector(
+            `[data-state-index="${c.states.findIndex((s) => s.name === name)}"]`,
+          )
+          ?.scrollIntoView?.({ block: 'nearest' });
+      },
+      (i) =>
+        body
+          .querySelector(`[data-transition-index="${i}"]`)
+          ?.scrollIntoView?.({ block: 'nearest' }),
+      (from, to) => {
+        c.transitions.push({ from, to, exitTime: 1, conditions: [] });
+        render();
+      },
+    );
     const states = () => c.states.map((s) => ({ id: s.name, name: s.name }));
     body.append(
       select('Initial state', states(), c.initial, (v) => {
@@ -134,9 +162,22 @@ export function animationEditor(
     for (const [i, state] of c.states.entries()) {
       const row = node('div', 'animation-row'),
         name = input('State name', state.name);
+      row.dataset.stateIndex = String(i);
       name.input.onchange = () => {
+        const next = name.input.value.trim();
+        if (
+          !next ||
+          next === '*' ||
+          c.states.some((s) => s !== state && s.name === next)
+        ) {
+          error.textContent =
+            'Use a unique state name; * is reserved for Any state';
+          name.input.value = state.name;
+          return;
+        }
         const old = state.name;
-        state.name = name.input.value;
+        state.name = next;
+        if (selected === old) selected = next;
         if (c.initial === old) c.initial = state.name;
         for (const t of c.transitions) {
           if (t.from === old) t.from = state.name;
@@ -153,7 +194,16 @@ export function animationEditor(
           state.speed = v;
         }),
         button('Remove state', () => {
+          if (c.states.length === 1) {
+            error.textContent = 'Keep at least one state';
+            return;
+          }
+          c.transitions = c.transitions.filter(
+            (t) => t.from !== state.name && t.to !== state.name,
+          );
           c.states.splice(i, 1);
+          if (c.initial === state.name) c.initial = c.states[0]!.name;
+          if (selected === state.name) selected = c.initial;
           render();
         }),
       );
@@ -231,6 +281,9 @@ export function animationEditor(
       row.append(
         button('Remove parameter', () => {
           delete c.parameters[key];
+          c.transitions = c.transitions.filter(
+            (t) => !t.conditions.some((v) => v.parameter === key),
+          );
           render();
         }),
       );
@@ -253,6 +306,7 @@ export function animationEditor(
           t.exitTime === null ? '' : String(t.exitTime),
           'number',
         );
+      section.dataset.transitionIndex = String(i);
       exit.input.step = 'any';
       exit.input.onchange = () => {
         t.exitTime = exit.input.value === '' ? null : exit.input.valueAsNumber;
@@ -270,6 +324,24 @@ export function animationEditor(
           t.to = v;
         }),
         exit.row,
+        button('Earlier rule', () => {
+          if (i > 0) {
+            [c.transitions[i - 1], c.transitions[i]] = [
+              c.transitions[i]!,
+              c.transitions[i - 1]!,
+            ];
+            render();
+          }
+        }),
+        button('Later rule', () => {
+          if (i + 1 < c.transitions.length) {
+            [c.transitions[i + 1], c.transitions[i]] = [
+              c.transitions[i]!,
+              c.transitions[i + 1]!,
+            ];
+            render();
+          }
+        }),
         button('Remove transition', () => {
           c.transitions.splice(i, 1);
           render();
@@ -354,6 +426,7 @@ export function animationEditor(
     );
   }
   function render(): void {
+    stopPreview();
     body.replaceChildren();
     if (clip) renderClip(clip);
     if (controller) renderController(controller);
@@ -374,7 +447,10 @@ export function animationEditor(
     }),
     button('Cancel', () => dialog.close()),
   );
-  dialog.onclose = () => dialog.remove();
+  dialog.onclose = () => {
+    stopPreview();
+    dialog.remove();
+  };
   document.body.append(dialog);
   dialog.showModal();
 }

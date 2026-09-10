@@ -1,6 +1,6 @@
 {
   "name": "protomake",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
   "workspaces": [
@@ -22,7 +22,9 @@
     "build:player": "node scripts/build-player.mjs",
     "predev": "npm run build:player",
     "export:game": "node scripts/export-project.mjs",
-    "preview:game": "node scripts/preview-game.mjs"
+    "preview:game": "node scripts/preview-game.mjs",
+    "preview:prototypes": "node scripts/preview-game.mjs examples/prototypes/web 4180",
+    "examples:generate": "node scripts/create-prototypes.mjs"
   },
   "devDependencies": {
     "@eslint/js": "9.39.2",

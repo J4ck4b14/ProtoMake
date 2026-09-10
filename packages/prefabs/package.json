@@ -7,7 +7,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@protomake/core": "*",
+    "@protomake/core": "0.1.0",
     "zod": "4.3.6"
   }
 }

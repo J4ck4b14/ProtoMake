@@ -63,3 +63,11 @@ For any failure send the numbered check, shortest reproduction, expected vs actu
 - Double-click an existing animation clip in Assets, change frame durations and save. Reopen it to check persistence, then Undo and check playback. Repeat for an Animator state or transition. Verify the entity's Animator Inspector shortcuts open its existing controller and clips.
 - Set both a dynamic collider and its floor to restitution 1.5. The bounce should gain height. Restore ordinary values afterwards. Finite, nonnegative values remain required.
 - If startup still fails, send the displayed stage/error, browser/version, and the first red browser Console message. Spinner motion proves only that the UI is responsive; stage text and timeout reveal loading progress or a stall.
+
+## Complete release examples
+
+Run `npm run preview:prototypes` and use the launcher. Play all three through a result and restart. Fighter controls: Player 1 A/D, Space, F attack, G guard; Player 2 arrows, Up jump, K attack, L guard. R rematches. The fighter is two-player local only.
+
+Import each project's JSON to inspect and edit it. Scrub a clip, change a duration, connect states and reorder rules, then save/reopen and Undo. Change Ambient intensity and move/rotate a local light; verify editor Play and a rebuilt export show the same changes.
+
+See the workshop chapters for per-game success/failure checks. `tests/prototypes.test.ts` additionally completes the platformer with keyboard input only, so a reachable route is covered beyond isolated jump tests.

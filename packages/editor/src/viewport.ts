@@ -1,3 +1,4 @@
+import { Light2D } from '@protomake/renderer';
 import { compose, type Matrix2D } from '@protomake/core';
 import { EditorModel, pivotDelta } from './model';
 import { point, hitBox, bounds, snap, type Point } from './geometry';
@@ -417,6 +418,39 @@ export class SceneViewport {
           size.width,
           size.height,
         );
+      const light = this.model.world.read(entity.id, Light2D);
+      if (selected && light) {
+        // Light dimensions are world units, independent of inherited entity scale.
+        c.setTransform(ratio, 0, 0, ratio, 0, 0);
+        c.translate(...position);
+        c.rotate(Math.atan2(m[1], m[0]));
+        c.scale(this.zoom, this.zoom);
+        c.strokeStyle = light.color;
+        c.lineWidth = 1.5 / this.zoom;
+        c.setLineDash([5 / this.zoom, 4 / this.zoom]);
+        c.beginPath();
+        if (light.kind === 'area')
+          c.rect(
+            -light.width / 2,
+            -light.height / 2,
+            light.width,
+            light.height,
+          );
+        else if (light.kind === 'spot') {
+          const angle = (light.outerAngle * Math.PI) / 360;
+          c.moveTo(0, 0);
+          c.arc(0, 0, light.range, -angle, angle);
+          c.closePath();
+        } else
+          c.arc(
+            0,
+            0,
+            light.kind === 'ambient' ? 18 : light.range,
+            0,
+            Math.PI * 2,
+          );
+        c.stroke();
+      }
       c.restore();
       if (selected) {
         c.fillStyle = '#e3eaf0';

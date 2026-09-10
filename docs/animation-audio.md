@@ -8,7 +8,7 @@ Create **+ Animator** after at least one clip exists. Its form edits named state
 
 **Reopen and edit:** double-click an existing clip or Animator in Assets, or select it and choose **Edit animation**. The Animator section in the entity Inspector also provides **Edit controller** and **Edit clip** shortcuts. Saving updates the same asset ID, preserving references; Undo restores the previous edit. Stop Play before authoring.
 
-Parameters support bool, float, int and trigger. Transition conditions are ANDed. Rules are evaluated in authored order; the first matching rule wins, at most once per rendered engine update. `Any state` matches every state. Blank exit time allows an immediate transition; a numeric value waits for that many clip cycles. Referenced triggers are consumed only by a taken transition. Transitions cut to the first frame of their destination. There is no cross-fade/blend tree, skeletal animation, atlas slicing or timeline editor in this checkpoint.
+Parameters support bool, float, int and trigger. Transition conditions are ANDed. Rules are evaluated in authored order; the first matching rule wins, at most once per rendered engine update. `Any state` matches every state. Blank exit time allows an immediate transition; a numeric value waits for that many clip cycles. Referenced triggers are consumed only by a taken transition. Transitions cut to the first frame of their destination. There is no cross-fade/blend tree, skeletal animation, atlas slicing or skeletal timeline editor in this checkpoint.
 
 The effective speed is Animator × state × clip speed. Disabling the entity suspends its animation; re-enabling retains playback state. Stop destroys runtime playback state. Animations run after script update, so a parameter written by a script can affect that frame.
 
@@ -40,3 +40,9 @@ ctx.setBus('SFX', 1, true); // Mute SFX.
 Click the game viewport in editor Play to enable sound. Exported games have a Start button. Engine Pause suspends the audio context; Step advances the simulation while audio remains suspended. Stop, disabled/destroyed sources and scene changes release their voices. Source playback rate changes pitch as well as speed. This is non-spatial mono/stereo playback with one voice per AudioSource; spatial listeners/attenuation, streaming and effects processing are deferred.
 
 The adapter reuses decoded buffers and creates a fresh source node for each play/resume, as required by [AudioBufferSourceNode's one-shot lifecycle](https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode). It resumes suspended contexts through [AudioContext.resume](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/resume).
+
+## Authoring tools in 0.8
+
+Clips have Play/Pause preview, a scrub slider and a proportional frame timeline. Preview uses the unsaved frame durations, loop setting and clip speed. Clicking a numbered timeline segment jumps to its start; these controls do not modify runtime state. Closing or rerendering the editor releases its preview callback.
+
+Controllers show an automatically laid out state graph. Select a node to jump to its fields. Connect creates a transition from the selected node with exit time 1 and no conditions; edit its rule before saving if a conditional transition is intended. Arrow labels jump to transition fields. Earlier rule and Later rule control priority. The dot identifies the initial state. State names remain unique; renaming updates references. Deleting a state removes attached transitions and chooses a remaining initial state. Deleting a parameter removes transitions using it so a removed condition cannot accidentally become an always-true rule.

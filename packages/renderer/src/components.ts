@@ -4,6 +4,7 @@ const color = z.string().regex(/^#[0-9a-fA-F]{6}$/),
   finite = z.number().finite();
 const SpriteSchema = z.strictObject({
   texture: z.string(),
+  lit: z.boolean().default(true),
   width: finite.positive(),
   height: finite.positive(),
   tint: color,
@@ -23,6 +24,7 @@ export const SpriteRenderer: ComponentDefinition<SpriteData> = {
   schema: SpriteSchema,
   defaults: () => ({
     texture: '',
+    lit: true,
     width: 64,
     height: 64,
     tint: '#ffffff',
@@ -47,7 +49,7 @@ export const SpriteRenderer: ComponentDefinition<SpriteData> = {
       'order',
     ].map((path) => ({ path, label: path, kind: 'number' as const })),
     { path: 'tint', label: 'Tint', kind: 'color' },
-    ...['visible', 'flipX', 'flipY'].map((path) => ({
+    ...['visible', 'flipX', 'flipY', 'lit'].map((path) => ({
       path,
       label: path,
       kind: 'boolean' as const,
@@ -95,7 +97,59 @@ export const Camera2D: ComponentDefinition<CameraData> = {
     { path: 'background', label: 'Background', kind: 'color' },
   ],
 };
+const LightSchema = z
+  .strictObject({
+    kind: z.enum(['ambient', 'point', 'spot', 'area']),
+    color,
+    intensity: finite.nonnegative(),
+    range: finite.positive(),
+    falloff: finite.positive(),
+    innerAngle: finite.min(0).max(360),
+    outerAngle: finite.positive().max(360),
+    width: finite.positive(),
+    height: finite.positive(),
+  })
+  .refine(
+    (l) => l.innerAngle <= l.outerAngle,
+    'Inner angle must not exceed outer angle',
+  );
+export type LightData = z.infer<typeof LightSchema>;
+export const Light2D: ComponentDefinition<LightData> = {
+  type: 'protomake.light',
+  displayName: 'Light 2D',
+  schema: LightSchema,
+  defaults: () => ({
+    kind: 'point',
+    color: '#ffffff',
+    intensity: 1,
+    range: 300,
+    falloff: 1,
+    innerAngle: 40,
+    outerAngle: 70,
+    width: 160,
+    height: 80,
+  }),
+  inspector: [
+    {
+      path: 'kind',
+      label: 'Light type',
+      kind: 'enum',
+      options: ['ambient', 'point', 'spot', 'area'],
+    },
+    { path: 'color', label: 'Color', kind: 'color' },
+    ...[
+      'intensity',
+      'range',
+      'falloff',
+      'innerAngle',
+      'outerAngle',
+      'width',
+      'height',
+    ].map((path) => ({ path, label: path, kind: 'number' as const })),
+  ],
+};
 export function registerRendering(registry: ComponentRegistry): void {
   registry.register(SpriteRenderer);
   registry.register(Camera2D);
+  registry.register(Light2D);
 }

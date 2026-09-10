@@ -7,10 +7,10 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@protomake/core": "*",
-    "@protomake/assets": "*",
-    "@protomake/runtime": "*",
-    "@protomake/renderer": "*",
+    "@protomake/core": "0.1.0",
+    "@protomake/assets": "0.2.0",
+    "@protomake/runtime": "0.1.0",
+    "@protomake/renderer": "0.8.0",
     "zod": "4.3.6"
   }
 }

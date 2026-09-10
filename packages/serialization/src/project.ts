@@ -58,7 +58,7 @@ export function createProject(name: string): ProjectData {
     schemaVersion: PROJECT_SCHEMA_VERSION,
     id: guid(),
     name,
-    engineVersion: '0.7.0',
+    engineVersion: '0.8.0',
     startupScene: null,
     scenes: [],
     assets: [],

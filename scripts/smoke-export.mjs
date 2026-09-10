@@ -4,7 +4,9 @@ import { readFile, readdir } from 'node:fs/promises';
 import { URL } from 'node:url';
 import { Buffer } from 'node:buffer';
 import assert from 'node:assert/strict';
-const root = 'examples/milestones-5-7/web-build';
+const root = process.argv[2] ?? 'examples/milestones-5-7/web-build';
+const projectPath =
+  process.argv[3] ?? 'examples/milestones-5-7/Workshop.protomake.json';
 async function files(dir) {
   const result = [];
   for (const entry of await readdir(dir, { withFileTypes: true })) {
@@ -75,11 +77,7 @@ try {
     '/packages/editor/src/build-game.ts',
   );
   const model = new EditorModel();
-  model.load(
-    JSON.parse(
-      await readFile('examples/milestones-5-7/Workshop.protomake.json', 'utf8'),
-    ),
-  );
+  model.load(JSON.parse(await readFile(projectPath, 'utf8')));
   const browserFiles = await buildGame(model);
   for (const file of browserFiles)
     assert.deepEqual(

@@ -1,8 +1,16 @@
-# ProtoMake 0.7.0 — preview and authoring patch
+# ProtoMake 0.8
 
 A reusable, browser-native 2D engine and visual editor for human-authored projects.
 
-**Milestones 0–7 are implemented.** This patch addresses the reported standalone startup hang and animation editing discoverability. This is a development checkpoint, not a finished general-purpose engine release.
+**Milestones 0–7 and the requested polishing pass are complete.** This release includes editable animation playback/timeline and state graph tools, sprite lighting, and three playable workshop projects. It remains a development release with the documented scope below.
+
+## Three prototype workshop
+
+Read [ProtoMake-Prototype-Workshop.docx](docs/ProtoMake-Prototype-Workshop.docx) or its [Markdown source](docs/workshop.md). The 19-page guide explains reconstruction from a blank scene, exact entities/settings, scripts, tests, common mistakes and export.
+
+After installing dependencies, run `npm run preview:prototypes` to open the launcher for **Signal Patrol** (shooter), **Lantern Steps** (platformer) and **Sparring Room** (two-player local fighter). Complete editable JSON projects and raw images/audio/scripts are in [examples/prototypes](examples/prototypes/README.md). These builds are included in the release archive.
+
+Animation tools include clip playback/scrubbing, a proportional frame timeline, an automatic state graph and transition priority editing. [Light 2D](docs/lighting.md) offers ambient, point, spot and rectangular area types with per-sprite shading; it has no shadows, surface normals or HDR. Existing projects without lights keep their previous appearance.
 
 ## Start here
 
@@ -52,7 +60,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 95 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking and input feel remain part of the browser acceptance checklist.
+The suite includes 102 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking and input feel remain part of the browser acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 

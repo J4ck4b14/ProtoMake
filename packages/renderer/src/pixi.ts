@@ -9,6 +9,7 @@ import {
 import { loadImage, type AssetData } from '@protomake/assets';
 import type { World } from '@protomake/core';
 import { Camera2D } from './components';
+import { sceneLights, lightTint } from './lighting';
 import { renderList } from './order';
 import type { Renderer2D, View } from './adapter';
 export class PixiRenderer implements Renderer2D {
@@ -130,6 +131,7 @@ export class PixiRenderer implements Renderer2D {
     this.mask.clear().rect(vx, vy, vw, vh).fill(0xffffff);
     const seen = new Set<string>(),
       ordered = renderList(world);
+    const lights = sceneLights(world);
     for (const { id, guid, data } of ordered) {
       seen.add(guid);
       let sprite = this.sprites.get(guid);
@@ -144,6 +146,17 @@ export class PixiRenderer implements Renderer2D {
       sprite.visible = world.isActive(id) && data.visible;
       sprite.tint =
         data.texture && !this.textures.has(data.texture) ? 0xff00ff : data.tint;
+      if (data.lit && !(data.texture && !this.textures.has(data.texture))) {
+        const m = world.worldMatrix(id);
+        const cx = (0.5 - data.anchorX) * data.width * (data.flipX ? -1 : 1);
+        const cy = (0.5 - data.anchorY) * data.height * (data.flipY ? -1 : 1);
+        sprite.tint = lightTint(
+          data.tint,
+          m[4] + m[0] * cx + m[2] * cy,
+          m[5] + m[1] * cx + m[3] * cy,
+          lights,
+        );
+      }
       sprite.alpha = data.opacity;
       sprite.anchor.set(data.anchorX, data.anchorY);
       const m = world.worldMatrix(id),
