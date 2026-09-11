@@ -129,7 +129,7 @@ it('respects receiver channels and partial shadow opacity for gameplay samples',
   m.world.setLocalMatrix(m.entity(wall), compose(50, 0));
 
   expect(sampleLighting(m.world, 100, 0, undefined, 'World').intensity).toBe(0);
-  const exposed = sampleLighting(m.world, 100, 100, undefined, 'Characters').intensity,
+  const exposed = sampleLighting(m.world, -100, 0, undefined, 'Characters').intensity,
     shadowed = sampleLighting(m.world, 100, 0, undefined, 'Characters').intensity;
   expect(exposed).toBeGreaterThan(0);
   expect(shadowed).toBeGreaterThan(0);

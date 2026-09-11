@@ -1,8 +1,8 @@
-# ProtoMake 0.9.1
+# ProtoMake 0.9.2
 
 A reusable, browser-native 2D engine and visual editor for human-authored projects.
 
-**Milestones 0–7 plus the Editor Quality pass are implemented.** ProtoMake 0.9.1 focuses on reliability and authoring coherence: recovery/undo discipline, visual gizmos, channel-aware lighting with quality/performance diagnostics, a stronger in-editor TypeScript workflow, reusable perception primitives, mobile/tablet usability and safer optional account continuity. It remains a development release with the documented scope below.
+**Milestones 0–7 plus the Editor Quality pass are implemented.** ProtoMake 0.9.2 focuses on reliability and authoring coherence: recovery/undo discipline, visual gizmos, channel-aware lighting with quality/performance diagnostics, a stronger in-editor TypeScript workflow, reusable perception primitives, mobile/tablet usability and safer optional account continuity. It remains a development release with the documented scope below.
 
 ## Three prototype workshop
 
@@ -94,4 +94,4 @@ The suite includes 106 automated tests, with actual Rapier simulation and execut
 
 Prefabs do not yet support nested relationships or structural overrides. Animation transitions are immediate cuts; audio is non-spatial with one voice per source. Export conservatively includes every project scene/asset. Detailed contracts are in [prefabs](docs/prefabs.md) and [animation/audio](docs/animation-audio.md).
 
-See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [lighting](docs/lighting.md), [scripting guide](docs/scripting.md), [account continuity](docs/account-sync.md), [polish-pass notes](docs/polish-pass.md), [0.9 editor quality](docs/editor-quality-0.9.md), [0.9.1 hotfix](docs/hotfix-0.9.1.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).
+See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [lighting](docs/lighting.md), [scripting guide](docs/scripting.md), [account continuity](docs/account-sync.md), [polish-pass notes](docs/polish-pass.md), [0.9 editor quality](docs/editor-quality-0.9.md), [0.9.1 hotfix](docs/hotfix-0.9.1.md), [0.9.2 certification hotfix](docs/hotfix-0.9.2.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).
