@@ -7,7 +7,11 @@ import {
   SpriteRenderer,
   type LightingChannel,
 } from '@protomake/renderer';
-import { BoxCollider2D, CircleCollider2D, CapsuleCollider2D } from '@protomake/physics2d';
+import {
+  BoxCollider2D,
+  CircleCollider2D,
+  CapsuleCollider2D,
+} from '@protomake/physics2d';
 import type { LightingStats } from '@protomake/renderer/pixi';
 import { Perception2D } from '@protomake/scripting';
 import { compose, type Matrix2D } from '@protomake/core';
@@ -89,7 +93,9 @@ export class SceneViewport {
       this.safe(() => this.move(e)),
     );
     canvas.addEventListener('pointerup', (e) => this.safe(() => this.up(e)));
-    canvas.addEventListener('pointercancel', (e) => this.safe(() => this.pointerCancel(e)));
+    canvas.addEventListener('pointercancel', (e) =>
+      this.safe(() => this.pointerCancel(e)),
+    );
     canvas.addEventListener('lostpointercapture', () => {
       if (this.drag) this.cancel();
     });
@@ -208,10 +214,9 @@ export class SceneViewport {
           [number, Point],
           [number, Point],
         ];
-        const a = pair[0][1], b = pair[1][1], midpoint: Point = [
-          (a[0] + b[0]) / 2,
-          (a[1] + b[1]) / 2,
-        ];
+        const a = pair[0][1],
+          b = pair[1][1],
+          midpoint: Point = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2];
         this.pinch = {
           ids: [pair[0][0], pair[1][0]],
           startDistance: Math.max(1, Math.hypot(b[0] - a[0], b[1] - a[1])),
@@ -237,7 +242,9 @@ export class SceneViewport {
       const selectedId = [...this.model.selection][0]!,
         light = this.model.world.read(this.model.entity(selectedId), Light2D);
       if (light && (light.kind === 'point' || light.kind === 'spot')) {
-        const matrix = this.model.world.worldMatrix(this.model.entity(selectedId)),
+        const matrix = this.model.world.worldMatrix(
+            this.model.entity(selectedId),
+          ),
           angle = Math.atan2(matrix[1], matrix[0]),
           handle = this.toScreen([
             origin[0] + Math.cos(angle) * light.range,
@@ -313,7 +320,8 @@ export class SceneViewport {
       ...(lightId ? { lightId } : {}),
       ...(originalRange !== undefined ? { originalRange } : {}),
     };
-    if (['move', 'rotate', 'scale', 'light-range'].includes(kind)) this.model.beginGesture();
+    if (['move', 'rotate', 'scale', 'light-range'].includes(kind))
+      this.model.beginGesture();
     this.canvas.setPointerCapture(e.pointerId);
     e.preventDefault();
   }
@@ -327,7 +335,13 @@ export class SceneViewport {
       if (!a || !b) return;
       const midpoint: Point = [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2],
         distance = Math.max(1, Math.hypot(b[0] - a[0], b[1] - a[1]));
-      this.zoom = Math.min(8, Math.max(0.1, this.pinch.startZoom * distance / this.pinch.startDistance));
+      this.zoom = Math.min(
+        8,
+        Math.max(
+          0.1,
+          (this.pinch.startZoom * distance) / this.pinch.startDistance,
+        ),
+      );
       this.center = [
         this.pinch.anchorWorld[0] - (midpoint[0] - this.width / 2) / this.zoom,
         this.pinch.anchorWorld[1] - (midpoint[1] - this.height / 2) / this.zoom,
@@ -381,11 +395,15 @@ export class SceneViewport {
       const entity = this.model.entity(drag.lightId),
         light = this.model.world.read(entity, Light2D);
       if (light) {
-        let range = Math.max(1, Math.hypot(
-          (screen[0] - this.toScreen(drag.origin)[0]) / this.zoom,
-          (screen[1] - this.toScreen(drag.origin)[1]) / this.zoom,
-        ));
-        if (this.snapping && !e.altKey) range = Math.max(1, snap(range, this.spacing));
+        let range = Math.max(
+          1,
+          Math.hypot(
+            (screen[0] - this.toScreen(drag.origin)[0]) / this.zoom,
+            (screen[1] - this.toScreen(drag.origin)[1]) / this.zoom,
+          ),
+        );
+        if (this.snapping && !e.altKey)
+          range = Math.max(1, snap(range, this.spacing));
         this.model.world.set(entity, Light2D.type, { ...light, range });
       }
     }
@@ -491,7 +509,14 @@ export class SceneViewport {
     for (let y = 0; y < this.height; y += cell)
       for (let x = 0; x < this.width; x += cell) {
         const world = this.toWorld([x + cell / 2, y + cell / 2]),
-          intensity = Math.max(0, Math.min(1, sample(world[0], world[1], undefined, this.lightingChannel).intensity));
+          intensity = Math.max(
+            0,
+            Math.min(
+              1,
+              sample(world[0], world[1], undefined, this.lightingChannel)
+                .intensity,
+            ),
+          );
         c.fillStyle = `rgba(255, 166, 82, ${0.05 + intensity * 0.3})`;
         c.fillRect(x, y, cell, cell);
         c.fillStyle = intensity > 0.52 ? '#111820' : '#f4dac0';
@@ -507,7 +532,8 @@ export class SceneViewport {
     selected: boolean,
   ): void {
     if (!this.showGizmos) return;
-    const ratio = devicePixelRatio || 1, position = this.toScreen([m[4], m[5]]),
+    const ratio = devicePixelRatio || 1,
+      position = this.toScreen([m[4], m[5]]),
       rotation = Math.atan2(m[1], m[0]);
     c.save();
     c.setTransform(ratio, 0, 0, ratio, 0, 0);
@@ -530,13 +556,19 @@ export class SceneViewport {
             light.width + light.range * 2,
             light.height + light.range * 2,
           );
-      }
-      else if (light.kind === 'spot') {
+      } else if (light.kind === 'spot') {
         const angle = (light.outerAngle * Math.PI) / 360;
         c.moveTo(0, 0);
         c.arc(0, 0, light.range, -angle, angle);
         c.closePath();
-      } else c.arc(0, 0, light.kind === 'ambient' ? 18 : light.range, 0, Math.PI * 2);
+      } else
+        c.arc(
+          0,
+          0,
+          light.kind === 'ambient' ? 18 : light.range,
+          0,
+          Math.PI * 2,
+        );
       c.stroke();
       if (selected && (light.kind === 'point' || light.kind === 'spot')) {
         c.setLineDash([]);
@@ -579,10 +611,18 @@ export class SceneViewport {
         c.strokeStyle = collider.sensor ? '#f3b55c' : '#56d6b2';
         c.setLineDash(collider.sensor ? [7 / this.zoom, 4 / this.zoom] : []);
         c.beginPath();
-        if (box) c.rect(box.offsetX - box.width / 2, box.offsetY - box.height / 2, box.width, box.height);
-        else if (circle) c.arc(circle.offsetX, circle.offsetY, circle.radius, 0, Math.PI * 2);
+        if (box)
+          c.rect(
+            box.offsetX - box.width / 2,
+            box.offsetY - box.height / 2,
+            box.width,
+            box.height,
+          );
+        else if (circle)
+          c.arc(circle.offsetX, circle.offsetY, circle.radius, 0, Math.PI * 2);
         else if (capsule) {
-          const r = capsule.radius, half = capsule.halfHeight;
+          const r = capsule.radius,
+            half = capsule.halfHeight;
           c.moveTo(capsule.offsetX - r, capsule.offsetY - half);
           c.arc(capsule.offsetX, capsule.offsetY - half, r, Math.PI, 0);
           c.lineTo(capsule.offsetX + r, capsule.offsetY + half);
@@ -605,24 +645,70 @@ export class SceneViewport {
       c.closePath();
       c.fill();
       c.stroke();
-      if (perception.target && this.model.world.find(perception.target) !== undefined) {
-        const targetId = this.model.world.find(perception.target)!, targetPos = this.model.world.worldPosition(targetId),
-          localX = Math.cos(-rotation) * (targetPos[0] - m[4]) - Math.sin(-rotation) * (targetPos[1] - m[5]),
-          localY = Math.sin(-rotation) * (targetPos[0] - m[4]) + Math.cos(-rotation) * (targetPos[1] - m[5]),
-          sampler = createLightingSampler(this.model.world), targetSprite = this.model.world.read(targetId, SpriteRenderer),
-          channel = targetSprite?.lightingChannel ?? 'World', illumination = sampler(targetPos[0], targetPos[1], perception.target, channel).intensity,
-          distance = Math.hypot(localX, localY), angle = Math.abs(Math.atan2(localY, localX)),
-          inCone = distance <= perception.range && (perception.fovDegrees >= 360 || angle <= half),
-          visible = inCone && hasLineOfSight(this.model.world, this.model.world.get(entityId).guid, perception.target, channel),
+      if (
+        perception.target &&
+        this.model.world.find(perception.target) !== undefined
+      ) {
+        const targetId = this.model.world.find(perception.target)!,
+          targetPos = this.model.world.worldPosition(targetId),
+          localX =
+            Math.cos(-rotation) * (targetPos[0] - m[4]) -
+            Math.sin(-rotation) * (targetPos[1] - m[5]),
+          localY =
+            Math.sin(-rotation) * (targetPos[0] - m[4]) +
+            Math.cos(-rotation) * (targetPos[1] - m[5]),
+          sampler = createLightingSampler(this.model.world),
+          targetSprite = this.model.world.read(targetId, SpriteRenderer),
+          channel = targetSprite?.lightingChannel ?? 'World',
+          illumination = sampler(
+            targetPos[0],
+            targetPos[1],
+            perception.target,
+            channel,
+          ).intensity,
+          distance = Math.hypot(localX, localY),
+          angle = Math.abs(Math.atan2(localY, localX)),
+          inCone =
+            distance <= perception.range &&
+            (perception.fovDegrees >= 360 || angle <= half),
+          visible =
+            inCone &&
+            hasLineOfSight(
+              this.model.world,
+              this.model.world.get(entityId).guid,
+              perception.target,
+              channel,
+            ),
           exposed = visible && illumination >= perception.illuminationThreshold;
         c.setLineDash([]);
         c.strokeStyle = exposed ? '#ff7373' : visible ? '#d7ae68' : '#7f91a2';
-        c.beginPath(); c.moveTo(0, 0); c.lineTo(localX, localY); c.stroke();
-        c.fillStyle = '#0c1118dc'; c.fillRect(8 / this.zoom, 8 / this.zoom, 118 / this.zoom, 34 / this.zoom);
+        c.beginPath();
+        c.moveTo(0, 0);
+        c.lineTo(localX, localY);
+        c.stroke();
+        c.fillStyle = '#0c1118dc';
+        c.fillRect(
+          8 / this.zoom,
+          8 / this.zoom,
+          118 / this.zoom,
+          34 / this.zoom,
+        );
         c.fillStyle = exposed ? '#ff8a8a' : '#c9d5df';
         c.font = `${10 / this.zoom}px ui-monospace, monospace`;
-        c.fillText(`light ${illumination.toFixed(2)} / ${perception.illuminationThreshold.toFixed(2)}`, 13 / this.zoom, 22 / this.zoom);
-        c.fillText(exposed ? 'EXPOSED' : visible ? 'visible / too dark' : 'occluded / out of cone', 13 / this.zoom, 34 / this.zoom);
+        c.fillText(
+          `light ${illumination.toFixed(2)} / ${perception.illuminationThreshold.toFixed(2)}`,
+          13 / this.zoom,
+          22 / this.zoom,
+        );
+        c.fillText(
+          exposed
+            ? 'EXPOSED'
+            : visible
+              ? 'visible / too dark'
+              : 'occluded / out of cone',
+          13 / this.zoom,
+          34 / this.zoom,
+        );
       }
     }
 
@@ -630,8 +716,10 @@ export class SceneViewport {
     if (camera) {
       c.strokeStyle = '#6eb7ff';
       c.setLineDash([8 / this.zoom, 5 / this.zoom]);
-      const w = (this.width * camera.viewportWidth) / Math.max(0.001, camera.zoom),
-        h = (this.height * camera.viewportHeight) / Math.max(0.001, camera.zoom);
+      const w =
+          (this.width * camera.viewportWidth) / Math.max(0.001, camera.zoom),
+        h =
+          (this.height * camera.viewportHeight) / Math.max(0.001, camera.zoom);
       c.strokeRect(-w / 2, -h / 2, w, h);
     }
     c.restore();
@@ -639,17 +727,20 @@ export class SceneViewport {
 
   private drawLightingStats(c: CanvasRenderingContext2D): void {
     if (!this.lightingDebug || !this.lightingStats) return;
-    const s = this.lightingStats(), lines = [
-      `Lighting · ${this.lightingChannel}`,
-      `${s.lights} lights  S:${s.staticLights} M:${s.mixedLights} D:${s.dynamicLights}`,
-      `${s.casters} casters · ${s.shadowCasterTests} shadow tests`,
-      `static cache ${s.staticCacheHits} hit / ${s.staticCacheMisses} miss`,
-      `${s.channelsRendered} channels · ${s.renderMs.toFixed(2)} ms`,
-    ];
+    const s = this.lightingStats(),
+      lines = [
+        `Lighting · ${this.lightingChannel}`,
+        `${s.lights} lights  S:${s.staticLights} M:${s.mixedLights} D:${s.dynamicLights}`,
+        `${s.casters} casters · ${s.shadowCasterTests} shadow tests`,
+        `static cache ${s.staticCacheHits} hit / ${s.staticCacheMisses} miss`,
+        `${s.channelsRendered} channels · ${s.renderMs.toFixed(2)} ms`,
+      ];
     c.save();
     c.font = '10px ui-monospace, monospace';
-    const width = Math.max(...lines.map((line) => c.measureText(line).width)) + 18,
-      x = this.width - width - 10, y = 10;
+    const width =
+        Math.max(...lines.map((line) => c.measureText(line).width)) + 18,
+      x = this.width - width - 10,
+      y = 10;
     c.fillStyle = '#0c1118dc';
     c.fillRect(x, y, width, lines.length * 16 + 10);
     c.strokeStyle = '#536779';

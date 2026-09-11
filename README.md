@@ -52,8 +52,6 @@ Start testing with [TESTING-CHECKLIST.md](TESTING-CHECKLIST.md). Save your test 
 | 6         | Ordered sprite frames, clip/state playback, bool/float/int/trigger parameters, transitions, frame/state editor forms, AudioSource, WAV/MP3/OGG import, Web Audio mixer and buses                                                                         |
 | 7         | Separate production player, compiled project JS modules, dependency report, Build ZIP, standalone production preview and static-hosting instructions                                                                                                     |
 
-
-
 ## Editor Quality polish
 
 - **Recovery + history:** project edits use the existing bounded undo/redo command history, while a separate rotating autosave/checkpoint journal and emergency snapshot protect against crashes without polluting undo.

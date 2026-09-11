@@ -84,8 +84,10 @@ export class ProjectStorage {
   }
 
   async list(): Promise<ProjectSummary[]> {
-    const records = await this.request<StoredProject[]>(PROJECTS, 'readonly', (store) =>
-      store.getAll(),
+    const records = await this.request<StoredProject[]>(
+      PROJECTS,
+      'readonly',
+      (store) => store.getAll(),
     );
     return records
       .map(({ id, name, updated }) => ({ id, name, updated }))
@@ -93,17 +95,23 @@ export class ProjectStorage {
   }
 
   async summary(id: string): Promise<ProjectSummary | undefined> {
-    const record = await this.request<StoredProject | undefined>(PROJECTS, 'readonly', (store) =>
-      store.get(id),
+    const record = await this.request<StoredProject | undefined>(
+      PROJECTS,
+      'readonly',
+      (store) => store.get(id),
     );
     return record
       ? { id: record.id, name: record.name, updated: record.updated }
       : undefined;
   }
 
-  async loadSession(id: string): Promise<{ project: ProjectData; activeScene?: string }> {
-    const record = await this.request<StoredProject | undefined>(PROJECTS, 'readonly', (store) =>
-      store.get(id),
+  async loadSession(
+    id: string,
+  ): Promise<{ project: ProjectData; activeScene?: string }> {
+    const record = await this.request<StoredProject | undefined>(
+      PROJECTS,
+      'readonly',
+      (store) => store.get(id),
     );
     if (!record) throw new Error('Saved project not found');
     return {
@@ -142,24 +150,32 @@ export class ProjectStorage {
       };
     await this.request(RECOVERY, 'readwrite', (store) => store.put(snapshot));
     const all = await this.listRecovery(project.id);
-    for (const stale of all.slice(Math.max(0, limit))) await this.deleteRecovery(stale.key);
+    for (const stale of all.slice(Math.max(0, limit)))
+      await this.deleteRecovery(stale.key);
     return snapshot;
   }
 
   async listRecovery(projectId?: string): Promise<RecoverySnapshot[]> {
-    const records = await this.request<RecoverySnapshot[]>(RECOVERY, 'readonly', (store) =>
-      projectId ? store.index('projectId').getAll(projectId) : store.getAll(),
+    const records = await this.request<RecoverySnapshot[]>(
+      RECOVERY,
+      'readonly',
+      (store) =>
+        projectId ? store.index('projectId').getAll(projectId) : store.getAll(),
     );
     return records.sort((a, b) => b.updated - a.updated);
   }
 
-  async latestRecovery(projectId?: string): Promise<RecoverySnapshot | undefined> {
+  async latestRecovery(
+    projectId?: string,
+  ): Promise<RecoverySnapshot | undefined> {
     return (await this.listRecovery(projectId))[0];
   }
 
   async loadRecovery(key: string): Promise<RecoverySnapshot> {
-    const record = await this.request<RecoverySnapshot | undefined>(RECOVERY, 'readonly', (store) =>
-      store.get(key),
+    const record = await this.request<RecoverySnapshot | undefined>(
+      RECOVERY,
+      'readonly',
+      (store) => store.get(key),
     );
     if (!record) throw new Error('Recovery snapshot not found');
     return structuredClone(record);

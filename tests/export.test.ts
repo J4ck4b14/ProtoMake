@@ -39,8 +39,7 @@ function readStoredZip(data: Uint8Array): Map<string, Uint8Array> {
       nameStart = cursor + 30,
       payloadStart = nameStart + nameLength + extraLength,
       payloadEnd = payloadStart + compressedSize;
-    if ((flags & 0x800) === 0)
-      throw new Error('ZIP filename is not UTF-8');
+    if ((flags & 0x800) === 0) throw new Error('ZIP filename is not UTF-8');
     if (compression !== 0 || compressedSize !== uncompressedSize)
       throw new Error('ProtoMake export must use stored ZIP entries');
     if (payloadEnd > data.length) throw new Error('Truncated ZIP payload');

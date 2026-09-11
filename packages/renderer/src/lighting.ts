@@ -71,7 +71,12 @@ export function sceneShadowCasters(world: World): ShadowCaster[] {
     result.push({
       id: world.get(id).guid,
       channelMask: caster.channelMask,
-      points: [point(m, x0, y0), point(m, x1, y0), point(m, x1, y1), point(m, x0, y1)],
+      points: [
+        point(m, x0, y0),
+        point(m, x1, y0),
+        point(m, x1, y1),
+        point(m, x0, y1),
+      ],
     });
   }
   for (const [id] of world.query(SpriteRenderer.type)) {
@@ -86,7 +91,12 @@ export function sceneShadowCasters(world: World): ShadowCaster[] {
     result.push({
       id: world.get(id).guid,
       channelMask: channelBit(sprite.lightingChannel),
-      points: [point(m, x0, y0), point(m, x1, y0), point(m, x1, y1), point(m, x0, y1)],
+      points: [
+        point(m, x0, y0),
+        point(m, x1, y0),
+        point(m, x1, y1),
+        point(m, x0, y1),
+      ],
     });
   }
   return result;
@@ -166,9 +176,14 @@ function segmentsIntersect(
     c3 = cross(cx, cy, dx, dy, ax, ay),
     c4 = cross(cx, cy, dx, dy, bx, by),
     eps = 1e-9;
-  if (Math.abs(c1) < eps || Math.abs(c2) < eps || Math.abs(c3) < eps || Math.abs(c4) < eps)
+  if (
+    Math.abs(c1) < eps ||
+    Math.abs(c2) < eps ||
+    Math.abs(c3) < eps ||
+    Math.abs(c4) < eps
+  )
     return false; // grazing a corner should not flicker visibility
-  return (c1 > 0) !== (c2 > 0) && (c3 > 0) !== (c4 > 0);
+  return c1 > 0 !== c2 > 0 && c3 > 0 !== c4 > 0;
 }
 
 export function isOccluded(
@@ -181,13 +196,18 @@ export function isOccluded(
   receiverChannel: LightingChannel | number = 'World',
 ): boolean {
   for (const caster of casters) {
-    if (caster.id === ignoreCaster || !channelEnabled(caster.channelMask, receiverChannel)) continue;
+    if (
+      caster.id === ignoreCaster ||
+      !channelEnabled(caster.channelMask, receiverChannel)
+    )
+      continue;
     if (pointInPolygon(lightX, lightY, caster.points)) continue;
     const p = caster.points;
     for (let i = 0; i < p.length; i++) {
       const a = p[i]!,
         b = p[(i + 1) % p.length]!;
-      if (segmentsIntersect(lightX, lightY, x, y, a[0], a[1], b[0], b[1])) return true;
+      if (segmentsIntersect(lightX, lightY, x, y, a[0], a[1], b[0], b[1]))
+        return true;
     }
   }
   return false;
@@ -234,7 +254,6 @@ function samplePrepared(
   };
 }
 
-
 /** Line-of-sight primitive shared by stealth/gameplay scripts and editor debug tools. */
 export function hasLineOfSight(
   world: World,
@@ -242,21 +261,28 @@ export function hasLineOfSight(
   to: string,
   receiverChannel: LightingChannel | number = 'World',
 ): boolean {
-  const fromId = world.find(from), toId = world.find(to);
+  const fromId = world.find(from),
+    toId = world.find(to);
   if (fromId === undefined || toId === undefined) return false;
-  const [ax, ay] = world.worldPosition(fromId), [bx, by] = world.worldPosition(toId),
-    casters = sceneShadowCasters(world).filter((caster) => caster.id !== from && caster.id !== to);
+  const [ax, ay] = world.worldPosition(fromId),
+    [bx, by] = world.worldPosition(toId),
+    casters = sceneShadowCasters(world).filter(
+      (caster) => caster.id !== from && caster.id !== to,
+    );
   return !isOccluded(ax, ay, bx, by, casters, undefined, receiverChannel);
 }
 
 /** Build one cached query for debug heatmaps or systems that need many samples in a frame. */
-export function createLightingSampler(world: World): (
+export function createLightingSampler(
+  world: World,
+): (
   x: number,
   y: number,
   ignoreCaster?: string,
   receiverChannel?: LightingChannel | number,
 ) => LightingSample {
-  const lights = sceneLights(world), casters = sceneShadowCasters(world);
+  const lights = sceneLights(world),
+    casters = sceneShadowCasters(world);
   return (x, y, ignoreCaster, receiverChannel = 'World') =>
     samplePrepared(lights, casters, x, y, ignoreCaster, receiverChannel);
 }

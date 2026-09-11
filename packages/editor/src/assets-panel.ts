@@ -135,7 +135,9 @@ export class AssetsPanel {
       button('+ Script', () => showScripts(this.model, this.report)),
       button('Edit script', () =>
         this.run(() => {
-          const asset = this.model.project.assets.find((a) => a.id === this.selected);
+          const asset = this.model.project.assets.find(
+            (a) => a.id === this.selected,
+          );
           if (!asset || asset.mime !== 'text/typescript')
             throw new Error('Select a TypeScript asset');
           showScripts(this.model, this.report, asset.id);
@@ -283,7 +285,8 @@ export class AssetsPanel {
         });
       b.title =
         asset.path +
-        (asset.mime === 'text/typescript' || [CLIP_MIME, CONTROLLER_MIME].includes(asset.mime)
+        (asset.mime === 'text/typescript' ||
+        [CLIP_MIME, CONTROLLER_MIME].includes(asset.mime)
           ? ' · Double-click to edit'
           : '');
       b.draggable = !this.model.locked;
@@ -312,7 +315,8 @@ export async function attachRenderer(
   const canvas = node('canvas', 'render-canvas');
   area.prepend(canvas);
   const renderer = await PixiRenderer.create(canvas, true);
-  let assetSignature = '', sceneSignature = '';
+  let assetSignature = '',
+    sceneSignature = '';
   viewport.lightingStats = () => renderer.lightingStats;
   viewport.entityOrder = () => [
     ...[...model.world.all()]

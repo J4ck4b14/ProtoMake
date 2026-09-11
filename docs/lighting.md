@@ -35,9 +35,9 @@ Shadows remain projected 2D rectangle occlusion rather than normal-mapped or vol
 Rendering and gameplay share the same light attenuation and rectangle-occlusion rules. Project scripts can query:
 
 ```ts
-const exposure = ctx.illumination();     // this entity's centre, 0..1
+const exposure = ctx.illumination(); // this entity's centre, 0..1
 const doorway = ctx.lightAt(480, 192, 'World'); // arbitrary world point/channel, 0..1
-const visible = ctx.canSee(playerId, 450, 90);   // range + FOV + caster line-of-sight
+const visible = ctx.canSee(playerId, 450, 90); // range + FOV + caster line-of-sight
 
 if (exposure < 0.18) {
   // e.g. reduce an enemy's detection probability/range

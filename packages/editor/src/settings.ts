@@ -20,7 +20,11 @@ export function showSettings(
     appearance = loadAppearance(),
     accent = input('UI accent', appearance.accent, 'color'),
     surface = input('UI surface', appearance.surface, 'color'),
-    contrastNote = node('p', 'settings-note', 'Text and focus colours are chosen automatically for readable contrast.');
+    contrastNote = node(
+      'p',
+      'settings-note',
+      'Text and focus colours are chosen automatically for readable contrast.',
+    );
   bindings.setAttribute('aria-label', 'Input action definitions');
   bindings.value = JSON.stringify(model.project.input, null, 2);
   bindings.rows = 15;
@@ -94,7 +98,10 @@ export function showSettings(
           model.project.physics = settings;
           model.project.input = inputMap;
         });
-        applyAppearance({ accent: accent.input.value, surface: surface.input.value });
+        applyAppearance({
+          accent: accent.input.value,
+          surface: surface.input.value,
+        });
         dialog.close();
         report('Project and editor appearance settings updated');
       } catch (reason) {

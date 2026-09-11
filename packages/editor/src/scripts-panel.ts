@@ -166,45 +166,75 @@ export function showScripts(
   select.setAttribute('aria-label', 'Project script');
   select.append(new Option('New script', ''));
   for (const asset of model.project.assets)
-    if (asset.mime === 'text/typescript') select.append(new Option(asset.path, asset.id));
+    if (asset.mime === 'text/typescript')
+      select.append(new Option(asset.path, asset.id));
   templateSelect.setAttribute('aria-label', 'Script template');
   for (const template of Object.keys(templates) as TemplateName[])
     templateSelect.append(new Option(template, template));
 
-  let currentId = '', loadedPath = name.input.value, loadedSource = code.value;
+  let currentId = '',
+    loadedPath = name.input.value,
+    loadedSource = code.value;
 
-  const draftKey = (id = currentId) => `${draftPrefix}${model.project.id}.${id || 'new'}`;
+  const draftKey = (id = currentId) =>
+    `${draftPrefix}${model.project.id}.${id || 'new'}`;
   const readDraft = (id: string): Draft | undefined => {
     try {
-      const value = JSON.parse(localStorage.getItem(draftKey(id)) ?? 'null') as Draft | null;
-      return value && typeof value.path === 'string' && typeof value.source === 'string' ? value : undefined;
-    } catch { return undefined; }
+      const value = JSON.parse(
+        localStorage.getItem(draftKey(id)) ?? 'null',
+      ) as Draft | null;
+      return value &&
+        typeof value.path === 'string' &&
+        typeof value.source === 'string'
+        ? value
+        : undefined;
+    } catch {
+      return undefined;
+    }
   };
   const saveDraft = () => {
     if (name.input.value === loadedPath && code.value === loadedSource) return;
     try {
       localStorage.setItem(
         draftKey(),
-        JSON.stringify({ path: name.input.value, source: code.value, updated: Date.now() } satisfies Draft),
+        JSON.stringify({
+          path: name.input.value,
+          source: code.value,
+          updated: Date.now(),
+        } satisfies Draft),
       );
       draftStatus.textContent = 'Local draft protected';
     } catch {
-      draftStatus.textContent = 'Draft storage unavailable — use Save script before closing';
+      draftStatus.textContent =
+        'Draft storage unavailable — use Save script before closing';
     }
   };
   const clearDraft = (id = currentId) => {
-    try { localStorage.removeItem(draftKey(id)); } catch { /* optional storage */ }
+    try {
+      localStorage.removeItem(draftKey(id));
+    } catch {
+      /* optional storage */
+    }
   };
 
   const renderApi = () => {
     const query = apiSearch.input.value.trim().toLowerCase();
     apiResults.replaceChildren();
-    for (const entry of SCRIPT_CONTEXT_API.filter((item) =>
-      !query || item.name.toLowerCase().includes(query) || item.signature.toLowerCase().includes(query) || item.description.toLowerCase().includes(query),
+    for (const entry of SCRIPT_CONTEXT_API.filter(
+      (item) =>
+        !query ||
+        item.name.toLowerCase().includes(query) ||
+        item.signature.toLowerCase().includes(query) ||
+        item.description.toLowerCase().includes(query),
     )) {
       const row = button(entry.signature, () => {
         const cursor = code.selectionStart;
-        code.setRangeText(entry.signature.replace(/^ctx\./, ''), cursor, code.selectionEnd, 'end');
+        code.setRangeText(
+          entry.signature.replace(/^ctx\./, ''),
+          cursor,
+          code.selectionEnd,
+          'end',
+        );
         code.focus();
         saveDraft();
       });
@@ -214,7 +244,11 @@ export function showScripts(
     }
   };
   apiSearch.input.oninput = renderApi;
-  apiPanel.append(node('h3', '', 'ProtoMake scripting API'), apiSearch.row, apiResults);
+  apiPanel.append(
+    node('h3', '', 'ProtoMake scripting API'),
+    apiSearch.row,
+    apiResults,
+  );
   renderApi();
 
   const showDiagnostics = () => {
@@ -237,8 +271,10 @@ export function showScripts(
 
   const load = (id: string) => {
     currentId = id;
-    const asset = model.project.assets.find((a) => a.id === id), draft = readDraft(id);
-    name.input.value = draft?.path ?? asset?.path ?? 'Assets/Scripts/Behaviour.ts';
+    const asset = model.project.assets.find((a) => a.id === id),
+      draft = readDraft(id);
+    name.input.value =
+      draft?.path ?? asset?.path ?? 'Assets/Scripts/Behaviour.ts';
     code.value = draft?.source ?? asset?.data ?? templates.Behaviour;
     loadedPath = asset?.path ?? name.input.value;
     loadedSource = asset?.data ?? (draft ? '' : templates.Behaviour);
@@ -246,14 +282,20 @@ export function showScripts(
       ? `Restored protected draft from ${new Date(draft.updated).toLocaleString()}`
       : '';
     showDiagnostics();
-    if (id === initialAsset && location.line) requestAnimationFrame(() => code.jumpTo(location.line!, location.column));
+    if (id === initialAsset && location.line)
+      requestAnimationFrame(() => code.jumpTo(location.line!, location.column));
   };
   select.onchange = () => load(select.value);
   templateSelect.onchange = () => {
-    if (currentId && !confirm('Replace the current editor contents with this template?')) return;
+    if (
+      currentId &&
+      !confirm('Replace the current editor contents with this template?')
+    )
+      return;
     const selected = templateSelect.value as TemplateName;
     code.value = templates[selected];
-    if (!currentId) name.input.value = `Assets/Scripts/${selected.replace(/\s+/g, '')}.ts`;
+    if (!currentId)
+      name.input.value = `Assets/Scripts/${selected.replace(/\s+/g, '')}.ts`;
     showDiagnostics();
     saveDraft();
   };
@@ -261,12 +303,19 @@ export function showScripts(
     saveDraft();
     showDiagnostics();
   });
-  name.input.addEventListener('input', () => { saveDraft(); showDiagnostics(); });
+  name.input.addEventListener('input', () => {
+    saveDraft();
+    showDiagnostics();
+  });
 
   const check = () => {
     const result = compileScript(code.value, name.input.value);
     diagnosticList.replaceChildren(
-      node('p', 'ok', `Compilation passed · exposed fields: ${Object.keys(result.fields).join(', ') || 'none'} · Ctrl/Cmd+Space opens ctx autocomplete.`),
+      node(
+        'p',
+        'ok',
+        `Compilation passed · exposed fields: ${Object.keys(result.fields).join(', ') || 'none'} · Ctrl/Cmd+Space opens ctx autocomplete.`,
+      ),
     );
     return result;
   };
@@ -297,7 +346,9 @@ export function showScripts(
       loadedPath = name.input.value;
       loadedSource = code.value;
       draftStatus.textContent = 'Saved to project';
-      const existing = [...select.options].find((option) => option.value === saved);
+      const existing = [...select.options].find(
+        (option) => option.value === saved,
+      );
       if (!existing) select.append(new Option(name.input.value, saved));
       else existing.text = name.input.value;
       select.value = saved;
@@ -316,26 +367,41 @@ export function showScripts(
 
   actions.append(
     button('Compile', () => {
-      try { check(); } catch (error) { showDiagnostics(); report(String(error), true); }
+      try {
+        check();
+      } catch (error) {
+        showDiagnostics();
+        report(String(error), true);
+      }
     }),
-    button('API · Ctrl/Cmd+Space', () => { code.showApi(); code.focus(); }),
+    button('API · Ctrl/Cmd+Space', () => {
+      code.showApi();
+      code.focus();
+    }),
     saveButton,
     button('Attach to selection', () => {
       try {
         if (!currentId) throw new Error('Save the script first');
-        if (!model.selection.size) throw new Error('Select at least one entity first');
+        if (!model.selection.size)
+          throw new Error('Select at least one entity first');
         model.change('Attach script', () => {
           for (const id of model.selection) {
-            const entity = model.entity(id), value = { script: currentId, values: {} };
+            const entity = model.entity(id),
+              value = { script: currentId, values: {} };
             if (model.world.components(entity).has(ScriptBehaviour.type))
               model.world.set(entity, ScriptBehaviour.type, value);
             else model.world.add(entity, ScriptBehaviour.type, value);
           }
         });
         report('Script attached. Exposed properties are now in the Inspector.');
-      } catch (error) { report(String(error), true); }
+      } catch (error) {
+        report(String(error), true);
+      }
     }),
-    button('Close', () => { saveDraft(); dialog.close(); }),
+    button('Close', () => {
+      saveDraft();
+      dialog.close();
+    }),
   );
 
   const top = node('div', 'script-topbar');
@@ -344,16 +410,26 @@ export function showScripts(
   body.append(code.host, apiPanel);
   dialog.append(
     title,
-    node('p', 'script-help', 'TypeScript is a first-class project asset. The editor provides syntax colour, line numbers, live diagnostics, jump-to-error, ctx autocomplete, API search and protected drafts.'),
+    node(
+      'p',
+      'script-help',
+      'TypeScript is a first-class project asset. The editor provides syntax colour, line numbers, live diagnostics, jump-to-error, ctx autocomplete, API search and protected drafts.',
+    ),
     top,
     body,
     draftStatus,
     diagnosticList,
     actions,
   );
-  dialog.onclose = () => { saveDraft(); dialog.remove(); };
+  dialog.onclose = () => {
+    saveDraft();
+    dialog.remove();
+  };
   document.body.append(dialog);
-  if (initialAsset && [...select.options].some((option) => option.value === initialAsset))
+  if (
+    initialAsset &&
+    [...select.options].some((option) => option.value === initialAsset)
+  )
     select.value = initialAsset;
   load(select.value);
   dialog.showModal();

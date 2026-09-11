@@ -9,12 +9,24 @@ export interface ScriptLexeme {
 
 /** Lightweight lexical data for editor syntax colour without coupling the editor package to TypeScript. */
 export function scriptLexemes(source: string): ScriptLexeme[] {
-  const scanner = ts.createScanner(ts.ScriptTarget.Latest, false, ts.LanguageVariant.Standard, source),
+  const scanner = ts.createScanner(
+      ts.ScriptTarget.Latest,
+      false,
+      ts.LanguageVariant.Standard,
+      source,
+    ),
     result: ScriptLexeme[] = [];
-  for (let token = scanner.scan(); token !== ts.SyntaxKind.EndOfFileToken; token = scanner.scan()) {
+  for (
+    let token = scanner.scan();
+    token !== ts.SyntaxKind.EndOfFileToken;
+    token = scanner.scan()
+  ) {
     const text = scanner.getTokenText();
     let kind: ScriptLexeme['kind'] = 'plain';
-    if (token === ts.SyntaxKind.SingleLineCommentTrivia || token === ts.SyntaxKind.MultiLineCommentTrivia)
+    if (
+      token === ts.SyntaxKind.SingleLineCommentTrivia ||
+      token === ts.SyntaxKind.MultiLineCommentTrivia
+    )
       kind = 'comment';
     else if (
       token === ts.SyntaxKind.StringLiteral ||
@@ -22,11 +34,21 @@ export function scriptLexemes(source: string): ScriptLexeme[] {
       token === ts.SyntaxKind.TemplateHead ||
       token === ts.SyntaxKind.TemplateMiddle ||
       token === ts.SyntaxKind.TemplateTail
-    ) kind = 'string';
-    else if (token === ts.SyntaxKind.NumericLiteral || token === ts.SyntaxKind.BigIntLiteral) kind = 'number';
-    else if (token >= ts.SyntaxKind.FirstKeyword && token <= ts.SyntaxKind.LastKeyword) kind = 'keyword';
+    )
+      kind = 'string';
+    else if (
+      token === ts.SyntaxKind.NumericLiteral ||
+      token === ts.SyntaxKind.BigIntLiteral
+    )
+      kind = 'number';
+    else if (
+      token >= ts.SyntaxKind.FirstKeyword &&
+      token <= ts.SyntaxKind.LastKeyword
+    )
+      kind = 'keyword';
     else if (token === ts.SyntaxKind.Identifier && text === 'ctx') kind = 'api';
-    else if (token === ts.SyntaxKind.Identifier && /^[A-Z]/.test(text)) kind = 'type';
+    else if (token === ts.SyntaxKind.Identifier && /^[A-Z]/.test(text))
+      kind = 'type';
     result.push({ text, kind });
   }
   return result;
@@ -57,7 +79,8 @@ function literal(node: ts.Expression): unknown {
     ts.isNumericLiteral(node.operand)
   )
     return -Number(node.operand.text);
-  if (ts.isArrayLiteralExpression(node)) return node.elements.map((item) => literal(item));
+  if (ts.isArrayLiteralExpression(node))
+    return node.elements.map((item) => literal(item));
   if (ts.isObjectLiteralExpression(node)) {
     const values: Record<string, unknown> = {};
     for (const property of node.properties) {
@@ -138,17 +161,29 @@ export function scriptFields(source: string, path = 'Script.ts'): ScriptFields {
     if (field.help !== undefined && typeof field.help !== 'string')
       throw new Error(`${path}: ${name}.help must be a string`);
     for (const key of ['min', 'max', 'step'] as const)
-      if (field[key] !== undefined && (typeof field[key] !== 'number' || !Number.isFinite(field[key])))
+      if (
+        field[key] !== undefined &&
+        (typeof field[key] !== 'number' || !Number.isFinite(field[key]))
+      )
         throw new Error(`${path}: ${name}.${key} must be finite`);
     if (field.step !== undefined && field.step <= 0)
       throw new Error(`${path}: ${name}.step must be positive`);
-    if (field.min !== undefined && field.max !== undefined && field.min > field.max)
+    if (
+      field.min !== undefined &&
+      field.max !== undefined &&
+      field.min > field.max
+    )
       throw new Error(`${path}: ${name}.min must not exceed max`);
     if (field.options !== undefined) {
-      if (!Array.isArray(field.options) || !field.options.every((option) => typeof option === 'string'))
+      if (
+        !Array.isArray(field.options) ||
+        !field.options.every((option) => typeof option === 'string')
+      )
         throw new Error(`${path}: ${name}.options must be a string array`);
       if (!['string', 'asset', 'entity'].includes(field.type))
-        throw new Error(`${path}: ${name}.options are only valid for string-like fields`);
+        throw new Error(
+          `${path}: ${name}.options are only valid for string-like fields`,
+        );
     }
     result[name] = field;
   }
@@ -178,7 +213,10 @@ export interface ScriptDiagnostic {
   message: string;
 }
 
-export function scriptDiagnostics(source: string, path = 'Script.ts'): ScriptDiagnostic[] {
+export function scriptDiagnostics(
+  source: string,
+  path = 'Script.ts',
+): ScriptDiagnostic[] {
   const result = ts.transpileModule(source, {
     fileName: path,
     compilerOptions: {

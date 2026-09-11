@@ -155,14 +155,21 @@ export class Inspector {
         );
         if (script) {
           if (this.openScript)
-            section.append(button(`Open script · ${script.path.split('/').at(-1)}`, () => this.openScript?.(script.id)));
+            section.append(
+              button(`Open script · ${script.path.split('/').at(-1)}`, () =>
+                this.openScript?.(script.id),
+              ),
+            );
           try {
             const fields = scriptFields(script.data, script.path);
             for (const [name, field] of Object.entries(fields))
               inspectorFields.push({
                 path: `values.${name}`,
                 label: field.label || name,
-                kind: field.type === 'string' && field.options?.length ? 'enum' : field.type,
+                kind:
+                  field.type === 'string' && field.options?.length
+                    ? 'enum'
+                    : field.type,
                 ...(field.options?.length ? { options: field.options } : {}),
                 ...(field.help ? { help: field.help } : {}),
                 ...(field.min !== undefined ? { min: field.min } : {}),
@@ -201,7 +208,9 @@ export class Inspector {
             checkbox.checked = (current & (1 << index)) !== 0;
             checkbox.onchange = () => {
               let mask = 0;
-              for (const [bit, input] of [...row.querySelectorAll<HTMLInputElement>('input')].entries())
+              for (const [bit, input] of [
+                ...row.querySelectorAll<HTMLInputElement>('input'),
+              ].entries())
                 if (input.checked) mask |= 1 << bit;
               this.run(() => model.setProperty(type, field.path, mask));
             };
@@ -219,7 +228,10 @@ export class Inspector {
           const row = node('label', 'field'),
             select = node('select');
           select.setAttribute('aria-label', field.label);
-          if (field.help) { row.title = field.help; select.title = field.help; }
+          if (field.help) {
+            row.title = field.help;
+            select.title = field.help;
+          }
           if (field.kind !== 'enum') select.append(new Option('None', ''));
           if (field.kind === 'asset') {
             for (const asset of model.project.assets) {
@@ -265,7 +277,10 @@ export class Inspector {
           if (field.min !== undefined) control.input.min = String(field.min);
           if (field.max !== undefined) control.input.max = String(field.max);
         }
-        if (field.help) { control.row.title = field.help; control.input.title = field.help; }
+        if (field.help) {
+          control.row.title = field.help;
+          control.input.title = field.help;
+        }
         if (field.path === 'restitution')
           control.input.title =
             '0 absorbs bounce; 1 is elastic. Values above 1 add energy.';

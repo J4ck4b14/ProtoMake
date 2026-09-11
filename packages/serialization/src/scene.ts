@@ -40,11 +40,7 @@ function normalizeLegacyComponentTypes(input: unknown): unknown {
   )
     return input;
   for (const entity of input.entities) {
-    if (
-      !entity ||
-      typeof entity !== 'object' ||
-      !('components' in entity)
-    )
+    if (!entity || typeof entity !== 'object' || !('components' in entity))
       continue;
     const components = entity.components;
     if (

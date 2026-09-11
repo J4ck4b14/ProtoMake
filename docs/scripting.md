@@ -8,7 +8,15 @@ The in-editor source workspace supports line numbers, syntax colour, Tab indenta
 import type { ScriptContext } from '@protomake/scripting';
 
 export const fields = {
-  speed: { type: 'number', default: 80, label: 'Move speed', min: 0, max: 500, step: 5, help: 'World units per second' },
+  speed: {
+    type: 'number',
+    default: 80,
+    label: 'Move speed',
+    min: 0,
+    max: 500,
+    step: 5,
+    help: 'World units per second',
+  },
 } as const;
 
 export default class Drift {
@@ -35,7 +43,7 @@ Physics events call onCollisionEnter/onCollisionExit or onTriggerEnter/onTrigger
 | `ctx.entity`                                                   | This instance's stable entity GUID                                                        |
 | `ctx.position(id?)`                                            | World position, defaulting to self                                                        |
 | `ctx.illumination(id?)`                                        | Occlusion-aware perceptual light at an entity centre (0..1); ignores that entity's caster |
-| `ctx.lightAt(x, y, channel?)`                                 | Occlusion-aware perceptual light at an arbitrary world point/channel (0..1)               |
+| `ctx.lightAt(x, y, channel?)`                                  | Occlusion-aware perceptual light at an arbitrary world point/channel (0..1)               |
 | `ctx.canSee(target, range?, fov?, observer?)`                  | Distance + local-facing FOV + shadow-caster line-of-sight primitive                       |
 | `ctx.setPosition(x, y, id?)`                                   | Position update; kinematic bodies receive a next-step target, dynamic bodies teleport     |
 | `ctx.get<T>(type, id?)` / `ctx.set(type, data, id?)`           | Read an immutable component snapshot / validate and replace it                            |

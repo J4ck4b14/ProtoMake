@@ -6,19 +6,30 @@ const color = z.string().regex(/^#[0-9a-fA-F]{6}$/),
   channelMask = z.number().int().min(0).max(15);
 
 /** Four deliberately small lighting channels keep authoring readable and rendering bounded. */
-export const LIGHTING_CHANNELS = ['World', 'Characters', 'Foreground', 'Effects'] as const;
+export const LIGHTING_CHANNELS = [
+  'World',
+  'Characters',
+  'Foreground',
+  'Effects',
+] as const;
 export type LightingChannel = (typeof LIGHTING_CHANNELS)[number];
 export const ALL_LIGHTING_CHANNELS = (1 << LIGHTING_CHANNELS.length) - 1;
 export function channelIndex(channel: LightingChannel | number): number {
   if (typeof channel === 'number')
-    return Math.min(LIGHTING_CHANNELS.length - 1, Math.max(0, Math.trunc(channel)));
+    return Math.min(
+      LIGHTING_CHANNELS.length - 1,
+      Math.max(0, Math.trunc(channel)),
+    );
   const index = LIGHTING_CHANNELS.indexOf(channel);
   return index < 0 ? 0 : index;
 }
 export function channelBit(channel: LightingChannel | number): number {
   return 1 << channelIndex(channel);
 }
-export function channelEnabled(mask: number, channel: LightingChannel | number): boolean {
+export function channelEnabled(
+  mask: number,
+  channel: LightingChannel | number,
+): boolean {
   return (mask & channelBit(channel)) !== 0;
 }
 

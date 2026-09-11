@@ -25,15 +25,22 @@ export function showAccount(
     if (!sync.signedIn) {
       const email = input('Email', ''),
         password = input('Password', '', 'password'),
-        status = node('p', 'settings-note', 'Cloud sync is optional and is not required for the GitHub Pages public alpha. Configure a reachable ProtoMake sync server only if you want account-backed cross-device continuity.');
+        status = node(
+          'p',
+          'settings-note',
+          'Cloud sync is optional and is not required for the GitHub Pages public alpha. Configure a reachable ProtoMake sync server only if you want account-backed cross-device continuity.',
+        );
       email.input.autocomplete = 'email';
       password.input.autocomplete = 'current-password';
       const act = async (kind: 'signin' | 'signup') => {
         try {
           applyEndpoint();
-          if (kind === 'signup') await sync.signUp(email.input.value, password.input.value);
+          if (kind === 'signup')
+            await sync.signUp(email.input.value, password.input.value);
           else await sync.signIn(email.input.value, password.input.value);
-          report(`${kind === 'signup' ? 'Created' : 'Signed into'} ProtoMake account ${sync.user!.email}`);
+          report(
+            `${kind === 'signup' ? 'Created' : 'Signed into'} ProtoMake account ${sync.user!.email}`,
+          );
           render();
         } catch (error) {
           fail(error);
@@ -52,26 +59,43 @@ export function showAccount(
     const account = node('p', '', `Signed in as ${sync.user!.email}`),
       actions = node('div', 'actions'),
       list = node('div', 'cloud-projects'),
-      status = node('p', 'settings-note', 'Cloud saves use revision checks. A stale device cannot silently overwrite a newer project.');
+      status = node(
+        'p',
+        'settings-note',
+        'Cloud saves use revision checks. A stale device cannot silently overwrite a newer project.',
+      );
     actions.append(
       button('Apply server', () => {
         try {
           const before = sync.endpoint;
           applyEndpoint();
           if (sync.endpoint !== before) render();
-        } catch (error) { fail(error); }
+        } catch (error) {
+          fail(error);
+        }
       }),
-      button('Save current to account', () =>
-        void sync
-          .save(structuredClone(model.project), model.sceneId)
-          .then((revision) => {
-            report(`Saved ${model.project.name} to account · cloud revision ${revision}`);
-            return populate();
-          })
-          .catch(fail),
+      button(
+        'Save current to account',
+        () =>
+          void sync
+            .save(structuredClone(model.project), model.sceneId)
+            .then((revision) => {
+              report(
+                `Saved ${model.project.name} to account · cloud revision ${revision}`,
+              );
+              return populate();
+            })
+            .catch(fail),
       ),
       button('Refresh', () => void populate()),
-      button('Sign out', () => void sync.signOutRemote().then(() => render()).catch(fail)),
+      button(
+        'Sign out',
+        () =>
+          void sync
+            .signOutRemote()
+            .then(() => render())
+            .catch(fail),
+      ),
       button('Close', () => dialog.close()),
     );
     const populate = async () => {
@@ -79,30 +103,45 @@ export function showAccount(
         list.replaceChildren(node('p', '', 'Loading cloud projects…'));
         const projects = await sync.list();
         list.replaceChildren();
-        if (!projects.length) list.append(node('p', 'empty', 'No account projects yet.'));
+        if (!projects.length)
+          list.append(node('p', 'empty', 'No account projects yet.'));
         for (const project of projects) {
           const row = node('div', 'saved-project'),
-            info = node('span', '', `${project.name} · r${project.revision} · ${new Date(project.updated).toLocaleString()}`),
+            info = node(
+              'span',
+              '',
+              `${project.name} · r${project.revision} · ${new Date(project.updated).toLocaleString()}`,
+            ),
             controls = node('span', 'cloud-actions');
           controls.append(
-            button('Open', () =>
-              void (async () => {
-                if (!canLeave()) return;
-                const cloud = await sync.load(project.id);
-                model.load(cloud.project);
-                if (cloud.activeScene && model.project.scenes.some((s) => s.id === cloud.activeScene))
-                  model.switchScene(cloud.activeScene);
-                report(`Opened ${cloud.name} from account · revision ${cloud.revision}`);
-                dialog.close();
-              })().catch(fail),
+            button(
+              'Open',
+              () =>
+                void (async () => {
+                  if (!canLeave()) return;
+                  const cloud = await sync.load(project.id);
+                  model.load(cloud.project);
+                  if (
+                    cloud.activeScene &&
+                    model.project.scenes.some((s) => s.id === cloud.activeScene)
+                  )
+                    model.switchScene(cloud.activeScene);
+                  report(
+                    `Opened ${cloud.name} from account · revision ${cloud.revision}`,
+                  );
+                  dialog.close();
+                })().catch(fail),
             ),
-            button('Delete', () =>
-              void (async () => {
-                if (!confirm(`Delete ${project.name} from this account?`)) return;
-                await sync.delete(project.id);
-                report(`Deleted cloud copy of ${project.name}`);
-                await populate();
-              })().catch(fail),
+            button(
+              'Delete',
+              () =>
+                void (async () => {
+                  if (!confirm(`Delete ${project.name} from this account?`))
+                    return;
+                  await sync.delete(project.id);
+                  report(`Deleted cloud copy of ${project.name}`);
+                  await populate();
+                })().catch(fail),
             ),
           );
           row.append(info, controls);

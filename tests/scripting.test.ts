@@ -157,7 +157,8 @@ it('applies exposed overrides and reports callback failures with entity and scri
   });
   const physics = await Physics2D.create(editor.world, editor.project.physics),
     input = new InputService(editor.project.input);
-  let received = 0, illumination = -1;
+  let received = 0,
+    illumination = -1;
   class Behaviour {
     speed = 0;
     start(ctx: ScriptContext) {
@@ -264,13 +265,26 @@ it('dispatches enable/disable/destroy hooks once and leaves physics available du
 });
 
 it('validates rich Inspector metadata without executing project code', () => {
-  const fields = scriptFields(`
+  const fields = scriptFields(
+    `
     export const fields = {
       speed: { type: 'number', default: 4, label: 'Move speed', help: 'Units per second', min: 0, max: 20, step: 0.5 },
       stance: { type: 'string', default: 'patrol', options: ['patrol', 'alert'] },
     } as const;
-  `, 'Guard.ts');
-  expect(fields.speed).toMatchObject({ label: 'Move speed', min: 0, max: 20, step: 0.5 });
+  `,
+    'Guard.ts',
+  );
+  expect(fields.speed).toMatchObject({
+    label: 'Move speed',
+    min: 0,
+    max: 20,
+    step: 0.5,
+  });
   expect(fields.stance?.options).toEqual(['patrol', 'alert']);
-  expect(() => scriptFields(`export const fields = { speed: { type: 'number', default: 1, min: 2, max: 1 } }`, 'Bad.ts')).toThrow(/min must not exceed max/);
+  expect(() =>
+    scriptFields(
+      `export const fields = { speed: { type: 'number', default: 1, min: 2, max: 1 } }`,
+      'Bad.ts',
+    ),
+  ).toThrow(/min must not exceed max/);
 });
