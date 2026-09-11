@@ -20,6 +20,7 @@ export class Inspector {
     private readonly host: HTMLElement,
     private readonly model: EditorModel,
     private readonly run: (action: () => void) => void,
+    private readonly openScript?: (assetId: string) => void,
   ) {}
   render(): void {
     const model = this.model;
@@ -153,13 +154,20 @@ export class Inspector {
           (a) => a.id === getPath(data, 'script'),
         );
         if (script) {
+          if (this.openScript)
+            section.append(button(`Open script · ${script.path.split('/').at(-1)}`, () => this.openScript?.(script.id)));
           try {
             const fields = scriptFields(script.data, script.path);
             for (const [name, field] of Object.entries(fields))
               inspectorFields.push({
                 path: `values.${name}`,
-                label: name,
-                kind: field.type,
+                label: field.label || name,
+                kind: field.type === 'string' && field.options?.length ? 'enum' : field.type,
+                ...(field.options?.length ? { options: field.options } : {}),
+                ...(field.help ? { help: field.help } : {}),
+                ...(field.min !== undefined ? { min: field.min } : {}),
+                ...(field.max !== undefined ? { max: field.max } : {}),
+                ...(field.step !== undefined ? { step: field.step } : {}),
               });
           } catch (error) {
             section.append(node('p', 'error', String(error)));
@@ -180,6 +188,29 @@ export class Inspector {
             value = scriptFields(script.data, script.path)[field.path.slice(7)]
               ?.default;
         }
+        if (field.kind === 'mask') {
+          const row = node('fieldset', 'field mask-field'),
+            legend = node('legend', '', field.label),
+            current = Number(value ?? 0);
+          row.append(legend);
+          if (field.help) row.title = field.help;
+          (field.options ?? []).forEach((option, index) => {
+            const label = node('label', 'mask-option'),
+              checkbox = node('input');
+            checkbox.type = 'checkbox';
+            checkbox.checked = (current & (1 << index)) !== 0;
+            checkbox.onchange = () => {
+              let mask = 0;
+              for (const [bit, input] of [...row.querySelectorAll<HTMLInputElement>('input')].entries())
+                if (input.checked) mask |= 1 << bit;
+              this.run(() => model.setProperty(type, field.path, mask));
+            };
+            label.append(checkbox, node('span', '', option));
+            row.append(label);
+          });
+          section.append(row);
+          continue;
+        }
         if (
           field.kind === 'asset' ||
           field.kind === 'enum' ||
@@ -188,7 +219,8 @@ export class Inspector {
           const row = node('label', 'field'),
             select = node('select');
           select.setAttribute('aria-label', field.label);
-          select.append(new Option('None', ''));
+          if (field.help) { row.title = field.help; select.title = field.help; }
+          if (field.kind !== 'enum') select.append(new Option('None', ''));
           if (field.kind === 'asset') {
             for (const asset of model.project.assets) {
               const suitable =
@@ -228,7 +260,12 @@ export class Inspector {
                 ? 'color'
                 : 'text',
         );
-        if (field.kind === 'number') control.input.step = 'any';
+        if (field.kind === 'number') {
+          control.input.step = String(field.step ?? 'any');
+          if (field.min !== undefined) control.input.min = String(field.min);
+          if (field.max !== undefined) control.input.max = String(field.max);
+        }
+        if (field.help) { control.row.title = field.help; control.input.title = field.help; }
         if (field.path === 'restitution')
           control.input.title =
             '0 absorbs bounce; 1 is elastic. Values above 1 add energy.';

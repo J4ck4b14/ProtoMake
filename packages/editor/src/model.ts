@@ -175,7 +175,7 @@ export class EditorModel {
     this.saved = '';
     this.notify();
   }
-  load(input: unknown): void {
+  load(input: unknown, markAsSaved = true): void {
     this.ensureEditable();
     const project = validateProject(input, this.registry);
     if (project.scenes.length === 0) {
@@ -192,7 +192,7 @@ export class EditorModel {
     this.selection.clear();
     this.history.clear();
     this.gesture = undefined;
-    this.saved = deterministicJSON(project);
+    this.saved = markAsSaved ? deterministicJSON(project) : '';
     this.notify();
   }
   markSaved(snapshot: ProjectData = this.project): void {

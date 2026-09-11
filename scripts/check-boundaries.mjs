@@ -16,6 +16,7 @@ const allowed = {
     '@protomake/assets',
     '@protomake/input',
     '@protomake/physics2d',
+    '@protomake/renderer',
     'typescript',
     'zod',
   ],

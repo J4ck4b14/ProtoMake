@@ -16,3 +16,9 @@ DOM tests use jsdom, fake IndexedDB and mocked graphics. GPU appearance, audible
 Production verification builds the editor and a separate player, checks that the player's bundled module graph contains neither editor modules nor TypeScript, exports the Workshop using the same build code as the editor button, checks archive integrity, and serves the resulting static files at both root and subdirectory paths. This tests HTTP availability and exact bytes, not execution in a graphical browser. Remote CI and deployment to an external host have not been performed.
 
 Rapier's compat initialization emits an upstream deprecation warning despite its published no-argument API. Large chunks include embedded WASM and, in the editor only, the TypeScript compiler. Their size warnings are documented performance limitations rather than failed builds.
+
+## ProtoMake 0.9 Editor Quality delta
+
+The 0.9 pass adds checked-in regression cases for channel-aware/partial-shadow gameplay samples and rich literal script-field metadata, bringing the suite to 103 `it(...)` cases. The release source was additionally checked dependency-independently for TypeScript syntax/transpilation, all example JSON parsing, package-boundary rules and Node script syntax. The account service was exercised end-to-end for sign-up, first save, concurrent writes from the same revision (one success / one `409` conflict), sanitized project reads, explicit session revocation and oversized-password rejection.
+
+Before deployment, run the required gates at the top of this document after a clean `npm ci`. Release certification requires the complete Vitest, semantic TypeScript, lint/boundary and production-build sequence.

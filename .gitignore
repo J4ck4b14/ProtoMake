@@ -10,3 +10,6 @@ examples/milestones-5-7/web-build.zip
 
 examples/prototypes/web/
 examples/prototypes/web/*.zip
+
+# Optional local account server data
+.protomake/

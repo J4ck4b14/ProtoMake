@@ -9,6 +9,7 @@ import {
   ScriptSystem,
   ScriptBehaviour,
   type ScriptModule,
+  type ScriptContext,
 } from '@protomake/scripting';
 import {
   compileScript,
@@ -156,11 +157,13 @@ it('applies exposed overrides and reports callback failures with entity and scri
   });
   const physics = await Physics2D.create(editor.world, editor.project.physics),
     input = new InputService(editor.project.input);
-  let received = 0;
+  let received = 0, illumination = -1;
   class Behaviour {
     speed = 0;
-    start() {
+    start(ctx: ScriptContext) {
       received = this.speed;
+      illumination = ctx.lightAt(0, 0);
+      expect(typeof ctx.illumination).toBe('function');
     }
     update() {
       throw new Error('intentional fault');
@@ -179,6 +182,7 @@ it('applies exposed overrides and reports callback failures with entity and scri
   engine.addSystem(scripts);
   engine.start();
   expect(received).toBe(4);
+  expect(illumination).toBe(1);
   expect(() => engine.tick(1 / 60)).toThrow(/intentional fault/);
   expect(engine.state).toBe('faulted');
   engine.stop();
@@ -257,4 +261,16 @@ it('dispatches enable/disable/destroy hooks once and leaves physics available du
     'disable',
     'destroy',
   ]);
+});
+
+it('validates rich Inspector metadata without executing project code', () => {
+  const fields = scriptFields(`
+    export const fields = {
+      speed: { type: 'number', default: 4, label: 'Move speed', help: 'Units per second', min: 0, max: 20, step: 0.5 },
+      stance: { type: 'string', default: 'patrol', options: ['patrol', 'alert'] },
+    } as const;
+  `, 'Guard.ts');
+  expect(fields.speed).toMatchObject({ label: 'Move speed', min: 0, max: 20, step: 0.5 });
+  expect(fields.stance?.options).toEqual(['patrol', 'alert']);
+  expect(() => scriptFields(`export const fields = { speed: { type: 'number', default: 1, min: 2, max: 1 } }`, 'Bad.ts')).toThrow(/min must not exceed max/);
 });

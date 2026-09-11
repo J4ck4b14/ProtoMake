@@ -624,3 +624,298 @@ header {
 .animator-graph {
   overflow-x: auto;
 }
+
+/* User-selectable editor palette. Derived text colours are WCAG-oriented and
+   recalculated in appearance.ts whenever the accent or surface changes. */
+:root {
+  --protomake-accent: #f3ac66;
+  --protomake-accent-text: #17212b;
+  --protomake-surface: #17212b;
+  --protomake-surface-text: #e2eaf1;
+  --protomake-panel: #19232d;
+  --protomake-panel-raised: #202d38;
+  --protomake-control: #293540;
+  --protomake-border: #3b4a58;
+  --protomake-muted: #aebdcc;
+}
+body,
+:root { background: var(--protomake-surface); color: var(--protomake-surface-text); }
+header { background: var(--protomake-surface); border-color: var(--protomake-border); }
+.brand { background: var(--protomake-accent); color: var(--protomake-accent-text); }
+.toolbar,
+.panel,
+.scene-header,
+h2,
+footer,
+dialog { background: var(--protomake-panel-raised); color: var(--protomake-surface-text); border-color: var(--protomake-border); }
+.toolbar,
+.panel { background: var(--protomake-panel); }
+.scene-header,
+h2,
+footer { background: var(--protomake-panel-raised); }
+button { background: var(--protomake-control); border-color: var(--protomake-border); color: var(--protomake-surface-text); }
+button:hover { background: color-mix(in srgb, var(--protomake-control), var(--protomake-surface-text) 10%); }
+button.active,
+button.selected { background: var(--protomake-accent); border-color: var(--protomake-accent); color: var(--protomake-accent-text); }
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+canvas:focus-visible { outline-color: var(--protomake-accent); }
+input,
+select,
+textarea { background: color-mix(in srgb, var(--protomake-surface), #000 12%); color: var(--protomake-surface-text); border-color: var(--protomake-border); }
+.field span,
+.scene-header span,
+.settings-note,
+.script-help,
+.draft-status { color: var(--protomake-muted); }
+.splitter:hover,
+.splitter:focus-visible { background: var(--protomake-accent); }
+
+.mobile-nav,
+.mobile-view-tools { display: none; }
+
+@media (max-width: 800px) {
+  #app {
+    min-width: 0;
+    min-height: 100dvh;
+    width: 100%;
+    overflow: hidden;
+  }
+  header {
+    padding: 6px 8px;
+    gap: 8px;
+    min-height: 48px;
+  }
+  .brand { width: 30px; height: 30px; font-size: 20px; flex: 0 0 auto; }
+  .project-title { max-width: 120px; min-width: 70px; }
+  .menu {
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    scrollbar-width: thin;
+  }
+  .menu button,
+  .toolbar button,
+  .mobile-nav button,
+  .mobile-view-tools button {
+    min-height: 42px;
+    padding: 8px 12px;
+  }
+  .toolbar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 5px 7px;
+    flex: 0 0 auto;
+  }
+  .toolbar .spacer,
+  .toolbar .divider { display: none; }
+  .mobile-nav {
+    display: flex;
+    gap: 4px;
+    overflow-x: auto;
+    padding: 5px 6px;
+    background: var(--protomake-panel-raised);
+    border-bottom: 1px solid var(--protomake-border);
+    flex: 0 0 auto;
+  }
+  .mobile-view-tools {
+    gap: 5px;
+    padding: 5px 6px;
+    background: var(--protomake-panel);
+    border-bottom: 1px solid var(--protomake-border);
+  }
+  #app[data-mobile-panel='scene'] .mobile-view-tools { display: flex; }
+  .splitter { display: none !important; }
+  .workspace,
+  .bottom {
+    min-height: 0;
+    height: auto;
+    flex: 1 1 auto;
+    grid-template-columns: 1fr;
+  }
+  .workspace { display: block; }
+  .bottom { display: none; }
+  #app[data-mobile-panel='project'] .workspace,
+  #app[data-mobile-panel='console'] .workspace,
+  #app[data-mobile-panel='assets'] .workspace { display: none; }
+  #app[data-mobile-panel='project'] .bottom,
+  #app[data-mobile-panel='console'] .bottom,
+  #app[data-mobile-panel='assets'] .bottom { display: block; }
+  .workspace > .panel,
+  .workspace > .scene-area,
+  .bottom > .panel { display: none; height: 100%; border: 0; }
+  #app[data-mobile-panel='hierarchy'] .hierarchy,
+  #app[data-mobile-panel='scene'] .scene-area,
+  #app[data-mobile-panel='inspector'] .inspector,
+  #app[data-mobile-panel='project'] .project,
+  #app[data-mobile-panel='console'] .console,
+  #app[data-mobile-panel='assets'] .assets { display: flex; flex-direction: column; }
+  .panel { overflow: auto; }
+  .scene-area { min-height: 0; }
+  .scene-canvas { min-height: 280px; }
+  .actions button { min-height: 40px; }
+  .field { grid-template-columns: 100px minmax(0, 1fr); }
+  dialog {
+    width: calc(100vw - 16px) !important;
+    max-width: calc(100vw - 16px);
+    max-height: calc(100dvh - 16px);
+    padding: 14px;
+  }
+  .script-editor textarea { min-height: 45dvh; }
+  footer { font-size: 9px; padding: 4px 8px; }
+}
+
+/* ProtoMake 0.9 editor-quality scripting workspace. The textarea remains the source
+   of truth; a synchronized overlay provides syntax colour without a heavy IDE dependency. */
+.script-workspace {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 250px;
+  gap: 10px;
+  min-height: 440px;
+}
+.script-topbar {
+  display: grid;
+  grid-template-columns: minmax(140px, 0.6fr) minmax(140px, 0.5fr) minmax(260px, 1fr);
+  gap: 8px;
+  margin-bottom: 10px;
+  align-items: end;
+}
+.code-editor {
+  min-width: 0;
+  min-height: 420px;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr);
+  border: 1px solid var(--protomake-border);
+  border-radius: 6px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--protomake-surface), #000 18%);
+}
+.code-gutter {
+  margin: 0;
+  padding: 10px 8px;
+  text-align: right;
+  overflow: hidden;
+  user-select: none;
+  color: color-mix(in srgb, var(--protomake-muted), transparent 20%);
+  background: color-mix(in srgb, var(--protomake-surface), #000 28%);
+  border-right: 1px solid var(--protomake-border);
+  font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.code-viewport { position: relative; min-width: 0; overflow: hidden; }
+.code-highlight,
+.code-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  padding: 10px 12px;
+  tab-size: 2;
+  white-space: pre;
+  overflow: auto;
+  font: 12px/1.65 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+}
+.code-highlight {
+  pointer-events: none;
+  overflow: visible;
+  color: var(--protomake-surface-text);
+}
+.code-input {
+  resize: none;
+  color: transparent;
+  background: transparent;
+  caret-color: var(--protomake-surface-text);
+  -webkit-text-fill-color: transparent;
+}
+.code-input::selection { background: color-mix(in srgb, var(--protomake-accent), transparent 62%); }
+.tok-comment { color: #7fa37f; }
+.tok-string { color: #d7ad78; }
+.tok-number { color: #9ec7f3; }
+.tok-keyword { color: #c999e8; }
+.tok-api { color: #70d7cf; font-weight: 650; }
+.tok-type { color: #7bb8ef; }
+.code-autocomplete {
+  position: absolute;
+  left: 14px;
+  bottom: 14px;
+  width: min(560px, calc(100% - 28px));
+  max-height: 250px;
+  overflow: auto;
+  z-index: 6;
+  border: 1px solid var(--protomake-border);
+  border-radius: 6px;
+  background: var(--protomake-panel-raised);
+  box-shadow: 0 10px 28px #0008;
+}
+.code-autocomplete button {
+  display: grid;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--protomake-border), transparent 40%);
+  border-radius: 0;
+  white-space: normal;
+}
+.code-autocomplete button span,
+.api-results small { color: var(--protomake-muted); font-size: 10px; }
+.script-api {
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid var(--protomake-border);
+  border-radius: 6px;
+  overflow: auto;
+  background: color-mix(in srgb, var(--protomake-panel), #000 7%);
+}
+.script-api h3 { margin-bottom: 8px; }
+.script-api .field { grid-template-columns: 1fr; }
+.api-results { display: grid; gap: 4px; }
+.api-results button { text-align: left; white-space: normal; display: grid; gap: 2px; }
+.script-diagnostics { display: grid; gap: 4px; margin: 8px 0; }
+.script-diagnostics button { text-align: left; white-space: normal; }
+.script-diagnostics .ok { color: #82d8aa; }
+
+.mask-field {
+  border: 1px solid var(--protomake-border);
+  border-radius: 5px;
+  padding: 7px 9px;
+  margin: 8px 0;
+}
+.mask-field legend { color: var(--protomake-muted); padding: 0 5px; }
+.mask-option { display: inline-flex; gap: 4px; align-items: center; margin: 2px 10px 2px 0; }
+
+.recovery-dialog { width: min(760px, 94vw); max-height: 86vh; overflow: auto; }
+.recovery-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--protomake-border);
+}
+.recovery-row .actions { padding: 0; justify-content: flex-end; }
+
+@media (pointer: coarse) {
+  button, input, select { min-height: 40px; }
+  .scene-canvas { touch-action: none; }
+}
+
+@media (max-width: 900px) {
+  .script-editor { width: calc(100vw - 20px); }
+  .script-workspace { grid-template-columns: 1fr; min-height: 0; }
+  .code-editor { min-height: 52vh; }
+  .script-api { max-height: 220px; }
+  .script-topbar { grid-template-columns: 1fr 1fr; }
+  .script-topbar .field { grid-column: 1 / -1; }
+}
+
+@media (max-width: 800px) {
+  .recovery-row { grid-template-columns: 1fr; }
+  .recovery-row .actions { justify-content: flex-start; }
+  .script-topbar { display: flex; flex-direction: column; align-items: stretch; }
+  .script-topbar > * { width: 100%; }
+  .code-editor { grid-template-columns: 42px minmax(0, 1fr); min-height: 56vh; }
+}
+.console-jump { margin-left: 8px; padding: 2px 6px; min-height: 0; font-size: 10px; }

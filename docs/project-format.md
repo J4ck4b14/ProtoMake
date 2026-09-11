@@ -23,4 +23,4 @@ IndexedDB stores the complete project transactionally. The active editor scene i
 
 Milestone 5–7 migration: schema 3 → 4 adds `folders`, `sceneFolders` (scene GUID → folder path), and `mixer`. Existing v1–v3 projects migrate sequentially. Panel sizes are local preferences and never enter project JSON. Prefabs, AnimationClips and Animator controllers are typed text assets; AudioClips embed their imported bytes. Current engineVersion is 0.8.0.
 
-Release 0.8 adds the optional defaulted sprite `lit` field and registered `protomake.light` component. Existing projects without lights render as before. This does not change the enclosing project schema version.
+Release 0.8 lighting now includes defaulted Sprite Renderer fields `lit` and `castShadow`, `protomake.light.mobility` (`static | mixed | dynamic`), and the optional `protomake.shadowCaster` rectangle component. Older component payloads receive defaults during registered-component parsing; projects without active lights render as before. These additions do not change the enclosing project schema version. Editor appearance/account state remain browser preferences/services and are not serialized into project JSON.

@@ -6,6 +6,10 @@ export interface InspectorField {
   readonly path: string;
   readonly label: string;
   readonly options?: readonly string[];
+  readonly help?: string;
+  readonly min?: number;
+  readonly max?: number;
+  readonly step?: number;
   readonly kind:
     | 'number'
     | 'boolean'
@@ -13,7 +17,8 @@ export interface InspectorField {
     | 'color'
     | 'asset'
     | 'enum'
-    | 'entity';
+    | 'entity'
+    | 'mask';
 }
 export interface ComponentDefinition<T> {
   readonly type: string;

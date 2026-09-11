@@ -106,7 +106,7 @@ The supplied actor images are separate frames, not an atlas. Every example uses 
 
 # 5 Add lights with predictable behavior
 
-Create four empty entities and add Light 2D to each. These settings match the completed examples. Keep Transform scale at 1; light dimensions use world units. Aim Spotlight down and right with approximately 23 degrees of rotation. For an exact Inspector entry, set a=0.921061, b=0.389418, c=-0.389418 and d=0.921061; retain its x and y.
+Create four empty entities and add Light 2D to each. These settings are a readable baseline; the dedicated Lantern Shadow Lab example below pushes them further. Keep Transform scale at 1; light dimensions use world units. Aim Spotlight down and right with approximately 23 degrees of rotation. For an exact Inspector entry, set a=0.921061, b=0.389418, c=-0.389418 and d=0.921061; retain its x and y. Set Ambient, Cool area and Spotlight to **static**; set Warm pool to **mixed**.
 
 | Entity and type | Position  | Color and intensity | Shape settings                 |
 | --------------- | --------- | ------------------- | ------------------------------ |
@@ -117,11 +117,13 @@ Create four empty entities and add Light 2D to each. These settings match the co
 
 Leave unlisted falloff values at 1. Cone angles are full angles in degrees; a spot faces local +X before rotation. Area lights measure falloff from the nearest point on their rotated rectangle. Their range starts outside that rectangle. Selected lights display their range, cone or rectangle in the scene viewport.
 
-**What this renderer computes.** Each sprite samples the light field at its visual center. Contributions accumulate and multiply the sprite's tint. This gives colored lighting and spatial variation between sprites. It does not create a gradient across one large sprite, surface normals, cast shadows, occlusion or bloom. A floor built from many tiles can show variation that a single large rectangle cannot.
+**What this renderer computes.** With at least one active light, ProtoMake builds a screen-space light surface. Point and spot lights create visible gradients across large floors and walls instead of tinting a whole sprite from one center sample; area lights emit from a rotated rectangle. Contributions accumulate and multiply the rendered scene. The model is deliberately LDR: it has no normal maps, HDR energy model or bloom.
 
-With no active lights, sprites retain their original appearance. Adding an active light enables illumination; an intensity-zero light still counts. Start with ambient fill so objects outside local light ranges remain readable. Uncheck a sprite's lit property for HUD, signs or emissive-looking markers. Camera background is not lit.
+With no active lights, sprites retain their original appearance. Start with a low ambient fill so objects outside local light ranges remain readable. Uncheck a sprite's **Lit** property for HUD, signs or emissive-looking markers. Enable **Cast Shadow** on Sprite Renderer for rectangular sprite occlusion, or add **Shadow Caster 2D** when the blocking geometry should be invisible or differ from the sprite. Ambient light is never shadowed.
 
-**Exercise.** Lower Ambient intensity to 0.2, move Warm pool across the actor, then rotate Spotlight by 180 degrees. Observe the light color and falloff on the actor. Restore the table values afterwards. Raising intensity beyond 1 is allowed, but combined channel gains clamp to 1 in this LDR tint model; it cannot generate HDR glow.
+**Exercise.** Lower Ambient intensity to 0.2 and enable Cast Shadow on a wall or platform between Warm pool and the actor. Move the light in Edit mode and watch the illuminated surface and projected shadow update. Then switch Warm pool to **dynamic**, parent it to the actor and Play: the pool now travels with the actor. A **mixed** light keeps its authored light definition fixed at runtime but recomputes shadows from moving casters; a **static** light also snapshots caster geometry. Raising intensity beyond 1 is allowed, but the LDR result saturates rather than producing HDR glow.
+
+**Reference example.** Import `examples/lighting-shadow-demo/lighting-shadow-demo.protomake.json`. **Lantern Shadow Lab** combines a dim static ambient fill, static fixtures, a mixed fixed lamp with live caster shadows, a dynamic player torch and shadow-casting platforms. Scripts can use `ctx.illumination()` or `ctx.lightAt(x, y)` to turn the same attenuation/occlusion rules into stealth exposure checks.
 
 ---
 
@@ -142,7 +144,7 @@ Open Settings. Input action definitions are a JSON array. Retain the default act
 
 Use physical codes such as KeyF, Space and ArrowLeft. Action names are case-sensitive. Keep commas between array records, and choose Apply settings. An invalid binding is reported rather than silently ignored. The shooter adds Fire; the platformer uses the default Move and Jump; the fighter defines separate actions for each player.
 
-1. Select the entity that will own the game behaviour. Open Scripts and select its imported main file under Project script. Compile, then Attach to selection. Helpers.ts is an imported utility module; do not attach it to an entity.
+1. Select the entity that will own the game behaviour. In Assets, double-click its imported `.ts` file (or use Scripts), Compile, Save, then Attach to selection. Ctrl/Cmd+S saves from the source editor, and unsaved source is protected as a browser-local draft. Helpers.ts is an imported utility module; do not attach it to an entity.
 2. The Inspector displays the behaviour's exposed numeric fields. Keep their supplied defaults initially. A main script can call its helper using `import { bar } from './Helpers'` because both files live in the same Assets/Scripts folder.
 3. Add Audio Source to the behaviour owner, choose Action.wav, set volume 0.3, bus SFX, and leave Loop and Play on awake off. For the fighter the owner is Arena logic; for the other games it is Player.
 4. Open Mixer if you want to adjust SFX without altering source clips. Click the game viewport after Play to unlock sound. Standalone games perform that unlock through Start.
@@ -424,6 +426,8 @@ The export destination must be empty. Do not overwrite your only custom build as
 **Verification evidence.** The release's automated suite covers the three gameplay flows, real Rapier integration, compiled script modules, animation edits, loading feedback and lighting math. Production and export checks are recorded in the repository. Automated checks do not replace manual GPU, keyboard, audio and interaction verification in target browsers, so each example should also be playtested before release.
 
 **Useful source entry points.** Read the main script in each example's Scripts folder for game rules; Helpers.ts for bars and sprite visibility; packages/scripting/src/runtime.ts for ScriptContext; packages/animation/src/index.ts for playback and transitions; packages/renderer/src/lighting.ts for illumination; and tests/prototypes.test.ts for executable gameplay checks. These local sources are the implementation authority for this workshop. docs/lighting.md, docs/animation-audio.md and docs/web-build.md provide focused references.
+
+**Mobile, appearance and continuity.** At 800 CSS pixels or below the editor switches to touch-sized Hierarchy, Scene, Inspector, Project, Console and Assets tabs; the Scene tab adds explicit Pan, zoom and Frame controls. Settings lets you choose the editor accent and surface colours while ProtoMake derives readable foreground colours automatically. The Account dialog is optional: with `npm run dev:account` or a deployed ProtoMake account server, projects can be saved and reopened across browsers/devices with revision-conflict protection. Local IndexedDB saves and JSON export continue to work independently.
 
 **Next step.** Choose one example and make a small original variation with a clear completion condition. Write three acceptance checks before adding features. Keep an exported playable build and a project JSON at each milestone. A useful portfolio extension should explain a design choice, demonstrate its implementation and show how you verified it—not merely add more systems.
 

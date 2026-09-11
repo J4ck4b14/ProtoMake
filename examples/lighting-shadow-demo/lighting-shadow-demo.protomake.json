@@ -1,0 +1,1479 @@
+{
+  "schemaVersion": 4,
+  "id": "73255c06-eb9d-4735-b3d8-26abac3bd8a5",
+  "name": "Lantern Shadow & Stealth Lab",
+  "engineVersion": "0.9.0",
+  "startupScene": "2608a04e-e69b-4502-bf62-542927f3ad73",
+  "scenes": [
+    {
+      "schemaVersion": 1,
+      "id": "2608a04e-e69b-4502-bf62-542927f3ad73",
+      "name": "Scene 1",
+      "entities": [
+        {
+          "id": "04a8b262-d6cb-4fe4-8d30-a28195d2e850",
+          "name": "Instructions",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                -225
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "3b4ca704-aeba-4048-a8ba-b64bbf43c02b",
+              "lit": false,
+              "width": 760,
+              "height": 44,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 20,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "054d0ccd-4920-41c5-a826-08060076f280",
+          "name": "Middle floor",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                60,
+                180
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
+              "lit": true,
+              "width": 160,
+              "height": 24,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0,
+              "castShadow": true
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.5,
+              "restitution": 0,
+              "layer": 0,
+              "width": 160,
+              "height": 24
+            }
+          }
+        },
+        {
+          "id": "0b7d2ec0-cc9e-4e75-9274-214a88d8a918",
+          "name": "Checkpoint",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                -80,
+                50
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "b3795dc4-2ac2-4cee-8f44-836eab6977ed",
+              "lit": false,
+              "width": 20,
+              "height": 36,
+              "tint": "#f3ac66",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "0c5d4e16-65b7-4d6f-afd7-ea7959704569",
+          "name": "Defeat",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "9f2e452d-88ac-478c-8eb9-fda848969104",
+              "lit": false,
+              "width": 520,
+              "height": 120,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 30,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "0d45cce6-296c-4661-8629-7f4aa969bbb0",
+          "name": "Spotlight",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                0.9210609940028851,
+                0.3894183423086505,
+                -0.3894183423086505,
+                0.9210609940028851,
+                -350,
+                -160
+              ]
+            },
+            "protomake.light": {
+              "kind": "spot",
+              "color": "#fff0ce",
+              "intensity": 0.45,
+              "range": 700,
+              "falloff": 1,
+              "innerAngle": 30,
+              "outerAngle": 75,
+              "width": 160,
+              "height": 80,
+              "mobility": "static"
+            }
+          }
+        },
+        {
+          "id": "1692f56f-10d9-4fb4-920a-7625ddfb06fe",
+          "name": "Ambient",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "protomake.light": {
+              "kind": "ambient",
+              "color": "#7890a8",
+              "intensity": 0.18,
+              "range": 300,
+              "falloff": 1,
+              "innerAngle": 40,
+              "outerAngle": 70,
+              "width": 160,
+              "height": 80,
+              "mobility": "static"
+            }
+          }
+        },
+        {
+          "id": "1a34e8ab-e20c-4cd7-a366-5306348ea744",
+          "name": "Health",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                -350,
+                -192
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "width": 160,
+              "height": 12,
+              "tint": "#74e8b8",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0,
+              "anchorY": 0.5,
+              "layer": 20,
+              "order": 1
+            }
+          }
+        },
+        {
+          "id": "310555c0-5419-40f1-9397-00b1fc7ada4f",
+          "name": "Coin 1",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                -250,
+                130
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "343b7c30-b3b5-49a2-b025-bfd5a1127e66",
+              "lit": false,
+              "width": 18,
+              "height": 18,
+              "tint": "#ffe39c",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.prefab": {
+              "prefab": "45d401aa-b37f-4a6e-a5f3-06883ebc7f71",
+              "source": "310555c0-5419-40f1-9397-00b1fc7ada4f",
+              "root": "310555c0-5419-40f1-9397-00b1fc7ada4f",
+              "overrides": []
+            }
+          }
+        },
+        {
+          "id": "3a242676-4295-4a76-b13f-564743098d55",
+          "name": "Health background",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                -350,
+                -192
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "width": 160,
+              "height": 12,
+              "tint": "#26313d",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0,
+              "anchorY": 0.5,
+              "layer": 20,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "3b3d10b8-e201-4e83-ac61-e5d2e2754558",
+          "name": "Goal",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                330,
+                135
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "628ba8c4-7a58-4c78-a586-b8e1bcd42b4e",
+              "lit": false,
+              "width": 32,
+              "height": 48,
+              "tint": "#6ee7b7",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "4779bf5c-f201-4d3c-a600-89a0eb783a79",
+          "name": "Cool area",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                200,
+                60
+              ]
+            },
+            "protomake.light": {
+              "kind": "area",
+              "color": "#75caff",
+              "intensity": 0.32,
+              "range": 220,
+              "falloff": 1,
+              "innerAngle": 40,
+              "outerAngle": 70,
+              "width": 220,
+              "height": 100,
+              "mobility": "static"
+            }
+          }
+        },
+        {
+          "id": "50542638-19a0-495f-a46f-d3280b6f45ee",
+          "name": "West floor",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                -240,
+                180
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
+              "lit": true,
+              "width": 240,
+              "height": 24,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0,
+              "castShadow": true
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.5,
+              "restitution": 0,
+              "layer": 0,
+              "width": 240,
+              "height": 24
+            }
+          }
+        },
+        {
+          "id": "57b70788-e8de-45be-a363-157e42dce527",
+          "name": "Step one",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                -80,
+                90
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
+              "lit": true,
+              "width": 100,
+              "height": 24,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0,
+              "castShadow": true
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.5,
+              "restitution": 0,
+              "layer": 0,
+              "width": 100,
+              "height": 24
+            }
+          }
+        },
+        {
+          "id": "57c17328-af43-4173-b591-00cea27719db",
+          "name": "East floor",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                300,
+                180
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
+              "lit": true,
+              "width": 160,
+              "height": 24,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0,
+              "castShadow": true
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.5,
+              "restitution": 0,
+              "layer": 0,
+              "width": 160,
+              "height": 24
+            }
+          }
+        },
+        {
+          "id": "5951b181-a782-4b4d-ac31-5e8648eb5b14",
+          "name": "Camera",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "protomake.camera": {
+              "zoom": 1,
+              "background": "#101820",
+              "priority": 0,
+              "viewportX": 0,
+              "viewportY": 0,
+              "viewportWidth": 1,
+              "viewportHeight": 1
+            }
+          }
+        },
+        {
+          "id": "71af7897-c5f5-4d2c-9354-b2d7ff71aad6",
+          "name": "Warm pool",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                -190,
+                0
+              ]
+            },
+            "protomake.light": {
+              "kind": "point",
+              "color": "#ffb76b",
+              "intensity": 0.65,
+              "range": 350,
+              "falloff": 1.4,
+              "innerAngle": 40,
+              "outerAngle": 70,
+              "width": 160,
+              "height": 80,
+              "mobility": "mixed"
+            }
+          }
+        },
+        {
+          "id": "739312ef-0ce0-4012-9be4-dfe2c1dd085e",
+          "name": "Coin 4",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                300,
+                105
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "343b7c30-b3b5-49a2-b025-bfd5a1127e66",
+              "lit": false,
+              "width": 18,
+              "height": 18,
+              "tint": "#ffe39c",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.prefab": {
+              "prefab": "45d401aa-b37f-4a6e-a5f3-06883ebc7f71",
+              "source": "310555c0-5419-40f1-9397-00b1fc7ada4f",
+              "root": "739312ef-0ce0-4012-9be4-dfe2c1dd085e",
+              "overrides": [
+                {
+                  "path": [
+                    "name"
+                  ],
+                  "removed": false,
+                  "value": "Coin 4"
+                },
+                {
+                  "path": [
+                    "components",
+                    "protomake.transform",
+                    "local"
+                  ],
+                  "removed": false,
+                  "value": [
+                    1,
+                    0,
+                    0,
+                    1,
+                    300,
+                    105
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "8b277fa7-0bb5-4661-b012-0a60cfdc0cbd",
+          "name": "Score",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                190,
+                -192
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "width": 1,
+              "height": 12,
+              "tint": "#f3ac66",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0,
+              "anchorY": 0.5,
+              "layer": 20,
+              "order": 1
+            }
+          }
+        },
+        {
+          "id": "8cc83a58-fe0f-4eb9-bda0-8024205738e3",
+          "name": "Step two",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                120,
+                0
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
+              "lit": true,
+              "width": 100,
+              "height": 24,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0,
+              "castShadow": true
+            },
+            "protomake.rigidbody": {
+              "mode": "static",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0.5,
+              "restitution": 0,
+              "layer": 0,
+              "width": 100,
+              "height": 24
+            }
+          }
+        },
+        {
+          "id": "8ebf9f18-870c-4469-851d-ce028c85a13d",
+          "name": "Backdrop",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "db68dcb1-8402-4c1d-8cce-10219a009483",
+              "lit": false,
+              "width": 800,
+              "height": 500,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": -10,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "9df8d4e5-6c92-4978-afb1-a7b99d05df28",
+          "name": "Score background",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                190,
+                -192
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "width": 160,
+              "height": 12,
+              "tint": "#26313d",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0,
+              "anchorY": 0.5,
+              "layer": 20,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "a65fcaec-d24d-4110-8a33-c14b5053a617",
+          "name": "Coin 3",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                120,
+                -45
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "343b7c30-b3b5-49a2-b025-bfd5a1127e66",
+              "lit": false,
+              "width": 18,
+              "height": 18,
+              "tint": "#ffe39c",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.prefab": {
+              "prefab": "45d401aa-b37f-4a6e-a5f3-06883ebc7f71",
+              "source": "310555c0-5419-40f1-9397-00b1fc7ada4f",
+              "root": "a65fcaec-d24d-4110-8a33-c14b5053a617",
+              "overrides": [
+                {
+                  "path": [
+                    "name"
+                  ],
+                  "removed": false,
+                  "value": "Coin 3"
+                },
+                {
+                  "path": [
+                    "components",
+                    "protomake.transform",
+                    "local"
+                  ],
+                  "removed": false,
+                  "value": [
+                    1,
+                    0,
+                    0,
+                    1,
+                    120,
+                    -45
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "b198981b-f0e1-405c-b43a-81dc8ddb45de",
+          "name": "Coin 2",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                -80,
+                45
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "343b7c30-b3b5-49a2-b025-bfd5a1127e66",
+              "lit": false,
+              "width": 18,
+              "height": 18,
+              "tint": "#ffe39c",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.prefab": {
+              "prefab": "45d401aa-b37f-4a6e-a5f3-06883ebc7f71",
+              "source": "310555c0-5419-40f1-9397-00b1fc7ada4f",
+              "root": "b198981b-f0e1-405c-b43a-81dc8ddb45de",
+              "overrides": [
+                {
+                  "path": [
+                    "name"
+                  ],
+                  "removed": false,
+                  "value": "Coin 2"
+                },
+                {
+                  "path": [
+                    "components",
+                    "protomake.transform",
+                    "local"
+                  ],
+                  "removed": false,
+                  "value": [
+                    1,
+                    0,
+                    0,
+                    1,
+                    -80,
+                    45
+                  ]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "c867d490-aea3-4e17-8598-42f70c0232b0",
+          "name": "Victory",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                0,
+                0
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "f7ba8245-49c9-4847-8905-2380f91f5a03",
+              "lit": false,
+              "width": 520,
+              "height": 120,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 30,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "d81ac2da-c34c-4e34-a0ed-f4596f38fa7f",
+          "name": "Player",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                -310,
+                130
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "ec20c2d6-684b-421a-b541-800c25e31a04",
+              "lit": true,
+              "width": 32,
+              "height": 32,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.rigidbody": {
+              "mode": "dynamic",
+              "mass": 1,
+              "gravityScale": 1,
+              "linearDamping": 0,
+              "angularDamping": 0,
+              "freezeRotation": true,
+              "continuous": true,
+              "velocityX": 0,
+              "velocityY": 0,
+              "angularVelocity": 0
+            },
+            "protomake.box-collider": {
+              "offsetX": 0,
+              "offsetY": 0,
+              "sensor": false,
+              "friction": 0,
+              "restitution": 0,
+              "layer": 0,
+              "width": 28,
+              "height": 32
+            },
+            "protomake.animator": {
+              "controller": "6aefaee6-eab1-46ba-8892-b2b3c5ce9f69",
+              "speed": 1
+            },
+            "protomake.audio-source": {
+              "clip": "859be3de-e21e-414e-bd84-4b53f555e1e6",
+              "loop": false,
+              "volume": 0.3,
+              "rate": 1,
+              "bus": "SFX",
+              "playOnAwake": false
+            },
+            "protomake.script": {
+              "script": "d17eb1e8-7d24-45fe-9578-bc59e7f5155a",
+              "values": {}
+            }
+          }
+        },
+        {
+          "id": "45fae6d2-2a76-47a3-abce-33f79e043ee5",
+          "name": "Player torch",
+          "enabled": true,
+          "parent": "d81ac2da-c34c-4e34-a0ed-f4596f38fa7f",
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                18,
+                -4
+              ]
+            },
+            "protomake.light": {
+              "kind": "point",
+              "mobility": "dynamic",
+              "color": "#ffd08a",
+              "intensity": 1.15,
+              "range": 240,
+              "falloff": 1.55,
+              "innerAngle": 40,
+              "outerAngle": 70,
+              "width": 160,
+              "height": 80
+            }
+          }
+        },
+        {
+          "id": "01ffde6a-5cec-492f-8d22-8de0e85fdcc6",
+          "name": "Stealth guard",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                1,
+                0,
+                0,
+                1,
+                -440,
+                130
+              ]
+            },
+            "protomake.sprite": {
+              "texture": "4325f91a-78bb-4493-a299-cce5cddc8ded",
+              "lit": true,
+              "castShadow": true,
+              "lightingChannel": "Characters",
+              "width": 48,
+              "height": 48,
+              "tint": "#ffcf7a",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 1,
+              "order": 1
+            },
+            "protomake.perception": {
+              "target": "d81ac2da-c34c-4e34-a0ed-f4596f38fa7f",
+              "range": 450,
+              "fovDegrees": 90,
+              "illuminationThreshold": 0.55,
+              "debug": true
+            },
+            "protomake.script": {
+              "script": "f522ea91-9950-4ddd-8eb6-4c69793d84fa",
+              "values": {
+                "player": "d81ac2da-c34c-4e34-a0ed-f4596f38fa7f",
+                "detectionLight": 0.55,
+                "detectionTime": 0.8,
+                "viewRange": 450,
+                "viewAngle": 90
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "assets": [
+    {
+      "id": "ec20c2d6-684b-421a-b541-800c25e31a04",
+      "path": "Assets/Images/Actor-0.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAwCAYAAABwrHhvAAAAr0lEQVR4nGNgGAUjHTASUlDyYsd/Si3pkfDAaQ8TpYZTCkYdMOAOYCFVQ5mQO8mWlP36D0/IYmyMKAlywENg1AED7gCSE2HXu50kWzJaEo46YNQBgxqMtoiwusyhewOKr01iOahuMSxUBjwERh0w6gCS2wPkgEFdDow6YMAdMFoZEQwBBgYGhjPPv2MNBRNJTgz9pKhlYBgEITDqgFEHUL0ywpXacYEBD4EBd8AoAAB22yETDJs46wAAAABJRU5ErkJggg==",
+      "width": 32,
+      "height": 48
+    },
+    {
+      "id": "686e2df7-7249-4611-9cb5-7eccfffcfe1e",
+      "path": "Assets/Images/Actor-1.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAwCAYAAABwrHhvAAAAr0lEQVR4nGNgGAWjYIABIyEFJS92/KfUkh4JD5z2MFFqOKVg1AED7gAWUjWUCbmTbEnZr//whCzGxoiSIAc8BEYdMOAOIDkRdr3bSbIloyXhqANGHTDqAHwAawHh0L0BpRlmEstBdYthhdOAh8CoA0YdQHJ1TA4YrY5HHYAPjPaOCYYAAwMDw5nn37GGgokkJ4Z+UtQyMAyCEBh1wKgDiKqMcKVgaoABD4EBd8AoAAAV6B0UjlqcqQAAAABJRU5ErkJggg==",
+      "width": 32,
+      "height": 48
+    },
+    {
+      "id": "1519c6b2-58e0-4a09-9eca-49f8d0a11220",
+      "path": "Assets/Images/Actor-2.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAwCAYAAABwrHhvAAAAr0lEQVR4nGNgGAUjHTASUvB5Tdp/Si3hDZmF0x4mSg2nFIw6YMAdwEKqhu9+M0m25NWvmfCELMbGiJIgBzwERh0w4A4gORFybkon2ZLRknDUAaMOGNRgtEWE1WUO3RtQfL1ZcRvVLYaFyoCHwKgDRh1AcnuAHDCoy4FRBwy4A0YrI4IhwMDAwHDm+XesoWAiyYmhnxS1DAyDIARGHTDqAKpXRrhSOy4w4CEw4A4YBQCMoyI/c8MN1gAAAABJRU5ErkJggg==",
+      "width": 32,
+      "height": 48
+    },
+    {
+      "id": "b88d398a-e90b-4162-80a4-d21b4ca4ed9c",
+      "path": "Assets/Images/Actor-3.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAwCAYAAABwrHhvAAAAr0lEQVR4nGNgGAWjYIABIyEFn9ek/afUEt6QWTjtYaLUcErBqAMG3AEspGr47jeTZEte/ZoJT8hibIwoCXLAQ2DUAQPuAJITIeemdJItGS0JRx0w6oBRB+ADWAsIh+4NKM2wzYrbqG4xrHAa8BAYdcCoA0iujskBo9XxqAPwgdHeMcEQYGBgYDjz/DvWUDCR5MTQT4paBoZBEAKjDhh1AFGVEa4UTA0w4CEw4A4YBQAhDx5AB9zhIwAAAABJRU5ErkJggg==",
+      "width": 32,
+      "height": 48
+    },
+    {
+      "id": "4325f91a-78bb-4493-a299-cce5cddc8ded",
+      "path": "Assets/Images/Enemy.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAA10lEQVR4nO1VuxHCMAyNfVklQ1DSM0wmUKEJGIaekiEYRhTEd4kty9yhDwWvSmxH7+nJkabpj2CkTw4RAn1FAtjlydbkoxhDAdYQBWhkP4rVFaBJLsG1BFxSrACv7FkB1uR1/CxteuDQIAiBlttDneR5ObXEW3Oa9+TNh/fr4X05r9ra3iWIsL5wxnfCiOwLCIGyNKmskQDTLB2wuHSNiPLgXYrifK4XvBHyF+yTzb0NLzQOWIuo47Ml8HTC9Q5wiXUFeLkgOqApohcrfhiNDmi4EDlvfh8vw71ODOGPDS4AAAAASUVORK5CYII=",
+      "width": 32,
+      "height": 32
+    },
+    {
+      "id": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
+      "path": "Assets/Images/Platform.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAYCAYAAACbU/80AAAARUlEQVR4nGNs2rPyP8MAAqaBtHzUAaMOYGBgYGDUDkoazQWjDhh1wMh2AMvbRw8G1AEDHwLCcgoD6oABD4FRB4w6YNQBAPD/B/fqTxWJAAAAAElFTkSuQmCC",
+      "width": 32,
+      "height": 24
+    },
+    {
+      "id": "343b7c30-b3b5-49a2-b025-bfd5a1127e66",
+      "path": "Assets/Images/Coin.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAgUlEQVR4nN1UMRKAMAgj/szd7/gKv+Pu03Dr9SCh6nWSqQUSwh1gNslQBd3dEwCgGOpkBCPC5QsJy0MVNDM7j7W9t/2SypqiEQn797jUWgWq/GBqVHJvsU2p6K39nShOKZuXKg4AUpEiU/5GxJYxgqrJTuCnuxaLp9bUmRjlTbtHN9SkPSESjuPjAAAAAElFTkSuQmCC",
+      "width": 18,
+      "height": 18
+    },
+    {
+      "id": "b3795dc4-2ac2-4cee-8f44-836eab6977ed",
+      "path": "Assets/Images/Flag.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABQAAAAkCAYAAACJ8xqgAAAAVklEQVR4nO3QMQoAIQxEUf/i/a+crYQgFi6ThRTzO5uXwTG6R35ERKjgowK/ggB9FwKUgqsScK0rA3MymNeVgHsSuK+TwVPzy/Wbev2hQYMGDRo0mHoB8/YEWr/ii9AAAAAASUVORK5CYII=",
+      "width": 20,
+      "height": 36
+    },
+    {
+      "id": "628ba8c4-7a58-4c78-a586-b8e1bcd42b4e",
+      "path": "Assets/Images/Goal.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAwCAYAAABwrHhvAAAAlElEQVR4nO3YQQ6AMAhEUfD+d8aVjYZCjdK68HfbZuaF7hD5+9HRAzOz1yWqYU94UVF8B7KtKo9yHWBWeZSv2aVI/n9PS8+53S+oLB/lNIAbTVF5lHf0pRNYcQAAAAAAAAAAAAAAAAAAAAAAABog2mBUnWgDk06gCpHluD3Q7DWdyHXabgLVy6lRfvcLZiF6uZ8vq3eqPEBYSe/zaQAAAABJRU5ErkJggg==",
+      "width": 32,
+      "height": 48
+    },
+    {
+      "id": "db68dcb1-8402-4c1d-8cce-10219a009483",
+      "path": "Assets/Images/Backdrop.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAyAAAAH0CAIAAABKIt4vAAALMUlEQVR4nO3cIYtD5xaG0Z0SiIuJCIwrA8eXqP5/UVkfGOrGxcTFXXHh+n55moa5a/l93iMfciC783YZAAA6+5l53G+vHz4cT3bt2rVr165duz9y95fXTwIA/GwCCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgJrAAAGICCwAgtjtvl3/7HQAAfpT9zDzut9cPH44nu3bt2rVr167dH7nrEyEAQExgAQDEBBYAQExgAQDEBBYAQExgAQDEBBYAQExgAQDEBBYAQExgAQDEBBYAQExgAQDEBBYAQGy/dvbrb7+37wEA8J7++vOPv3viFywAgNjiL1j/tRB0/3M4nh732zPrdu3atWvXrl27/+ju8ic7v2ABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBAbHfeLgtnH5/bzHx/Xev3AQB4F8vBs5+Zx/22trp8ODOH4+mZc7t27dq1a9eu3dfsLjzBJ0IAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCI7c7bZeHs43Obme+va/0+AADvYjl49jPzuN/WVpcPZ+ZwPD1zbteuXbt27dq1+5rdhSf4RAgAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAACx3Xm7LJx9fG4z8/11rd8HAOBdLAfPfmYe99va6vLhzByOp2fO7dq1a9euXbt2X7O78ASfCAEAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACC2O2+XhbOPz21mvr+u9fsAALyL5eDZz8zjfltbXT6cmcPx9My5Xbt27dq1a9fua3YXnuATIQBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMR25+2ycPbxuc3M99e1fh8AgHexHDz7mXncb2ury4czczienjm3a9euXbt27dp9ze7CE3wiBACICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgNjuvF0Wzj4+t5n5/rrW7wMA8C6Wg2c/M4/7bW11+XBmDsfTM+d27dq1a9euXbuv2V14gk+EAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAENudt8vC2cfnNjPfX9f6fQAA3sVy8Oxn5nG/ra0uH87M4Xh65tyuXbt27dq1a/c1uwtP8IkQACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYgILACAmsAAAYrvzdlk4+/jcZub761q/DwDAu1gOnv3MPO63tdXlw5k5HE/PnNu1a9euXbt27b5md+EJPhECAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBATGABAMQEFgBAbHfeLgtnH5/bzHx/Xev3AQB4F8vBs5+Zx/22trp8ODOH4+mZc7t27dq1a9eu3dfsLjzBJ0IAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCICSwAgJjAAgCI7c7bZeHs43Obme+va/0+AADvYjl49jPzuN/WVpcPZ+ZwPD1zbteuXbt27dq1+5rdhSf4RAgAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAEBNYAAAxgQUAENs/c/zrb79X7wEA8GP4BQsAILb4C9Zff/7x5PDheHrcb08+xK5du3bt2rVr9w13/YIFABATWAAAMYEFABATWAAAMYEFABATWAAAsd15u/zb7wAA8KPsZ+b/6n8p7Nq1a9euXbt2/2k+EQIAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEBMYAEAxAQWAEDsP3r0A8KP8QWxAAAAAElFTkSuQmCC",
+      "width": 800,
+      "height": 500
+    },
+    {
+      "id": "3b4ca704-aeba-4048-a8ba-b64bbf43c02b",
+      "path": "Assets/Images/Instructions.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,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",
+      "width": 760,
+      "height": 44
+    },
+    {
+      "id": "f7ba8245-49c9-4847-8905-2380f91f5a03",
+      "path": "Assets/Images/Victory.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,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",
+      "width": 520,
+      "height": 120
+    },
+    {
+      "id": "9f2e452d-88ac-478c-8eb9-fda848969104",
+      "path": "Assets/Images/Defeat.png",
+      "kind": "image",
+      "mime": "image/png",
+      "data": "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAggAAAB4CAYAAACXQQqLAAAWxklEQVR4nO3dd3xUVd7H8U8mPSEhjSQEEkNvQRABpdhoEpDAuqsuiq4VsexjWdujzyogC7irLqIiogsqUmVRkLoUWRZQmqyAgEBoiZDeSZ3y/JEwJtyUSTIhEL/v1ysvJzPnnvu7Azjfe+65Z1zCOl5rQ0RERKQcU2MXICIiIpcfBQQRERExUEAQERERAwUEERERMVBAEBEREQMFBBERETFQQBAREREDBQQRERExUEAQERERAwUEERERMVBAEBEREQMFBBERETFQQBAREREDBQQRERExUEAQERERAwUEERERMVBAEBEREQMFBBERETFQQBAREREDBQQRERExUEAQERERAwUEERERMVBAEBEREQMFBBERETFQQBAREREDBQQRERExUEAQERERAwUEERERMVBAEBEREQO3xi5A5FIJCAjgm40b69XHkqVLmf7XvwJw67BhTJ86tdJ2BQUFpKen8+OhQ6xbv54t//53hdffmzmTAf37U1JSwth77iH+xIka9z11yhRihw/HarXywMMPs3///jofx4MPPMAfn3gCgMzMTIbFxmI2m2vVh6+PD7HDh9O3b186d+pEQEAA3t7e5OXlcS4piYMHD7L1P/9hx7ffYrVaG7S28n8Wzz73HN9s2VLl6wAffPghcz76qMr+PDw82LljBwDzP/+ct2fMcLh+kaZCIwgiDcDb25vWrVtz67Bh/P2tt3j/3Xfx8vKyv/76lCnk5eXh7u7OpIkTMZmq/6d40403Ejt8OAALFi6sVzgAGHXbbfbHgYGBDBwwoFbb33vPPaxZtYpXXn6ZoUOGEBkZiZ+fH25ubgQEBNClc2fu+N3vePedd1i7ahVj4uJqPEZn1eaI+8aNo7m/v9P7FWlKNIIgvxpZWVlc07t3pa8FBwezcf16oOIogaPKn7WaTCZahIQQExPDk48/TnR0NP379eOF555j8pQpACSnpPDW3//Oa3/+M926duUP993HvE8+qbRvPz8/Xvnf/wXg1OnTvDdrVq1qu9jVV19N9FVXAWA2m3FzcyNu1CjDKEdlXF1dmT51KkMGDwZKz/CXfvEFO777joSEBHJzcwkMDKRNdDSDBw1iRGwsoaGhvPbqqxw+coSfjh5tsNpqw9fXl/vvv593Zs50ar8iTYlG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",
+      "width": 520,
+      "height": 120
+    },
+    {
+      "id": "859be3de-e21e-414e-bd84-4b53f555e1e6",
+      "path": "Assets/Audio/Action.wav",
+      "kind": "audio",
+      "mime": "audio/wav",
+      "data": "data:audio/wav;base64,UklGRiYfAABXQVZFZm10IBAAAAABAAEAIlYAAESsAAACABAAZGF0YQIfAAAAAAoAKQBbAJ0A6gA9AZMB5QEwAm4CngK8AsgCwgKsAoYCUwIXAtQBjAFBAfQApQBUAP//ov88/8n+R/6z/Q39VvyO+7v64vkJ+Tz4gvfo9nj2PPY99oP2E/ft9xH5e/oi/Pz9+/8OAicEMgYfCN4JYQubDIUNGg5ZDkUO4w07DVoMSwscCtgIjAdBBv8EygOlAo0BgAB5/27+Wf0x/PL6l/kd+In23vQn83Hxze9M7gTtCexv60froeuH7P3tAvCQ8pn1CfnJ/LwAwwS+CIsMDBAkE70VxBctGfMZGBqkGaQYKxdPFScTzBBVDtgLZgkOB9cExQLXAAn/T/2f++35LvhW9l/0R/IR8N3tseuY6ajn+eWn5MvjfOPN48/kh+b36Bjs2e8k9Nz43f3/AhsIBw2bEbMVLxn3G/sdMB+YHzofJR5tHC4ahReQFG8RPg4XCw8INgWVAjEACv4X/FH6qvgX94v1+vNe8rTw/O487YLr3Olf6CHnOubB5czla+au55npLuxj7yvzb/cR/O8A5AXJCnQPvxOHF68aHR3EHpsfoh/iHmodUhuzGK0VYBLrDm0LAQi+BLQB8f54/Er6Yvi39j716fOs8nvxTfAd7+nttuyN63nqjenb6HfoeOjv6Ozpe+ug7VzwpfNt9577GwDFBHcJCQ5XEjoWkhlCHDYeXR+zHzkf+R0EHHIZYBbsEjkPaQuaB+oDcQBC/Wn67vfQ9Qz0mvJt8Xjwre//7mHuzu1A7bnsPezX65Prgeuy6zfsIu1+7lbwrvKE9dD4hPyIAMQEGQljDX8RSRWdGF4bch3FHkwfAR/qHRMcjRlzFuMS/g7nCsIGrwLO/jb7/Pct9dHy6fBy72Huqu0+7Q7tCe0i7U7the3F7Q7uZ+7X7mzvMvA58YzyOPRF9rX4h/uy/igC1wWmCXgNLRGkFLwXVhpXHKkdOh4DHgEdPBvBGKYVBhIBDroJVQX3AMP81fhI9THyne+U7RbsHeuh6pHq3epy6z3sLe007kbvXPBy8YryqvPY9B/2jPco+f36Ev1q/wMC1wTbB/sKJA48ESYUxhb+GLUa0xtFHP8b+xo8GcoWthMXEAsMswcyA67+S/or9m3yKu927F7q5ugP6NDnHejk6BHqj+tG7SHvDvH88uH0tPZ0+CH6wPtZ/fb+ngBdAjkENAZQCIkK1AwlD2oRjhN7FRgXThgGGS4ZuBibF9YVbhNtEOgM9gi1BEcA0ft191nznO9d7LHprOdV5rLlveVs5q/ncOmY6w3us/Bx8zH23/hr+8v9+P/xAboDWAXUBjcIiwnYCiQMcw3EDhIQVhGCEokTVxTbFAIVvRT8E7cS6BCRDrgLawi/BMoArPyE+HT0n/Am7SfqvOf45enkleT75BPmz+ca6trs9O9J87z2L/qI/a8AlQMrBmoITwrcCxkNDw7IDlIPtw8CEDsQZxCGEJUQkBBsEB4Qmg/SDrsNSwx7CkkIuAXQAp//Nvyu+CD1qvFr7oHrCekc58/lMOVI5RnmnOfG6YLsuu9P8yL3Evv//sgCVAaICVQMqQ6BENoRuBIlEy0T3hJKEoERkhCMD3cOXQ1ADCAL+gnICIIHHgaVBN8C+ADd/pH8GvqD99z0OPKt71PtROuX6WPovOev50fohulp6+Xt6vBi9DD4NvxSAGQESgjkCxcPzRH1E4UVeBbQFpYW2BWlFBMTOBEpD/wMxgqVCHcGdASSAtEAL/+m/S/8w/pa+e73fPYC9YTzBvKU8DrvB+4N7V/sDewn7Lrsz+1q74nxJfQw95j6Rf4aAvsFxQlaDZsQaxOzFWAXZxjCGHEYfBfxFeMTaRGcDpgLeAhXBU0Cb//M/HH6ZPio9jr1FvQz84fyCPKr8WnxOfEZ8QjxCfEh8VjxufFO8iLzP/Su9XL3jPn4+6/+oAG9BO0HGgsmDvcQchN9FQEX7xc5GNoX0hYoFeoSLBAEDY8J6wU3ApP+Gfvk9wr1nPKk8CjvKu6j7Yvt1e1x7lHvY/CY8eLyN/SN9eL2MviB+dP6LPyV/RP/qwBiAjkELQY4CFAKZgxsDk4Q9xFTE04U1xTeFFoURhOiEXQPyAyxCUUGoALe/h/7gvcl9CPxlO6L7BXrOer46U3qLOuI7EzuY/C28i31s/c0+p784/76AN4CjQQIBlUHeQh8CWYKPAsFDMIMdA0XDqYOGA9iD3gPTg/XDgoO3gxQC18JEAdsBIEBY/4n++f3vfTH8R7v3ewZ6+TpSelQ6fnpPesR7WPvHfIm9WL4tvsE/zMCLAXbBzAKIQypDccOgA/aD+APnw8kD3wOtA3VDOkL8wr3CfQI5wfLBpkFTQTfAksBkf+u/an7iflZ9yj1B/ML8Ubvz+247BPs7etQ7EDtve7A8DzzIPZV+cP8SwDSAzoHZQo8DacPlhH9EtYTIBTgEyAT7xFeEIIObgw5CvYHtwWLA34BmP/d/U/87Pqv+ZT4k/en9sr1+fQz9Hnzz/I78sfxfvFq8ZjxE/Lj8g70mfWA98D5TfwZ/xACHgUqCBkL0Q06EDsSwhO+FCcV9xQwFNgS/hCxDgkMHAkHBuMCzP/Y/B36rveX9eLzk/Kp8SDx7/AO8W7xBPLE8qDzkPSN9ZH2mveo+L754PoU/F79w/5FAOcBpwN/BWgHVwk9CwsNrg4VECwR5BEuEv8RUREhEHQOUQzHCecGyQOFADf9+vnq9iD0s/G37znuQu3W7PPsku2n7iPw8vEC9Dv2i/jd+iD9Rv9CAQ8DpwQLBjsHPQgWCc0JaArsCl0LvgsODEoMbgxzDFEM/gtxC6QKjwkvCIQGkARbAvH/X/23+g74fPUW8/XwLe/S7fPsm+zP7JDt2u6i8NnybPVD+Eb7Wv5kAU4EAAdnCXMLGQ1SDh8PgA99DyAPdQ6KDW4MLwvZCXkIGAe7BWYEGwPZAZwAZP8o/uf8n/tO+vX4mfc/9vL0u/Oo8sfxJfHR8NbwPfEN8kfz6vTv9kv57vvF/rkBtASaB1QKyAziDo4QvxFrEo4SKhJFEekPJw4QDLoJOweqBBwCp/9Z/UH7a/nc95j2nvXr9Hf0PfQz9FD0jfTi9Er1xPVM9uX2kvdX+Dn5PPpm+7r8OP7f/6sBlQOSBZYHkAlvCyINlQ63D3oQ0BCwEBYQAQ92DYALLAmMBrYDwwDL/ef6L/i79Z3z5vGg8NLvfe+f7zDwJPFu8vzzvvWh95P5hvtq/Tb/4ABjAr8D8QT9BeYGsgdkCAIJjgkJCnUKzwoRCzgLOgsRC7UKHQpFCScIxAYcBTYDGgHW/nf8EPq193v1ePO+8WHwbu/y7vTude9z8Ofxw/P59XT4Hvvg/aAASwPJBQcI9gmLC74Miw31Df8NsQ0XDTwMLwv8CbAIVwf7BaQEVQMTAt8At/+Y/oH9bfxb+0r6OPkq+CL3KPZD9X304vN781XzePPt87f02/VV9yD5M/uA/fj/hgIXBZQH5gn5C7kNFg8DEHcQbxDrD/IOjg3MC74JeAcPBZgCKADU/av7vPkT+Lb2qvXt9H70VvRu9Lz0N/XW9Y72Wfcx+BH5+Pnl+tr71/zh/fv+JABhAbACDgR3BeMGSgifCdcK5Au4DEYNhQ1pDe4MDwzQCjQJRgcRBagCHQCG/ff6ifhQ9mD0yfKZ8dnwjvC38FHxUvKv81n1PfdK+Wz7kf2n/54BbQMHBWcGiQduCBYJhwnGCdkJyAmaCVMJ+QiNCBIIhgfoBjUGaQWBBHoDUQIIAaD/G/6C/N36OPmf9yH2zfSy897yXfI68nryIfMu9Jz1Yfdy+b37MP60ADcDoAXcB9gJggvPDLQNLg48DuENJg0TDLgKJAlnB5EFtAPeARwAev7+/K/7j/qf+d34RfjT94L3Tvcx9yr3NfdU94b3z/cx+LL4Vfkf+hL7Mfx6/ev+fQAsAusDrgVnBwcJfQq7C7EMVA2ZDXkN8wwGDLgKEgkhB/UEoAI3AND9fftU+Wb3wvV19Ijz/vLY8hPzp/OL9LL1D/eS+Cz60ftx/QL/egDVAQwDHgQKBdMFewYGB3cH0gcZCE0IcAh/CHcIVggWCLIHJwdvBogFcQQrA7kBIwBw/qv84voj+X73A/bC9MjzIvPZ8vPycvNU9JT1KfcF+Rn7U/2f/+cBGwQmBvcHggm5CpgLGQw9DAgMgAuwCqMJZQgFB5AFEgSZAiwB1f+Y/nn9evyZ+9f6L/qf+SX5vfhn+CL47/fQ98n33/cV+HH4+Pit+ZP6qfvv/F7+8v+fAVsDGAXIBlsIwQnsCs8LXgySDGUM1wvqCqUJEgg+BjkEFQLm/7z9rfvI+R74u/ao9ev0h/R79MH0VPUo9jT3afi8+R/7h/zp/T3/ewCgAagCkwNhBBMFrQUxBqEG/wZNB4kHswfHB8MHogdgB/cGZAalBbcEnANWAuoAYf/D/Rz8e/rs+ID3RPZG9ZL0MfQp9H30LfU19o73K/kA+/38D/8jASoDEAXGBj4IbglNCtcKCwvtCoAKzgnhCMUHhQYuBc0DbQIXAdX/qv6c/az82/so+5H6E/qs+Vn5Gfnr+M74xPjP+PP4M/mS+RX6vvqQ+4r8qv3u/k4AxAFGA8cEPAaWB8cIxAmBCvMKEwveClMKcglECM8GIgVJA1UBWP9j/Yb70/lY+B/3M/aY9VL1XvW59V32PvdU+JD55/pM/LT9Ev9dAJABpQKYA2cEFAWfBQsGXAaTBrUGwwa/BqkGgQZGBvQFiwUFBWMEoQO/Ar4BoABq/yL+z/x8+zP6APnu9wv3YPb39df1BfaC9k33Y/i6+Ur7BP3b/rwAmgJiBAUGdQelCIwJIwpoCloK/QlXCXAIVAcOBqwEOgPFAVoAA//H/a78u/vy+lP63PmM+V75T/la+Xv5sfn3+Uz6sfok+6j7Pfzl/KH9cv5Y/1AAWQFuAogDoQSvBakGhQc6CL0IBwkRCdcIVgiPB4cGQwXMAy8CeAC3/vr8UvvN+Xr4ZPeV9hP24/UE9nP2K/cj+FL5qfod/J/9I/+aAPoBOgNSBD0F9gV+BtYG/wb/BtoGlgY4BsUFQgWzBBsEewPVAikCdgG8APz/M/9j/o79tvzf+w/7S/qa+QX5kfhI+C/4S/ih+DL5/fn/+jP8kP0M/5wAMgLBAzkFjgayB5oIPgmYCaMJYAnRCPwH6gamBToEtgInAZz/IP7B/Ij7fvqp+Q35qvh/+In4w/go+a/5UvoK+8/7nPxq/Tf+//7B/3oALAHXAXsCGAOuAz0EwwQ8BacF/wVABmQGZwZEBvgFgAXcBAwEEwP1AboAa/8Q/rb8aPsz+iL5Qfia9zP3E/c796v3YfhV+YH62ftR/dv+aQDuAVwDpwTFBa0GWQfGB/MH4weYBxoHbwagBbYEugO3ArIBtQDG/+j+Hv5r/c/8Svzb+4D7OPsC+9v6xfq/+sn65voX+177vvs3/Mz8fP1H/ir/IQAoATcCSANQBEcFIwbbBmUHuwfXB7UHUwe0BtoFzASRAzUCwwBK/9P9b/wp+w36JPl3+Ar43/f390/44vio+Zn6q/vS/AT+N/9fAHUBcgJPAwgEnAQKBVMFeQV/BWkFOgX3BKMEQgTVA18D4AJZAsoBMwGUAO7/P/+K/tH9GP1i/LT7FfuK+hn6yvmi+aT51vk5+s36kPt+/JH9wf4FAFIBnQLaA/wE+gXJBmEHvQfYB7IHTAeqBtMFzgSmA2UCGQHN/4v+X/1S/Gz7s/oq+tP5rvm4+e75S/rI+l77CPy//Hz9O/72/qv/VQD2AIsBFAKSAgQDbAPIAxkEXQSUBLoEzQTMBLEEfAQqBLkDKQN8ArIB0ADd/9z+1v3V/OD7AftC+qr5QPkL+Q/5S/nB+W36SvtR/Hn9t/4AAEgBhAKoA6sEgwUqBpoG0gbRBpkGLgaWBdgE/QMNAxECEwEbADD/WP6Y/fT8bfwF/Lr7i/t3+3r7kvu7+/T7OfyL/Ob8TP26/TP+tf5B/9X/cQAVAb0BZgIMA6oDOgS4BB0FZAWIBYUFVwX+BHoEzAP5AgYC+wDh/7/+of2S/Jr7xfoZ+p/5WflM+Xj52/lx+jT7Hfwj/Tz+XP96AI4BiwJsAyoEvwQpBWcFeQViBSUFyAROBMADIgN6As4BIwF9AN//Sv/B/kT+1P1w/Rj9y/yL/Fb8LfwT/Af8DPwj/FD8kvzr/F395v2G/jn//P/KAJ8BcwI+A/oDnwQlBYcFvgXIBaIFTAXHBBcEQgNNAkMBKwAS///9/vwX/FP7ufpO+hT6Dfo4+pL6Fvu++4T8X/1G/jH/FwDzALwBbgIFA38D2QMUBDEEMgQbBO0DrQNeAwQDoAI2AsYBVAHfAGgA8f94//7+hf4O/pr9LP3G/Gz8Ifzq+8n7wvvY+w38YvzW/Gj9Fv7b/rL/kgB4AVkCLQPsA5AEDwVnBZEFjAVXBfQEZQSxA90C8QH2APb/+P4I/iz9bfzQ+1r7D/vu+vf6Kft/+/X7hfwo/dj9j/5G//f/nQA2Ab4BMwKTAuACGAM9A1IDVgNMAzQDEQPjAqoCZwIaAsIBYAH0AH4AAAB6//D+Y/7Y/VP92fxt/BX81vuz+6/7zvsQ/HT8+fyd/Vn+Kf8FAOcAxgGaAloDAASFBOMEFwUfBfoEqgQzBJgD4AITAjcBVQB3/6P+3/00/aX8N/zs+8T7v/vc+xb8avzU/E791P1h/u/+fP8CAIAA9QBeAboBCgJNAoQCsALQAuQC7gLsAt0CwwKbAmQCHwLLAWgB9gB4APH/Yf/M/jj+qv0l/bD8UPwJ/N/71fvu+yr8iPwH/aL9Vv4b/+v/vgCOAVMCBAObAxIEZgSTBJcEdAQqBL0DMgOOAtkBGAFUAJT/3f42/qT9K/3O/I78bPxn/Hz8qfzs/D/9oP0K/nr+7f5e/83/NQCZAPUASQGWAdoBFgJKAnQClQKsArcCtgKnAogCWgIcAs0BbQH+AIIA/P9v/97+Tv7F/Uj92/yE/Ef8J/wn/Ej8ifzr/Gn9Af6s/mb/JQDmAKABTALjAmEDwAP9AxcEDATfA5ADJAOgAggCZAG5AA0Aaf/O/kT+zf1u/Sf9+fzk/Of8Af0t/Wr9tP0J/mT+xP4k/4X/4/88AJEA4gAsAXEBrwHmARYCPgJdAnECegJ2AmQCQwISAtEBgAEgAbIAOgC6/zX/sP4v/rj9Tv33/Lf8kPyG/Jr8zPwb/YX9B/6d/kD/7P+ZAEIB4AFtAuQCQQOAA58DngN9Az4D5AJzAvABXwHIAC4Amv8O/4/+If7I/YT9Vv0//T79Uf12/ar96/01/ob+3P4z/4r/3/8wAH0AxgAJAUcBfgGvAdkB/AEWAicCLgIqAhkC+wHPAZUBTQH5AJgALgC//0r/1v5l/v39of1V/R79/fz1/Af9NP16/dn9TP7R/mH/+v+SACgBswEwApgC6QIfAzkDNgMWA9sChwIgAqgBJAGbABAAiv8M/5v+Ov7r/bH9jP18/YD9l/2+/fT9Nf5+/s3+IP9z/8T/EgBcAKEA4AAYAUoBdQGZAbUBygHYAd0B2QHLAbQBkgFlAS0B6wCfAEsA8f+S/zH/0v53/iT+3f2l/X79a/1t/Yb9tf36/VL+vP4y/7P/NwC7ADsBsAEWAmoCqALOAtoCzQKmAmcCFAKvAT0BwwBEAMf/T//g/n7+Lf7u/cP9rf2q/bv93f0O/kv+kv7g/jH/hP/V/yIAagCsAOcAGQFDAWQBfQGPAZgBmgGVAYgBdAFZATgBDgHeAKcAagAoAOL/mP9N/wT/vf59/kT+F/73/eX95f32/Rn+Tv6T/uf+R/+x/x4AjgD7AGEBvAEIAkICaQJ5AnMCVgIkAt4BiAElAbgARgDU/2X//f6h/lP+Fv7s/db90/3i/QT+NP5y/rr+CP9b/6//AABNAJQA0wAJATQBVgFsAXkBfAF3AWoBVgE8AR0B+QDRAKUAdwBGABIA3/+p/3T/P/8N/97+tP6R/nb+Zf5e/mT+dv6W/sL++/4+/4v/3v81AI4A5AA1AX0BugHoAQYCEgILAvEBxQGIAT0B5gCGACIAvv9c/wH/r/5r/jb+E/4C/gP+Fv46/mz+rP71/kT/l//r/zsAhgDKAAQBMwFWAW0BeAF4AW0BWAE7ARgB7wDDAJQAZAA1AAYA2f+u/4X/YP89/x//BP/u/t3+0v7M/s7+1/7n/gD/IP9J/3j/rv/o/yYAZgClAOIAGgFLAXIBjwGeAZ8BkgF3AU0BFwHVAIsAOwDo/5T/RP/6/rn+hP5d/kb+Pv5H/mD+iP69/v3+Rf+S/+L/MAB7AL8A+wAtAVIBagF1AXMBZQFMASkB/wDOAJoAZAAtAPn/yP+a/3L/UP80/x7/D/8F/wL/BP8L/xf/J/87/1P/b/+N/6//0//5/yAASQBxAJkAvgDfAPwAEwEjASsBKQEeAQoB7ADEAJUAXwAjAOb/p/9p/y///P7Q/q/+mv6R/pb+qP7H/vL+Jv9j/6X/6/8wAHQAswDqABkBPAFTAV0BWwFMATIBDQHgAK0AdQA7AAEAy/+Y/2r/Q/8k/w7/Af/8/v/+Cf8b/zH/Tf9r/4z/rv/Q//L/EgAxAE4AaACAAJUApwC1AMAAxwDJAMgAwgC3AKcAkgB5AFsAOQAUAO7/xf+d/3b/Uv8x/xf/BP/4/vX+/P4L/yT/Rv9v/57/0f8HAD0AcwCkANAA9QAQASIBKQElARUB/ADZAK8AfwBKABQA3/+r/3v/Uf8v/xX/BP/9/v/+Cv8e/zj/WP99/6T/zf/1/xsAPwBfAHsAkgCiAK4AtAC1ALEAqACcAI0AewBnAFEAOwAjAAsA9f/d/8b/sP+c/4n/eP9r/2D/Wf9X/1j/X/9r/3v/kf+q/8j/6f8KAC4AUgBzAJIArQDCANEA2QDZANIAwgCrAI0AagBCABcA7P/B/5j/c/9T/zr/KP8e/x3/Jf81/0z/af+M/7L/2v8CACkATgBvAIsAogCxALoAvAC3AKwAnACHAG8AVAA4ABsAAADm/87/uP+m/5f/jP+F/4H/gP+C/4j/kP+a/6b/tP/D/9P/5f/3/wgAGwAtAD8AUABfAG0AeACAAIQAhQCCAHsAbwBgAEwANgAcAAEA5v/K/6//lv+B/2//Y/9c/1v/YP9r/3z/kv+s/8r/6v8KACoASQBlAH0AkACeAKUApgChAJUAhQBvAFYAOgAdAAAA5P/J/7H/nf+N/4L/fP96/33/hf+R/5//sP/D/9f/7P///xEAIgAyAD8ASQBRAFcAWgBbAFkAVgBQAEkAQQA3ACwAIAAUAAYA+v/s/9//0v/F/7r/sf+p/6T/of+h/6T/qv+z/7//zf/e//H/AwAYACsAPgBPAF4AaQBxAHQAcwBuAGUAWABHADMAHgAHAPH/2v/F/7P/o/+X/5D/jP+O/5P/nf+q/7r/zf/h//X/CQAcAC4APgBLAFQAWwBdAFwAWABRAEgAPQAwACIAEwAFAPj/7P/g/9f/z//I/8T/wv/B/8L/xf/I/87/1P/b/+L/6//z//z/BAANABYAHgAmAC0AMwA4ADsAPQA9ADsANwAyACoAIQAXAAsAAADz/+b/2v/P/8b/vv+5/7b/tv+5/7//x//R/93/6//6/wcAFgAkADAAOgBDAEgASgBKAEcAQQA5AC4AIgAVAAcA+//u/+L/2P/P/8n/xP/D/8P/xv/L/9H/2f/i/+z/9v///wgAEAAYAB4AIwAnACkAKgApACgAJQAhAB0AGAATAA4ACAACAP7/+P/z/+7/6v/m/+P/4f/f/97/3v/f/+H/5P/n/+z/8v/4//7/BAALABEAGAAdACIAJgAoACkAKAAmACIAHgAXABAACQAAAPn/8f/p/+P/3f/Z/9f/1v/X/9n/3f/i/+n/8P/3////BgANABQAGgAeACIAIwAkACMAIAAdABgAEwAOAAgAAQD9//f/8v/u/+v/6f/o/+f/6P/p/+v/7f/w//P/9//7//7/AQAEAAcACQALAA0ADwAQABAAEAAQAA8ADgANAAsACQAHAAUAAgAAAP3/+v/4//X/8//x//D/7//v/+//8P/x//T/9v/5//z/AAADAAYACQAMAA8AEQASABIAEgARAA8ADQALAAcABAAAAP7/+//4//X/8//x//D/8P/x//L/8//1//j/+v/9/wAAAgAEAAYACAAKAAsACwALAAsACgAJAAgABgAEAAIAAQAAAP7//f/8//v/+v/6//r/+v/6//r/+//7//z//f/+////AAAAAAAAAQACAAMAAwAEAAQABAAEAAQABAAEAAMAAwACAAEAAQAAAAAA///+//3//f/8//z//P/8//z//P/9//3//v///wAAAAAAAAEAAgACAAMAAwADAAMAAwADAAIAAgABAAEAAAAAAAAA//////7//v/+//7//v/+/////////wAAAAAAAAAAAAAAAAAAAQABAAEAAQABAAEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA=",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "6a13937c-262f-4da8-9893-9330a6a4271f",
+      "path": "Assets/Scripts/Helpers.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nimport type { SpriteData } from '@protomake/renderer';\nexport function sprite(\n  c: ScriptContext,\n  id: string,\n  changes: Partial<SpriteData>,\n): void {\n  c.set(\n    'protomake.sprite',\n    { ...c.get<SpriteData>('protomake.sprite', id)!, ...changes },\n    id,\n  );\n}\nexport function show(c: ScriptContext, name: string, visible: boolean): void {\n  sprite(c, c.find(name)!, { visible });\n}\nexport function bar(\n  c: ScriptContext,\n  name: string,\n  value: number,\n  maximum: number,\n): void {\n  sprite(c, c.find(name)!, {\n    width: Math.max(1, (160 * value) / maximum),\n    visible: value > 0,\n  });\n}\nexport function clamp(value: number, min: number, max: number): number {\n  return Math.max(min, Math.min(max, value));\n}\n",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "d17eb1e8-7d24-45fe-9578-bc59e7f5155a",
+      "path": "Assets/Scripts/Platformer.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nimport { show, sprite, bar } from './Helpers';\nexport const fields = {\n  speed: { type: 'number', default: 220 },\n  jumpSpeed: { type: 'number', default: 480 },\n} as const;\n/** Edge input is latched in update and consumed once by the fixed simulation. */\nexport default class Platformer {\n  speed = 220;\n  jumpSpeed = 480;\n  private buffer = 0;\n  private coyote = 0;\n  private lives = 3;\n  private collected = new Set<string>();\n  private spawn: [number, number] = [-310, 130];\n  private done = false;\n  start(c: ScriptContext): void {\n    this.reset(c);\n  }\n  private reset(c: ScriptContext): void {\n    this.done = false;\n    this.lives = 3;\n    this.collected.clear();\n    this.spawn = [-310, 130];\n    this.buffer = 0;\n    this.coyote = 0;\n    c.setPosition(...this.spawn);\n    c.physics.setVelocity(c.entity, 0, 0);\n    for (let i = 1; i <= 4; i++) show(c, `Coin ${i}`, true);\n    sprite(c, c.find('Checkpoint')!, { tint: '#f3ac66' });\n    show(c, 'Victory', false);\n    show(c, 'Defeat', false);\n    bar(c, 'Health', 3, 3);\n    bar(c, 'Score', 0, 4);\n  }\n  update(c: ScriptContext): void {\n    if (c.input.wasPressed('Restart')) this.reset(c);\n    if (!this.done && c.input.wasPressed('Jump')) this.buffer = 0.12;\n    c.setParameter(\n      'active',\n      !this.done && Math.abs(c.input.getAxis('Move')) > 0.1,\n    );\n  }\n  fixedUpdate(c: ScriptContext): void {\n    if (this.done) {\n      c.physics.setVelocity(c.entity, 0, 0);\n      return;\n    }\n    const [x, y] = c.position(),\n      dt = c.delta;\n    const grounded =\n      Boolean(c.physics.raycast([x, y + 15], [0, 1], 8, c.entity)) &&\n      c.physics.velocity(c.entity)[1] >= 0;\n    this.coyote = grounded ? 0.1 : Math.max(0, this.coyote - dt);\n    this.buffer = Math.max(0, this.buffer - dt);\n    let vy = c.physics.velocity(c.entity)[1];\n    if (this.buffer > 0 && this.coyote > 0) {\n      vy = -this.jumpSpeed;\n      this.buffer = 0;\n      this.coyote = 0;\n      c.playAudio();\n    }\n    c.physics.setVelocity(c.entity, c.input.getAxis('Move') * this.speed, vy);\n    for (let i = 1; i <= 4; i++) {\n      const name = `Coin ${i}`,\n        p = c.position(c.find(name)!);\n      if (!this.collected.has(name) && Math.hypot(x - p[0], y - p[1]) < 30) {\n        this.collected.add(name);\n        show(c, name, false);\n        bar(c, 'Score', this.collected.size, 4);\n      }\n    }\n    const checkpoint = c.position(c.find('Checkpoint')!);\n    if (Math.hypot(x - checkpoint[0], y - checkpoint[1]) < 35) {\n      this.spawn = [-80, 55];\n      sprite(c, c.find('Checkpoint')!, { tint: '#6ee7b7' });\n    }\n    if (y > 270 || Math.abs(x) > 400) {\n      this.lives--;\n      bar(c, 'Health', this.lives, 3);\n      this.buffer = 0;\n      this.coyote = 0;\n      c.setPosition(...this.spawn);\n      c.physics.setVelocity(c.entity, 0, 0);\n      if (!this.lives) {\n        this.done = true;\n        show(c, 'Defeat', true);\n      }\n    }\n    const goal = c.position(c.find('Goal')!);\n    if (\n      this.collected.size === 4 &&\n      Math.hypot(x - goal[0], y - goal[1]) < 35\n    ) {\n      this.done = true;\n      show(c, 'Victory', true);\n    }\n  }\n}\n",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "f6734354-8a70-4c19-8746-b9274b5ef65d",
+      "path": "Assets/Animations/Idle.animation.json",
+      "kind": "text",
+      "mime": "application/x-protomake-animation",
+      "data": "{\"version\":1,\"name\":\"Idle\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"ec20c2d6-684b-421a-b541-800c25e31a04\",\"duration\":0.3},{\"texture\":\"686e2df7-7249-4611-9cb5-7eccfffcfe1e\",\"duration\":0.3}]}",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "80239f61-e03b-4434-a11e-8e275b6da9d2",
+      "path": "Assets/Animations/Action.animation.json",
+      "kind": "text",
+      "mime": "application/x-protomake-animation",
+      "data": "{\"version\":1,\"name\":\"Action\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"1519c6b2-58e0-4a09-9eca-49f8d0a11220\",\"duration\":0.08},{\"texture\":\"b88d398a-e90b-4162-80a4-d21b4ca4ed9c\",\"duration\":0.08}]}",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "6aefaee6-eab1-46ba-8892-b2b3c5ce9f69",
+      "path": "Assets/Animations/Actor.animator.json",
+      "kind": "text",
+      "mime": "application/x-protomake-animator",
+      "data": "{\"version\":1,\"initial\":\"Idle\",\"parameters\":{\"active\":{\"type\":\"bool\",\"default\":false}},\"states\":[{\"name\":\"Idle\",\"clip\":\"f6734354-8a70-4c19-8746-b9274b5ef65d\",\"speed\":1},{\"name\":\"Action\",\"clip\":\"80239f61-e03b-4434-a11e-8e275b6da9d2\",\"speed\":1}],\"transitions\":[{\"from\":\"Idle\",\"to\":\"Action\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"active\",\"operator\":\"==\",\"value\":true}]},{\"from\":\"Action\",\"to\":\"Idle\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"active\",\"operator\":\"==\",\"value\":false}]}]}",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "45d401aa-b37f-4a6e-a5f3-06883ebc7f71",
+      "path": "Assets/Prefabs/Coin.prefab.json",
+      "kind": "text",
+      "mime": "application/x-protomake-prefab",
+      "data": "{\"schemaVersion\":1,\"id\":\"45d401aa-b37f-4a6e-a5f3-06883ebc7f71\",\"name\":\"Assets/Prefabs/Coin.prefab.json\",\"entities\":[{\"id\":\"310555c0-5419-40f1-9397-00b1fc7ada4f\",\"name\":\"Coin 1\",\"enabled\":true,\"parent\":null,\"components\":{\"protomake.transform\":{\"local\":[1,0,0,1,-250,130]},\"protomake.sprite\":{\"texture\":\"343b7c30-b3b5-49a2-b025-bfd5a1127e66\",\"lit\":false,\"width\":18,\"height\":18,\"tint\":\"#ffe39c\",\"opacity\":1,\"visible\":true,\"flipX\":false,\"flipY\":false,\"anchorX\":0.5,\"anchorY\":0.5,\"layer\":0,\"order\":0}}}]}",
+      "width": 0,
+      "height": 0
+    },
+    {
+      "id": "f522ea91-9950-4ddd-8eb6-4c69793d84fa",
+      "path": "Assets/Scripts/StealthGuard.ts",
+      "kind": "text",
+      "mime": "text/typescript",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\n\nexport const fields = {\n  player: { type: 'entity', default: '', label: 'Player' },\n  detectionLight: { type: 'number', default: 0.55, min: 0, max: 1, step: 0.05, label: 'Detection light' },\n  detectionTime: { type: 'number', default: 0.8, min: 0.05, max: 10, step: 0.05, label: 'Detection time' },\n  viewRange: { type: 'number', default: 450, min: 0, max: 2000, step: 10, label: 'View range' },\n  viewAngle: { type: 'number', default: 90, min: 1, max: 360, step: 1, label: 'View angle' },\n} as const;\n\nexport default class StealthGuard {\n  player = '';\n  detectionLight = 0.55;\n  detectionTime = 0.8;\n  viewRange = 450;\n  viewAngle = 90;\n  private alert = 0;\n  private detected = false;\n\n  update(ctx: ScriptContext) {\n    if (!this.player) return;\n    const visible = ctx.canSee(this.player, this.viewRange, this.viewAngle) &&\n      ctx.illumination(this.player) >= this.detectionLight;\n    this.alert = Math.max(0, Math.min(1,\n      this.alert + (visible ? 1 : -1) * ctx.delta / this.detectionTime));\n    if (this.alert >= 1 && !this.detected) {\n      this.detected = true;\n      ctx.log('Guard detected the player');\n    } else if (this.alert <= 0 && this.detected) {\n      this.detected = false;\n      ctx.log('Guard lost the player');\n    }\n  }\n}\n",
+      "width": 0,
+      "height": 0
+    }
+  ],
+  "physics": {
+    "gravityX": 0,
+    "gravityY": 980,
+    "layers": [
+      "Default",
+      "World",
+      "Actors",
+      "Triggers"
+    ],
+    "matrix": [
+      [
+        true,
+        true,
+        true,
+        true
+      ],
+      [
+        true,
+        true,
+        true,
+        true
+      ],
+      [
+        true,
+        true,
+        true,
+        true
+      ],
+      [
+        true,
+        true,
+        true,
+        true
+      ]
+    ]
+  },
+  "input": [
+    {
+      "name": "Move",
+      "kind": "vector2",
+      "positiveX": [
+        "KeyD",
+        "ArrowRight",
+        "GamepadAxis0+"
+      ],
+      "negativeX": [
+        "KeyA",
+        "ArrowLeft",
+        "GamepadAxis0-"
+      ],
+      "positiveY": [
+        "KeyS",
+        "ArrowDown",
+        "GamepadAxis1+"
+      ],
+      "negativeY": [
+        "KeyW",
+        "ArrowUp",
+        "GamepadAxis1-"
+      ]
+    },
+    {
+      "name": "Jump",
+      "kind": "button",
+      "positiveX": [
+        "Space",
+        "GamepadButton0"
+      ],
+      "negativeX": [],
+      "positiveY": [],
+      "negativeY": []
+    },
+    {
+      "name": "Interact",
+      "kind": "button",
+      "positiveX": [
+        "KeyE",
+        "Mouse0",
+        "GamepadButton2"
+      ],
+      "negativeX": [],
+      "positiveY": [],
+      "negativeY": []
+    },
+    {
+      "name": "Restart",
+      "kind": "button",
+      "positiveX": [
+        "KeyR"
+      ],
+      "negativeX": [],
+      "positiveY": [],
+      "negativeY": []
+    }
+  ],
+  "mixer": [
+    {
+      "name": "Master",
+      "volume": 1,
+      "muted": false
+    },
+    {
+      "name": "Music",
+      "volume": 1,
+      "muted": false
+    },
+    {
+      "name": "SFX",
+      "volume": 1,
+      "muted": false
+    },
+    {
+      "name": "UI",
+      "volume": 1,
+      "muted": false
+    },
+    {
+      "name": "Ambience",
+      "volume": 1,
+      "muted": false
+    }
+  ],
+  "folders": [
+    "Assets",
+    "Assets/Images",
+    "Assets/Scripts",
+    "Assets/Audio",
+    "Assets/Animations",
+    "Assets/Prefabs",
+    "Scenes"
+  ],
+  "sceneFolders": {
+    "2608a04e-e69b-4502-bf62-542927f3ad73": "Scenes"
+  }
+}

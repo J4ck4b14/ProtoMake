@@ -2,6 +2,7 @@ import { inverse, multiply, type World, type Guid } from '@protomake/core';
 import type { EngineContext, System } from '@protomake/runtime';
 import type { InputService } from '@protomake/input';
 import type { Physics2D, ContactEvent } from '@protomake/physics2d/rapier';
+import { hasLineOfSight, sampleLighting, SpriteRenderer, type LightingChannel } from '@protomake/renderer';
 import { ScriptBehaviour, type ScriptFields } from './component';
 export interface MediaServices {
   animation?: {
@@ -32,6 +33,12 @@ export interface ScriptContext {
   readonly elapsed: number;
   position(entity?: Guid): readonly [number, number];
   setPosition(x: number, y: number, entity?: Guid): void;
+  /** Perceptual 0..1 illumination at an entity centre, including sprite shadow occlusion. */
+  illumination(entity?: Guid): number;
+  /** Perceptual 0..1 illumination at an arbitrary world point. */
+  lightAt(x: number, y: number, channel?: LightingChannel): number;
+  /** True when target is within range/FOV and not blocked by a shadow-caster shape. */
+  canSee(target: Guid, range?: number, fovDegrees?: number, observer?: Guid): boolean;
   get<T = unknown>(type: string, entity?: Guid): T | undefined;
   set(type: string, value: unknown, entity?: Guid): void;
   find(name: string): Guid | undefined;
@@ -124,6 +131,34 @@ export class ScriptSystem implements System {
         return clock().elapsed;
       },
       position: (stable = id) => this.world.worldPosition(entity(stable)),
+      illumination: (stable = id) => {
+        const target = entity(stable),
+          [x, y] = this.world.worldPosition(target),
+          channel = this.world.read(target, SpriteRenderer)?.lightingChannel ?? 'World';
+        return sampleLighting(this.world, x, y, stable, channel).intensity;
+      },
+      lightAt: (x, y, channel = 'World') => {
+        if (!Number.isFinite(x) || !Number.isFinite(y))
+          throw new Error('Light sample position must be finite');
+        return sampleLighting(this.world, x, y, undefined, channel).intensity;
+      },
+      canSee: (target, range = 500, fovDegrees = 90, observer = id) => {
+        if (!Number.isFinite(range) || range < 0 || !Number.isFinite(fovDegrees) || fovDegrees < 0 || fovDegrees > 360)
+          throw new Error('canSee expects a non-negative range and FOV between 0 and 360 degrees');
+        const observerId = entity(observer), targetId = entity(target),
+          observerMatrix = this.world.worldMatrix(observerId),
+          [ax, ay] = this.world.worldPosition(observerId), [bx, by] = this.world.worldPosition(targetId),
+          dx = bx - ax, dy = by - ay, distance = Math.hypot(dx, dy);
+        if (distance > range) return false;
+        if (distance > Number.EPSILON && fovDegrees < 360) {
+          const forward = Math.atan2(observerMatrix[1], observerMatrix[0]),
+            targetAngle = Math.atan2(dy, dx),
+            delta = Math.atan2(Math.sin(targetAngle - forward), Math.cos(targetAngle - forward));
+          if (Math.abs(delta) > (fovDegrees * Math.PI) / 360) return false;
+        }
+        const channel = this.world.read(targetId, SpriteRenderer)?.lightingChannel ?? 'World';
+        return hasLineOfSight(this.world, observer, target, channel);
+      },
       setPosition: (x, y, stable = id) => {
         if (!Number.isFinite(x) || !Number.isFinite(y))
           throw new Error('Position must be finite');

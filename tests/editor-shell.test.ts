@@ -7,6 +7,7 @@ vi.mock('@protomake/renderer/pixi', () => ({
       resize() {},
       render() {},
       setAssets: async () => {},
+      invalidateStaticLighting() {},
       destroy() {},
     }),
   },

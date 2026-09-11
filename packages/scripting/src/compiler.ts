@@ -1,6 +1,37 @@
 import ts from 'typescript';
 import type { AssetData } from '@protomake/assets';
 import type { ScriptField, ScriptFields } from './component';
+
+export interface ScriptLexeme {
+  text: string;
+  kind: 'plain' | 'comment' | 'string' | 'number' | 'keyword' | 'api' | 'type';
+}
+
+/** Lightweight lexical data for editor syntax colour without coupling the editor package to TypeScript. */
+export function scriptLexemes(source: string): ScriptLexeme[] {
+  const scanner = ts.createScanner(ts.ScriptTarget.Latest, false, ts.LanguageVariant.Standard, source),
+    result: ScriptLexeme[] = [];
+  for (let token = scanner.scan(); token !== ts.SyntaxKind.EndOfFileToken; token = scanner.scan()) {
+    const text = scanner.getTokenText();
+    let kind: ScriptLexeme['kind'] = 'plain';
+    if (token === ts.SyntaxKind.SingleLineCommentTrivia || token === ts.SyntaxKind.MultiLineCommentTrivia)
+      kind = 'comment';
+    else if (
+      token === ts.SyntaxKind.StringLiteral ||
+      token === ts.SyntaxKind.NoSubstitutionTemplateLiteral ||
+      token === ts.SyntaxKind.TemplateHead ||
+      token === ts.SyntaxKind.TemplateMiddle ||
+      token === ts.SyntaxKind.TemplateTail
+    ) kind = 'string';
+    else if (token === ts.SyntaxKind.NumericLiteral || token === ts.SyntaxKind.BigIntLiteral) kind = 'number';
+    else if (token >= ts.SyntaxKind.FirstKeyword && token <= ts.SyntaxKind.LastKeyword) kind = 'keyword';
+    else if (token === ts.SyntaxKind.Identifier && text === 'ctx') kind = 'api';
+    else if (token === ts.SyntaxKind.Identifier && /^[A-Z]/.test(text)) kind = 'type';
+    result.push({ text, kind });
+  }
+  return result;
+}
+
 export interface CompiledScript {
   id: string;
   path: string;
@@ -26,6 +57,7 @@ function literal(node: ts.Expression): unknown {
     ts.isNumericLiteral(node.operand)
   )
     return -Number(node.operand.text);
+  if (ts.isArrayLiteralExpression(node)) return node.elements.map((item) => literal(item));
   if (ts.isObjectLiteralExpression(node)) {
     const values: Record<string, unknown> = {};
     for (const property of node.properties) {
@@ -101,6 +133,23 @@ export function scriptFields(source: string, path = 'Script.ts'): ScriptFields {
       throw new Error(`${path}: invalid field ${name}`);
     const field = value as ScriptField;
     validateField(name, field, field.default);
+    if (field.label !== undefined && typeof field.label !== 'string')
+      throw new Error(`${path}: ${name}.label must be a string`);
+    if (field.help !== undefined && typeof field.help !== 'string')
+      throw new Error(`${path}: ${name}.help must be a string`);
+    for (const key of ['min', 'max', 'step'] as const)
+      if (field[key] !== undefined && (typeof field[key] !== 'number' || !Number.isFinite(field[key])))
+        throw new Error(`${path}: ${name}.${key} must be finite`);
+    if (field.step !== undefined && field.step <= 0)
+      throw new Error(`${path}: ${name}.step must be positive`);
+    if (field.min !== undefined && field.max !== undefined && field.min > field.max)
+      throw new Error(`${path}: ${name}.min must not exceed max`);
+    if (field.options !== undefined) {
+      if (!Array.isArray(field.options) || !field.options.every((option) => typeof option === 'string'))
+        throw new Error(`${path}: ${name}.options must be a string array`);
+      if (!['string', 'asset', 'entity'].includes(field.type))
+        throw new Error(`${path}: ${name}.options are only valid for string-like fields`);
+    }
     result[name] = field;
   }
   return result;
@@ -123,6 +172,39 @@ export function validateField(
   )
     throw new Error(`Script property ${name}: expected ${field.type}`);
 }
+export interface ScriptDiagnostic {
+  line: number;
+  column: number;
+  message: string;
+}
+
+export function scriptDiagnostics(source: string, path = 'Script.ts'): ScriptDiagnostic[] {
+  const result = ts.transpileModule(source, {
+    fileName: path,
+    compilerOptions: {
+      target: ts.ScriptTarget.ES2022,
+      module: ts.ModuleKind.ESNext,
+      strict: true,
+      isolatedModules: true,
+      sourceMap: false,
+    },
+    reportDiagnostics: true,
+  });
+  return (result.diagnostics ?? [])
+    .filter((diagnostic) => diagnostic.category === ts.DiagnosticCategory.Error)
+    .map((diagnostic) => {
+      const position =
+        diagnostic.file && diagnostic.start !== undefined
+          ? diagnostic.file.getLineAndCharacterOfPosition(diagnostic.start)
+          : { line: 0, character: 0 };
+      return {
+        line: position.line + 1,
+        column: position.character + 1,
+        message: ts.flattenDiagnosticMessageText(diagnostic.messageText, ' '),
+      };
+    });
+}
+
 export function compileScript(
   source: string,
   path = 'Script.ts',
@@ -138,19 +220,11 @@ export function compileScript(
     },
     reportDiagnostics: true,
   });
-  const errors = (result.diagnostics ?? []).filter(
-    (d) => d.category === ts.DiagnosticCategory.Error,
-  );
+  const errors = scriptDiagnostics(source, path);
   if (errors.length)
     throw new Error(
       errors
-        .map((d) => {
-          const position =
-            d.file && d.start !== undefined
-              ? d.file.getLineAndCharacterOfPosition(d.start)
-              : undefined;
-          return `${path}${position ? `:${position.line + 1}:${position.character + 1}` : ''}: ${ts.flattenDiagnosticMessageText(d.messageText, ' ')}`;
-        })
+        .map((d) => `${path}:${d.line}:${d.column}: ${d.message}`)
         .join('\n'),
     );
   const dependencies: string[] = [];

@@ -18,8 +18,16 @@ import { Inspector } from './inspector';
 import { PlayMode } from './play-mode';
 import { node, button, input, ask } from './dom';
 import './style.css';
+import { applyAppearance, loadAppearance } from './appearance';
+import { AccountSync } from './account-sync';
+import { showAccount } from './account-dialog';
+import { RecoveryManager } from './recovery';
+import type { RecoverySnapshot } from './storage';
+import { LIGHTING_CHANNELS, type LightingChannel } from '@protomake/renderer';
+applyAppearance(loadAppearance(), false);
 const model = new EditorModel(),
-  storage = new ProjectStorage();
+  storage = new ProjectStorage(),
+  accountSync = new AccountSync();
 const app = document.getElementById('app')!,
   header = node('header'),
   brand = node('div', 'brand', 'F'),
@@ -37,7 +45,9 @@ const app = document.getElementById('app')!,
   projectBrowser = node('section', 'project panel'),
   consolePanel = node('section', 'console panel'),
   consoleBody = node('div', 'console-body'),
-  status = node('footer');
+  status = node('footer'),
+  mobileNav = node('nav', 'mobile-nav'),
+  mobileViewTools = node('div', 'mobile-view-tools');
 canvas.tabIndex = 0;
 canvas.setAttribute('aria-label', 'Scene viewport');
 playHost.hidden = true;
@@ -51,13 +61,27 @@ inspectorHost.append(inspectorBody);
 workspace.append(hierarchy, sceneArea, inspectorHost);
 consolePanel.append(node('h2', '', 'Console'), consoleBody);
 bottom.append(projectBrowser, consolePanel);
-app.append(header, toolbar, workspace, bottom, status);
+app.append(header, toolbar, mobileNav, mobileViewTools, workspace, bottom, status);
 function log(message: string, error = false): void {
   const line = node(
     'p',
     error ? 'error' : '',
     `${new Date().toLocaleTimeString()}  ${message}`,
-  );
+  ),
+    scriptLocation = /(?:^|\s)(Assets\/[^:\n]+\.ts):(\d+):(\d+)/.exec(message);
+  if (scriptLocation) {
+    const asset = model.project.assets.find((candidate) => candidate.path === scriptLocation[1]);
+    if (asset) {
+      const jump = button('Open error', () =>
+        showScripts(model, log, asset.id, {
+          line: Number(scriptLocation[2]),
+          column: Number(scriptLocation[3]),
+        }),
+      );
+      jump.classList.add('console-jump');
+      line.append(' ', jump);
+    }
+  }
   consoleBody.prepend(line);
   while (consoleBody.children.length > 60)
     consoleBody.lastElementChild?.remove();
@@ -72,11 +96,51 @@ function run(action: () => void): void {
 function asyncRun(action: () => Promise<void>): void {
   void action().catch((error) => log(String(error), true));
 }
+const recovery = new RecoveryManager(model, storage, log);
 const viewport = new SceneViewport(canvas, model, (error) =>
     log(String(error), true),
   ),
-  inspector = new Inspector(inspectorBody, model, run),
+  inspector = new Inspector(inspectorBody, model, run, (assetId) => showScripts(model, log, assetId)),
   play = new PlayMode(playHost, model, log, refresh);
+
+const mobilePanels = [
+  ['hierarchy', 'Hierarchy'],
+  ['scene', 'Scene'],
+  ['inspector', 'Inspector'],
+  ['project', 'Project'],
+  ['console', 'Console'],
+  ['assets', 'Assets'],
+] as const;
+function setMobilePanel(panel: (typeof mobilePanels)[number][0]): void {
+  app.dataset.mobilePanel = panel;
+  for (const child of mobileNav.querySelectorAll('button'))
+    child.classList.toggle('active', child.dataset.panel === panel);
+  requestAnimationFrame(() => viewport.draw());
+}
+for (const [panel, label] of mobilePanels) {
+  const control = button(label, () => setMobilePanel(panel));
+  control.dataset.panel = panel;
+  mobileNav.append(control);
+}
+mobileViewTools.append(
+  button('Pan', () => {
+    viewport.tool = 'pan';
+    refresh();
+  }),
+  button('−', () => viewport.zoomBy(1 / 1.25), 'Zoom out'),
+  button('+', () => viewport.zoomBy(1.25), 'Zoom in'),
+  button('Frame', () => viewport.frameSelected()),
+  button('Gizmos', () => {
+    viewport.showGizmos = !viewport.showGizmos;
+    viewport.draw();
+  }),
+  button('Light debug', () => {
+    viewport.lightingDebug = !viewport.lightingDebug;
+    viewport.draw();
+  }),
+);
+setMobilePanel('scene');
+
 let clipboard: SceneData | undefined;
 function canLeave(): boolean {
   return (
@@ -131,7 +195,12 @@ async function save(): Promise<void> {
   const snapshot = structuredClone(model.project);
   await storage.save(snapshot, model.sceneId);
   model.markSaved(snapshot);
-  log(`Saved ${snapshot.name}`);
+  recovery.clearEmergency(snapshot.id);
+  log(`Saved ${snapshot.name} locally`);
+  if (accountSync.signedIn && accountSync.isLinked(snapshot.id)) {
+    const revision = await accountSync.save(snapshot, model.sceneId);
+    log(`Synced ${snapshot.name} to account · cloud revision ${revision}`);
+  }
 }
 async function openProjects(): Promise<void> {
   if (model.locked) return;
@@ -175,6 +244,76 @@ async function openProjects(): Promise<void> {
   document.body.append(dialog);
   dialog.showModal();
 }
+function recoverySummary(snapshot: RecoverySnapshot): string {
+  const scenes = snapshot.project.scenes.length,
+    entities = snapshot.project.scenes.reduce((total, scene) => total + scene.entities.length, 0),
+    assets = snapshot.project.assets.length;
+  return `${scenes} scene${scenes === 1 ? '' : 's'} · ${entities} entities · ${assets} assets`;
+}
+
+function restoreRecovery(snapshot: RecoverySnapshot): void {
+  if (!canLeave()) return;
+  model.load(snapshot.project, false);
+  if (snapshot.activeScene && model.project.scenes.some((scene) => scene.id === snapshot.activeScene))
+    model.switchScene(snapshot.activeScene);
+  log(`Restored recovery snapshot for ${snapshot.projectName}; save when satisfied`);
+}
+
+function compareRecovery(snapshot: RecoverySnapshot): void {
+  const dialog = node('dialog'), heading = node('h2', '', 'Recovery comparison'),
+    current = structuredClone(model.project);
+  const currentScenes = current.scenes.length,
+    currentEntities = current.scenes.reduce((total, scene) => total + scene.entities.length, 0),
+    snapshotEntities = snapshot.project.scenes.reduce((total, scene) => total + scene.entities.length, 0);
+  dialog.append(
+    heading,
+    node('p', '', `Recovery · ${new Date(snapshot.updated).toLocaleString()} · ${recoverySummary(snapshot)}`),
+    node('p', '', `Current · ${currentScenes} scenes · ${currentEntities} entities · ${current.assets.length} assets`),
+    node('p', 'settings-note', '',),
+    button('Close', () => dialog.close()),
+  );
+  const note = dialog.querySelector('.settings-note');
+  if (note) note.textContent = `${snapshotEntities - currentEntities >= 0 ? '+' : ''}${snapshotEntities - currentEntities} entities · ${snapshot.project.assets.length - current.assets.length >= 0 ? '+' : ''}${snapshot.project.assets.length - current.assets.length} assets compared with the current project.`;
+  dialog.onclose = () => dialog.remove();
+  document.body.append(dialog);
+  dialog.showModal();
+}
+
+async function showRecovery(preferred?: RecoverySnapshot): Promise<void> {
+  const snapshots = preferred ? [preferred, ...(await recovery.list()).filter((item) => item.key !== preferred.key)] : await recovery.list(),
+    dialog = node('dialog', 'recovery-dialog'), heading = node('h2', '', 'Recovery journal');
+  dialog.append(heading, node('p', 'settings-note', 'Autosaves are separate from Save and rotate automatically. Restore keeps the recovered project dirty so you can inspect it before committing.'));
+  if (!snapshots.length) dialog.append(node('p', 'empty', 'No recovery snapshots yet.'));
+  for (const snapshot of snapshots) {
+    const row = node('div', 'recovery-row'), info = node('div');
+    info.append(
+      node('strong', '', snapshot.projectName),
+      node('div', 'settings-note', `${snapshot.reason === 'checkpoint' ? 'Checkpoint' : snapshot.key.startsWith('emergency:') ? 'Emergency' : 'Autosave'} · ${new Date(snapshot.updated).toLocaleString()}`),
+      node('div', 'settings-note', recoverySummary(snapshot)),
+    );
+    const actions = node('div', 'actions');
+    actions.append(
+      button('Restore', () => { restoreRecovery(snapshot); dialog.close(); }),
+      button('Compare', () => compareRecovery(snapshot)),
+      button('Discard', () => asyncRun(async () => {
+        await recovery.discard(snapshot);
+        row.remove();
+      })),
+    );
+    row.append(info, actions);
+    dialog.append(row);
+  }
+  const actions = node('div', 'actions');
+  actions.append(
+    button('Create checkpoint', () => asyncRun(async () => { await recovery.capture('checkpoint'); dialog.close(); })),
+    button('Close', () => dialog.close()),
+  );
+  dialog.append(actions);
+  dialog.onclose = () => dialog.remove();
+  document.body.append(dialog);
+  dialog.showModal();
+}
+
 const undo = button('Undo', () => run(() => model.undo())),
   redo = button('Redo', () => run(() => model.redo()));
 toolbar.append(undo, redo, node('span', 'divider'));
@@ -217,7 +356,22 @@ spacing.input.onchange = () => {
     viewport.draw();
   }
 };
-toolbar.append(grid.row, snapping.row, spacing.row, node('span', 'spacer'));
+const gizmos = input('Gizmos', '', 'checkbox');
+gizmos.input.checked = true;
+gizmos.input.onchange = () => { viewport.showGizmos = gizmos.input.checked; viewport.draw(); };
+const colliders = input('Colliders', '', 'checkbox');
+colliders.input.checked = true;
+colliders.input.onchange = () => { viewport.showColliders = colliders.input.checked; viewport.draw(); };
+const lightingDebug = input('Light debug', '', 'checkbox');
+lightingDebug.input.onchange = () => { viewport.lightingDebug = lightingDebug.input.checked; viewport.draw(); };
+const lightingChannel = node('select');
+lightingChannel.setAttribute('aria-label', 'Lighting debug channel');
+for (const channel of LIGHTING_CHANNELS) lightingChannel.append(new Option(channel, channel));
+lightingChannel.value = viewport.lightingChannel;
+lightingChannel.onchange = () => { viewport.lightingChannel = lightingChannel.value as LightingChannel; viewport.draw(); };
+toolbar.append(
+  grid.row, snapping.row, spacing.row, gizmos.row, colliders.row, lightingDebug.row, lightingChannel, node('span', 'spacer'),
+);
 const playButton = button('▶ Play', () => run(() => play.start())),
   pause = button('Pause', () => run(() => play.pause())),
   step = button('Step', () => run(() => play.step())),
@@ -485,6 +639,7 @@ window.addEventListener('keydown', (e) => {
 });
 window.addEventListener('beforeunload', (e) => {
   if (model.dirty) {
+    recovery.saveEmergency();
     e.preventDefault();
     e.returnValue = '';
   }
@@ -497,7 +652,16 @@ void attachRenderer(sceneArea, viewport, model, log).catch((error) =>
   log(`Renderer unavailable: ${String(error)}`, true),
 );
 
-menu.append(button('Settings', () => showSettings(model, log)));
+asyncRun(async () => {
+  const snapshot = await recovery.newestRecoverable();
+  if (snapshot) await showRecovery(snapshot);
+});
+
+menu.append(
+  button('Recovery', () => asyncRun(() => showRecovery())),
+  button('Account', () => showAccount(model, accountSync, log, canLeave)),
+  button('Settings', () => showSettings(model, log)),
+);
 
 const debugControl = input('Physics debug', '', 'checkbox');
 debugControl.input.onchange = () => play.setDebug(debugControl.input.checked);

@@ -2,20 +2,25 @@ import { PhysicsSettingsSchema } from '@protomake/physics2d';
 import { InputMapSchema } from '@protomake/input';
 import type { EditorModel } from './model';
 import { node, button, input } from './dom';
+import { applyAppearance, loadAppearance } from './appearance';
 export function showSettings(
   model: EditorModel,
   report: (message: string, error?: boolean) => void,
 ): void {
   if (model.locked) return;
   const dialog = node('dialog', 'settings'),
-    heading = node('h2', '', 'Physics & input'),
+    heading = node('h2', '', 'Project settings'),
     physics = structuredClone(model.project.physics),
     gx = input('Gravity X', String(physics.gravityX), 'number'),
     gy = input('Gravity Y', String(physics.gravityY), 'number'),
     names = input('Layer names', physics.layers.join(', ')),
     matrixHost = node('div', 'matrix'),
     bindings = node('textarea'),
-    error = node('p', 'error');
+    error = node('p', 'error'),
+    appearance = loadAppearance(),
+    accent = input('UI accent', appearance.accent, 'color'),
+    surface = input('UI surface', appearance.surface, 'color'),
+    contrastNote = node('p', 'settings-note', 'Text and focus colours are chosen automatically for readable contrast.');
   bindings.setAttribute('aria-label', 'Input action definitions');
   bindings.value = JSON.stringify(model.project.input, null, 2);
   bindings.rows = 15;
@@ -89,8 +94,9 @@ export function showSettings(
           model.project.physics = settings;
           model.project.input = inputMap;
         });
+        applyAppearance({ accent: accent.input.value, surface: surface.input.value });
         dialog.close();
-        report('Physics and input settings updated');
+        report('Project and editor appearance settings updated');
       } catch (reason) {
         error.textContent = String(reason);
       }
@@ -98,6 +104,11 @@ export function showSettings(
   );
   dialog.append(
     heading,
+    node('h3', '', 'Editor appearance'),
+    accent.row,
+    surface.row,
+    contrastNote,
+    node('h3', '', 'Physics'),
     gx.row,
     gy.row,
     names.row,

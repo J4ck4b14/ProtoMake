@@ -16,6 +16,7 @@ import { PixiRenderer } from '@protomake/renderer/pixi';
 import { EditorModel } from './model';
 import type { SceneViewport } from './viewport';
 import { node, button, ask } from './dom';
+import { showScripts } from './scripts-panel';
 export class AssetsPanel {
   private folder = 'Assets';
   private selected: string | undefined;
@@ -131,6 +132,15 @@ export class AssetsPanel {
     const actions = node('div', 'actions');
     actions.append(
       button('Import files', () => file.click()),
+      button('+ Script', () => showScripts(this.model, this.report)),
+      button('Edit script', () =>
+        this.run(() => {
+          const asset = this.model.project.assets.find((a) => a.id === this.selected);
+          if (!asset || asset.mime !== 'text/typescript')
+            throw new Error('Select a TypeScript asset');
+          showScripts(this.model, this.report, asset.id);
+        }),
+      ),
       button('+ Animation clip', () =>
         this.run(() => editMedia(this.model, CLIP_MIME)),
       ),
@@ -266,12 +276,14 @@ export class AssetsPanel {
       });
       b.ondblclick = () =>
         this.run(() => {
-          if (asset.mime === CLIP_MIME || asset.mime === CONTROLLER_MIME)
+          if (asset.mime === 'text/typescript')
+            showScripts(this.model, this.report, asset.id);
+          else if (asset.mime === CLIP_MIME || asset.mime === CONTROLLER_MIME)
             editMedia(this.model, asset.mime, asset.id);
         });
       b.title =
         asset.path +
-        ([CLIP_MIME, CONTROLLER_MIME].includes(asset.mime)
+        (asset.mime === 'text/typescript' || [CLIP_MIME, CONTROLLER_MIME].includes(asset.mime)
           ? ' · Double-click to edit'
           : '');
       b.draggable = !this.model.locked;
@@ -300,7 +312,8 @@ export async function attachRenderer(
   const canvas = node('canvas', 'render-canvas');
   area.prepend(canvas);
   const renderer = await PixiRenderer.create(canvas, true);
-  let assetSignature = '';
+  let assetSignature = '', sceneSignature = '';
+  viewport.lightingStats = () => renderer.lightingStats;
   viewport.entityOrder = () => [
     ...[...model.world.all()]
       .filter((e) => !model.world.components(e.id).has(SpriteRenderer.type))
@@ -326,6 +339,11 @@ export async function attachRenderer(
     renderer.render(model.world, view);
   };
   const sync = () => {
+    const nextSceneSignature = JSON.stringify([model.sceneId, model.scene]);
+    if (nextSceneSignature !== sceneSignature) {
+      sceneSignature = nextSceneSignature;
+      renderer.invalidateStaticLighting();
+    }
     const signature = JSON.stringify(model.project.assets);
     if (signature !== assetSignature) {
       assetSignature = signature;

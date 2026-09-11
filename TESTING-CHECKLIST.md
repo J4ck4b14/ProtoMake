@@ -1,4 +1,4 @@
-# ProtoMake 0.7 hands-on acceptance
+# ProtoMake 0.9 hands-on acceptance
 
 Start with the new Milestones 5–7 checks below, then briefly regress editing/save/physics. The automated tests do not establish rendered pixels, audible output, actual downloads or browser Service Worker behavior.
 
@@ -17,7 +17,7 @@ Expected: the physics playground plus **Enemy 01–10**, all linked to one prefa
 - Assign the active scene a folder using **Scene folder** in Project. Its path should appear in the sorted scene list and survive reopening.
 - In Hierarchy, select plain entities and **Group selection**. Use children/parenting to organize scene objects. Groups are transform entities, not asset folders.
 
-Expected: resizing affects only your local layout, not the scene or Undo history. Very narrow screens retain a desktop minimum width. An asset folder rename that would break imports from outside that folder is rejected with a script diagnostic.
+Expected: resizing affects only your local layout, not the scene or Undo history. At 800 CSS px and below the workspace changes to mobile panel tabs instead of forcing a desktop minimum width. An asset folder rename that would break imports from outside that folder is rejected with a script diagnostic.
 
 ## 3. Prefabs
 
@@ -71,3 +71,55 @@ Run `npm run preview:prototypes` and use the launcher. Play all three through a 
 Import each project's JSON to inspect and edit it. Scrub a clip, change a duration, connect states and reorder rules, then save/reopen and Undo. Change Ambient intensity and move/rotate a local light; verify editor Play and a rebuilt export show the same changes.
 
 See the workshop chapters for per-game success/failure checks. `tests/prototypes.test.ts` additionally completes the platformer with keyboard input only, so a reachable route is covered beyond isolated jump tests.
+
+
+## Additional polish acceptance
+
+### Lighting and stealth queries
+
+- Add a low-intensity Ambient Light and a Point Light. Make a large white floor/wall sprite. Moving the point light should visibly move a gradient across that surface; it should no longer tint the whole sprite uniformly from its centre.
+- Set the point light to **dynamic**, then Play and move/parent it from a script: the rendered light should move. Set it to **static**: runtime light/caster geometry should remain at the scene-start snapshot. Set it to **mixed**: the fixture stays fixed while moving shadow casters update. Authoring edits in the editor should still update all three modes.
+- Enable **Cast Shadow** on a wall sprite or add **Shadow Caster 2D**. Put the point light on one side and a lit surface/actor on the other. The region behind the caster should darken. Ambient fill should remain visible in the shadow.
+- In a project script, log `ctx.illumination()` while moving an entity between light and shadow, and compare with `ctx.lightAt(x, y)`. Values should fall toward 0 in darkness and rise toward 1 in bright light. A scene with no lights returns 1 for legacy behavior.
+
+### Script authoring and appearance
+
+- In Assets choose **+ Script**. Type code, use Tab indentation, then Ctrl/Cmd+S. Reopen the same `.ts` by double-clicking it in Assets.
+- Make an unsaved edit, close the editor dialog and reopen that script. The local protected draft should be offered/restored instead of being silently lost.
+- In Settings choose a very light accent and then a very dark accent/surface combination. Buttons, text and focus states should automatically switch to readable foreground colours; you should not need a separate text-colour setting.
+
+### Mobile and account continuity
+
+- Resize below 800 CSS px or open on a phone. Use Hierarchy / Scene / Inspector / Project / Console / Assets tabs. In Scene, test explicit Pan, +/− zoom and Frame controls. Return above 800 px and verify the normal resizable desktop layout.
+- Run `npm run dev:account`. Create an account, **Save current to account**, edit and Save again. Open the cloud project and verify its revision increases.
+- On a second browser/device connected to the same reachable server, open the project, save a newer revision, then attempt to save the stale first copy. The stale save must report a revision conflict instead of silently overwriting the newer cloud project.
+
+For true phone/desktop testing the account server must be reachable from both devices; localhost on one machine is not cross-device networking. See `docs/account-sync.md`.
+
+
+## ProtoMake 0.9 Editor Quality acceptance
+
+### Recovery and history
+
+- Make several Inspector/transform edits, use **Undo** / **Redo**, then create a separate **Recovery → Create checkpoint**. Recovery actions must not add commands to Undo history.
+- Make a dirty edit and reload/close the tab. Reopen ProtoMake: a newer autosave/emergency snapshot should offer **Restore**, **Compare** and **Discard**. Restoring must remain dirty until explicit Save.
+- Open two different projects in separate tabs and dirty both before the IndexedDB debounce completes. Their emergency snapshots must remain project-scoped rather than replacing one another.
+
+### Gizmos and lighting quality
+
+- Select point and spot lights. Their influence volume should rotate with the entity and the range handle should drag from the visually displayed handle. Area lights should show both the authored rectangle and its outer falloff extent.
+- Select Box/Circle/Capsule colliders, sensors, a Camera 2D, sprite/explicit shadow casters and a Perception 2D guard. Verify their shapes/cones are visible without entering Play.
+- For a Light 2D, test **Shadow opacity** at 0, 0.5 and 1, a small positive **Shadow bias**, and non-zero **Shadow softness**. Confirm partial/soft shadows remain bounded and ambient light is unaffected.
+- Put world and character sprites on different lighting channels; mask a lamp to Characters only. World receivers should remain dark while the character responds. Toggle **Light debug**, change its debug channel and inspect heatmap values plus light/caster/cache timing counters.
+
+### Perception and script authoring
+
+- Give a guard Perception 2D and a target. Rotate/move the target in/out of range/FOV and behind a caster. The target line should distinguish exposed, visible-but-too-dark and occluded/out-of-cone states.
+- Open a TypeScript asset and verify line numbers, syntax colour, `ctx.*` completion/API reference and click-to-jump diagnostics. From ScriptBehaviour use **Open script**.
+- Add literal script field metadata (`label`, `help`, `min`, `max`, `step`, `options`) and verify the Inspector reflects it. Invalid metadata such as `min > max` must fail compilation rather than silently degrading.
+
+### Hardened continuity and touch
+
+- While signed into one account server, change the server URL and apply it. ProtoMake should clear the prior session/revision links and require sign-in on the new server.
+- On two devices, issue concurrent saves from the same cloud revision: exactly one may advance it; the other must receive a revision conflict. Cloud project data returned to the browser must not contain server-internal ownership fields.
+- On touch hardware test one-finger Scene interaction plus two-finger pinch zoom, mobile panel switching, coarse controls and the narrow single-column script workspace.
