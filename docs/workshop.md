@@ -2,7 +2,7 @@
 
 ## Build a shooter a platformer and a local fighting game
 
-ProtoMake 0.8 • September 2026 • Practical workshop
+ProtoMake 0.9.3 • September 2026 • Practical workshop
 
 This workshop takes you from an empty ProtoMake scene to three small playable games. You will author entities, reuse prefabs, connect scripts to named input actions, edit sprite animations, light a scene and export a standalone web build. Each chapter ends with observable checks. The completed projects are included so you can compare your work at any point.
 
@@ -15,7 +15,7 @@ npm ci
 npm run preview:prototypes
 ```
 
-Open the URL printed by the terminal and choose a game. The launcher serves the three bundled production builds. Stop the server with Ctrl+C when finished. To author projects, run `npm run dev`, then use Import JSON to open a project's `.protomake.json` file.
+Open the URL printed by the terminal and choose a game. The launcher serves the three bundled production builds. Stop the server with Ctrl+C when finished. To author projects, run `npm run dev`, then use **Import project** to open a project's `.protomake.json` file.
 
 **Reading route.** Chapters 1–6 establish the common workflow. Chapters 7–9 build Signal Patrol; chapters 10–12 build Lantern Steps; chapters 13–15 build Sparring Room. Chapters 16–18 cover prefabs, export and further development. Read the shared setup once; then choose a game.
 
@@ -30,7 +30,7 @@ Use Node.js 22.12 or later. The dependency lockfile is included; npm ci installs
 1. Run `npm run dev`. Open the exact local URL printed by Vite. The editor opens at the root page. Stop older development servers first so you do not accidentally test an old build.
 2. Import one completed project from `examples/prototypes/shooter/shooter.protomake.json`, `platformer/platformer.protomake.json` or `fighter/fighter.protomake.json`. These paths are relative to `examples/prototypes` after the first example.
 3. Press Play, then click the game viewport to enable sound and focus input. Stop returns to the authored scene. Changes made by gameplay are disposable runtime state.
-4. Use Save for the browser's project store and Export JSON for a portable project backup. Save storage belongs to that browser and origin, including its port. Export JSON before changing origins or clearing browser data.
+4. Use **Save locally** for the browser's project store and **Export backup** for a portable `.protomake.json` backup. Local storage belongs to that browser origin. Export a backup before changing origins/devices or clearing browser data.
 5. To build your own version, choose New project and give it a different name. Preserve the completed example as your reference. Work through the following pages and save at each checkpoint.
 
 **What is in each example folder**
@@ -285,7 +285,7 @@ The checkpoint activates within 35 units of its center. It changes color to gree
 2. Jump from around X -220 toward Step one, collect Coin 2 and touch the flag. Start before the edge so the actor clears the platform underside. The flag becomes green. Deliberately fall into a gap; you should respawn on Step one with one less life and the first coins still absent.
 3. Reach Step two and collect Coin 3. Return to the east floor for Coin 4. Touch Goal after collecting all four. The victory panel appears. Touching Goal early should not finish the level.
 4. Repeat three falls in a fresh run. After defeat, press R. Verify full health, all four coins restored, the flag orange again and the original west-floor spawn.
-5. Save and export the authored project. Stop/Play should start a new run: runtime progress is not written into the saved project.
+5. Save locally and Export backup for the authored project. Stop/Play should start a new run: runtime progress is not written into the saved project.
 
 **Common failures.** An oversized ground ray allows jumping while far above a platform. Forgetting to clear the jump buffer after consumption creates repeated jumps. Preserving vertical velocity during respawn can send the character straight back into a death zone. Disabling collected entities would work for this simple scene, but hiding their sprites is enough and avoids changing unrelated component lifecycles.
 
@@ -374,7 +374,7 @@ The examples contain six linked drones, four linked coins or two linked fighters
 1. Select a drone instance and change Sprite Renderer width from 36 to 42. The Inspector records a property override. Other drones should retain their original width.
 2. Use the override's Apply action to change the prefab base. Instances without an overriding value inherit it. Revert restores the inherited property for an individual instance. Undo should reverse an authored edit.
 3. Use Unpack instance when you deliberately want an independent entity. Do not unpack merely to change a single property; an override already expresses that intention.
-4. Save, close and reopen your project. Confirm references and overrides survive. Export JSON before experimenting with destructive structural changes.
+4. Save locally, close and reopen your project. Confirm references and overrides survive. Export a backup before experimenting with destructive structural changes.
 
 **Stable references versus names.** Assets use IDs, so Move / rename preserves their references. Controllers point to clip IDs, clips point to image IDs and components point to controller IDs. Recreating an asset with the same filename creates a new identity. Editing an existing asset avoids that break. By contrast, the workshop scripts deliberately resolve scene entities by exact names for readability. Renaming Player or Coin 1 without changing the script is a different operation from renaming an asset.
 
@@ -427,8 +427,8 @@ The export destination must be empty. Do not overwrite your only custom build as
 
 **Useful source entry points.** Read the main script in each example's Scripts folder for game rules; Helpers.ts for bars and sprite visibility; packages/scripting/src/runtime.ts for ScriptContext; packages/animation/src/index.ts for playback and transitions; packages/renderer/src/lighting.ts for illumination; and tests/prototypes.test.ts for executable gameplay checks. These local sources are the implementation authority for this workshop. docs/lighting.md, docs/animation-audio.md and docs/web-build.md provide focused references.
 
-**Mobile, appearance and continuity.** At 800 CSS pixels or below the editor switches to touch-sized Hierarchy, Scene, Inspector, Project, Console and Assets tabs; the Scene tab adds explicit Pan, zoom and Frame controls. Settings lets you choose the editor accent and surface colours while ProtoMake derives readable foreground colours automatically. The Account dialog is optional: with `npm run dev:account` or a deployed ProtoMake account server, projects can be saved and reopened across browsers/devices with revision-conflict protection. Local IndexedDB saves and JSON export continue to work independently.
+**Mobile, appearance and continuity.** At 800 CSS pixels or below the editor switches to touch-sized Hierarchy, Scene, Inspector, Project, Console and Assets tabs; the Scene tab adds explicit Pan, zoom and Frame controls. Settings lets you choose the editor accent and surface colours while ProtoMake derives readable foreground colours automatically. Cloud sync is optional: with `npm run dev:account` or a deployed ProtoMake account server, projects can be saved and reopened across browsers/devices with revision-conflict protection. The public GitHub Pages alpha needs no backend: Save locally uses IndexedDB, while Export backup/Import project provide portable cross-device continuity.
 
-**Next step.** Choose one example and make a small original variation with a clear completion condition. Write three acceptance checks before adding features. Keep an exported playable build and a project JSON at each milestone. A useful portfolio extension should explain a design choice, demonstrate its implementation and show how you verified it—not merely add more systems.
+**Next step.** Choose one example and make a small original variation with a clear completion condition. Write three acceptance checks before adding features. Keep an exported playable build and a `.protomake.json` backup at each milestone. A useful portfolio extension should explain a design choice, demonstrate its implementation and show how you verified it—not merely add more systems.
 
 The supplied geometric PNGs and short WAV are workshop placeholder assets. They are included for use and modification with the project; retain the repository license and third-party notices when redistributing ProtoMake. Replace the presentation with your own art and sound when developing a distinctive game.

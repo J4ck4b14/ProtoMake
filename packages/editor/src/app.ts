@@ -150,6 +150,20 @@ function canLeave(): boolean {
     )
   );
 }
+function exportBackup(): void {
+  const blob = new Blob([serializeProject(model.project, model.registry)], {
+      type: 'application/json',
+    }),
+    url = URL.createObjectURL(blob),
+    anchor = node('a');
+  anchor.href = url;
+  anchor.download =
+    model.project.name.replace(/[^a-zA-Z0-9_-]/g, '_') + '.protomake.json';
+  anchor.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+  log(`Exported portable backup for ${model.project.name}`);
+}
+
 menu.append(
   button('New project', () =>
     asyncRun(async () => {
@@ -158,27 +172,14 @@ menu.append(
       if (name) model.newProject(name);
     }),
   ),
-  button('Open', () => asyncRun(openProjects)),
-  button('Save', () => asyncRun(save)),
-  button('Export JSON', () =>
-    run(() => {
-      const blob = new Blob([serializeProject(model.project, model.registry)], {
-          type: 'application/json',
-        }),
-        url = URL.createObjectURL(blob),
-        anchor = node('a');
-      anchor.href = url;
-      anchor.download =
-        model.project.name.replace(/[^a-zA-Z0-9_-]/g, '_') + '.protomake.json';
-      anchor.click();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    }),
-  ),
-  button('Import JSON', () => fileInput.click()),
+  button('Open local', () => asyncRun(openProjects), 'Open a project saved in this browser'),
+  button('Save locally', () => asyncRun(save), 'Save this project in this browser · Ctrl/Cmd+S'),
+  button('Export backup', () => run(exportBackup), 'Download a portable .protomake.json backup'),
+  button('Import project', () => fileInput.click(), 'Open a portable .protomake.json project'),
 );
 const fileInput = node('input');
 fileInput.type = 'file';
-fileInput.accept = '.json';
+fileInput.accept = '.protomake.json,.json,application/json';
 fileInput.hidden = true;
 fileInput.onchange = () =>
   asyncRun(async () => {
@@ -206,16 +207,16 @@ async function openProjects(): Promise<void> {
   if (model.locked) return;
   const projects = await storage.list(),
     dialog = node('dialog'),
-    heading = node('h2', '', 'Saved projects');
+    heading = node('h2', '', 'Local projects');
   dialog.append(heading);
   if (!projects.length)
     dialog.append(
-      node('p', '', 'No saved projects yet. Create a project and press Save.'),
+      node('p', '', 'No local projects yet. Create a project and choose Save locally.'),
     );
   for (const project of projects) {
     const row = node('div', 'saved-project');
     row.append(
-      button(project.name, () =>
+      button(`${project.name} · ${new Date(project.updated).toLocaleString()}`, () =>
         asyncRun(async () => {
           if (!canLeave()) return;
           const saved = await storage.loadSession(project.id);
@@ -229,7 +230,7 @@ async function openProjects(): Promise<void> {
           log(`Opened ${project.name}`);
         }),
       ),
-      button('Delete saved copy', () =>
+      button('Delete local copy', () =>
         asyncRun(async () => {
           if (!confirm(`Delete the saved copy of ${project.name}?`)) return;
           await storage.delete(project.id);
@@ -565,7 +566,7 @@ function refresh(): void {
   step.disabled = play.state !== 'paused';
   stop.disabled = play.state === 'stopped';
   for (const b of menu.querySelectorAll('button')) b.disabled = model.locked;
-  status.textContent = `${model.selection.size} selected · ${model.dirty ? 'Unsaved changes' : 'Saved'} · Drag handles to transform · Shift: multi-select · Alt: bypass snapping · Space / middle mouse: pan`;
+  status.textContent = `${model.selection.size} selected · ${model.dirty ? 'Unsaved changes' : 'Saved locally'} · Drag handles to transform · Shift: multi-select · Alt: bypass snapping · Space / middle mouse: pan`;
   renderHierarchy();
   renderProject();
   inspector.render();
@@ -574,7 +575,7 @@ function refresh(): void {
 model.onChange(refresh);
 refresh();
 log(
-  'ProtoMake editor ready. Save stores projects in this browser; export JSON for portable backups.',
+  'ProtoMake editor ready. Save locally stores projects in this browser; Export backup creates a portable .protomake.json file.',
 );
 window.addEventListener('keydown', (e) => {
   if ((e.target as HTMLElement)?.closest('input,textarea,select,dialog'))
@@ -652,14 +653,62 @@ void attachRenderer(sceneArea, viewport, model, log).catch((error) =>
   log(`Renderer unavailable: ${String(error)}`, true),
 );
 
+
+const STORAGE_NOTICE_KEY = 'protomake.storage-notice.v1';
+function showStorageNotice(): void {
+  try {
+    if (localStorage.getItem(STORAGE_NOTICE_KEY)) return;
+  } catch {
+    // Browsers that block localStorage still have the visible save/export actions.
+  }
+  const dialog = node('dialog', 'storage-notice'),
+    heading = node('h2', '', 'Where ProtoMake saves your work'),
+    actions = node('div', 'actions');
+  dialog.append(
+    heading,
+    node(
+      'p',
+      '',
+      'Save locally stores the complete project in this browser using IndexedDB. It does not require an account or backend.',
+    ),
+    node(
+      'p',
+      '',
+      'Browser storage is convenient, not a portable backup. Clearing site data, using private browsing, changing device, or moving ProtoMake to a different site can make local saves unavailable.',
+    ),
+    node(
+      'p',
+      'storage-notice-important',
+      'Use Export backup regularly. The downloaded .protomake.json can be kept anywhere and reopened later with Import project.',
+    ),
+  );
+  const dismiss = () => dialog.close();
+  actions.append(
+    button('Export backup now', () => run(exportBackup)),
+    button('Got it', dismiss),
+  );
+  dialog.append(actions);
+  dialog.onclose = () => {
+    try {
+      localStorage.setItem(STORAGE_NOTICE_KEY, 'seen');
+    } catch {
+      // The notice simply appears again next session when storage is unavailable.
+    }
+    dialog.remove();
+  };
+  document.body.append(dialog);
+  dialog.showModal();
+}
+
 asyncRun(async () => {
   const snapshot = await recovery.newestRecoverable();
   if (snapshot) await showRecovery(snapshot);
+  else showStorageNotice();
 });
 
 menu.append(
   button('Recovery', () => asyncRun(() => showRecovery())),
-  button('Account', () => showAccount(model, accountSync, log, canLeave)),
+  button('Cloud sync', () => showAccount(model, accountSync, log, canLeave), 'Optional account-backed project continuity'),
   button('Settings', () => showSettings(model, log)),
 );
 

@@ -1,6 +1,9 @@
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 export default defineConfig({
+  // Relative asset URLs make the same production build work at /ProtoMake/ on
+  // GitHub Pages as well as at a domain root or another static host.
+  base: './',
   server: {
     proxy: {
       '/api': 'http://127.0.0.1:4174',

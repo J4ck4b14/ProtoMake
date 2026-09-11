@@ -919,3 +919,21 @@ textarea { background: color-mix(in srgb, var(--protomake-surface), #000 12%); c
   .code-editor { grid-template-columns: 42px minmax(0, 1fr); min-height: 56vh; }
 }
 .console-jump { margin-left: 8px; padding: 2px 6px; min-height: 0; font-size: 10px; }
+
+/* Public-alpha storage notice: local browser persistence is convenient, while
+   portable .protomake.json exports remain the explicit cross-device backup path. */
+.storage-notice {
+  width: min(560px, 92vw);
+}
+.storage-notice p {
+  max-width: 62ch;
+  color: var(--protomake-muted);
+}
+.storage-notice-important {
+  padding: 10px 12px;
+  border: 1px solid var(--protomake-border);
+  border-left: 3px solid var(--protomake-accent);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--protomake-panel), #000 7%);
+  color: var(--protomake-surface-text) !important;
+}

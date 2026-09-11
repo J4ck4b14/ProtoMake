@@ -25,7 +25,7 @@ export function showAccount(
     if (!sync.signedIn) {
       const email = input('Email', ''),
         password = input('Password', '', 'password'),
-        status = node('p', 'settings-note', 'Accounts are optional. With a reachable ProtoMake sync server, the same projects can be opened on desktop or mobile.');
+        status = node('p', 'settings-note', 'Cloud sync is optional and is not required for the GitHub Pages public alpha. Configure a reachable ProtoMake sync server only if you want account-backed cross-device continuity.');
       email.input.autocomplete = 'email';
       password.input.autocomplete = 'current-password';
       const act = async (kind: 'signin' | 'signup') => {

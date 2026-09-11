@@ -45,6 +45,6 @@ Open the computer's LAN address from the phone. The Vite `/api` proxy keeps the 
 
 ## Validation notes
 
-Dependency-independent checks in this release cover TypeScript syntax/transpilation, package boundaries, account-server syntax, lighting/occlusion math, appearance contrast logic, project JSON parsing and concurrent revision-conflict behavior. The account backend was exercised through sign-up, save, load, revision advance and stale/concurrent-write rejection.
+The lighting/occlusion model, appearance contrast logic, project serialization, package boundaries and account revision-conflict behavior are covered by automated tests and release checks. The account backend is exercised through sign-up, save, load, revision advance, stale-write rejection and concurrent-write conflict handling.
 
-The lighting/occlusion model, appearance contrast logic, project serialization, package boundaries and account revision-conflict behavior are covered by release checks. Full certification is performed with a clean dependency install followed by formatting, strict typecheck, lint/package-boundary checks, the automated suite and both production builds.
+The later ProtoMake 0.9.2 certification completed a clean dependency install, formatting, strict typecheck, lint/package-boundary checks, all 106 automated tests and both production builds on Windows. The public-alpha workflow repeats the same gates before GitHub Pages deployment.

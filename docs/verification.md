@@ -23,7 +23,7 @@ The first clean Windows certification run of 0.9.0 successfully completed `npm c
 
 0.9.1 corrects the canonical component id to `protomake.shadow-caster`, imports `Buffer`/`URL` explicitly in the account server, and replaces the Python subprocess ZIP check with a pure TypeScript store-only ZIP reader that verifies UTF-8 flags, CRC32, directory offsets/counts and exact payload bytes. Project/scene validation accepts the briefly shipped `protomake.shadowCaster` alias and canonicalizes it (including prefab documents) on validated load/save, so work authored in the broken build remains recoverable. A regression case covers that compatibility path, bringing the expected suite to 106 tests.
 
-ProtoMake 0.9.1 should be certified with the complete command sequence at the top of this document. The hotfix addresses the component-registration, lint and cross-platform export-test defects exposed by the first clean certification pass.
+ProtoMake 0.9.2 completed the full Windows certification sequence: clean dependency installation, formatting, strict typecheck, lint and package-boundary checks, all 106 automated tests, and both production builds. The 0.9.1 hotfix notes below remain as historical context for the defects that certification uncovered.
 
 ## 0.9.1 dependency security note
 

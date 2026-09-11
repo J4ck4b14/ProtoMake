@@ -18,6 +18,11 @@ The export command requires an empty destination and writes both a folder and it
 
 The delivery archive includes a generated example at `examples/milestones-5-7/web-build/`. After installing development dependencies, `npm run preview:game` serves that folder. You may instead upload that folder directly to your static host.
 
+
+## Hosting the ProtoMake editor itself
+
+The editor build is also static. `npm run build` writes it to `dist/`, including the reusable standalone player under `dist/player/`. ProtoMake 0.9.3 uses relative Vite asset paths, so the editor can live under a GitHub Pages repository path instead of requiring `/` at the domain root. For the no-backend public alpha, local IndexedDB saves plus portable `.protomake.json` export/import are sufficient; account sync is optional. See [GitHub Pages deployment](github-pages.md).
+
 ## What is included
 
 - index.html with loading/error feedback and a click-to-start screen.

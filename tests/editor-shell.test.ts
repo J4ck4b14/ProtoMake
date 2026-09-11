@@ -23,6 +23,7 @@ it('boots the complete editor and executes create/edit/save/open through its con
   );
   vi.stubGlobal('devicePixelRatio', 1);
   vi.stubGlobal('confirm', () => true);
+  localStorage.setItem('protomake.storage-notice.v1', 'seen');
   const context = new Proxy({}, { get: () => () => {} });
   vi.spyOn(HTMLCanvasElement.prototype, 'getContext').mockReturnValue(
     context as never,
@@ -51,20 +52,20 @@ it('boots the complete editor and executes create/edit/save/open through its con
   const name = document.querySelector<HTMLInputElement>('[aria-label="Name"]')!;
   name.value = 'Saved actor';
   name.dispatchEvent(new Event('change'));
-  click('Save');
+  click('Save locally');
   await vi.waitFor(() =>
     expect(document.querySelector('.console-body')?.textContent).toContain(
       'Saved Untitled project',
     ),
   );
-  click('Open');
+  click('Open local');
   await vi.waitFor(() =>
     expect(document.querySelector('dialog')?.textContent).toContain(
       'Untitled project',
     ),
   );
   const saved = [...document.querySelectorAll('dialog button')].find(
-    (b) => b.textContent === 'Untitled project',
+    (b) => b.textContent?.startsWith('Untitled project · '),
   )! as HTMLButtonElement;
   saved.click();
   await vi.waitFor(() =>

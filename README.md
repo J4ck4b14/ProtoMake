@@ -1,8 +1,8 @@
-# ProtoMake 0.9.2
+# ProtoMake 0.9.3
 
 A reusable, browser-native 2D engine and visual editor for human-authored projects.
 
-**Milestones 0–7 plus the Editor Quality pass are implemented.** ProtoMake 0.9.2 focuses on reliability and authoring coherence: recovery/undo discipline, visual gizmos, channel-aware lighting with quality/performance diagnostics, a stronger in-editor TypeScript workflow, reusable perception primitives, mobile/tablet usability and safer optional account continuity. It remains a development release with the documented scope below.
+**Milestones 0–7 plus the Editor Quality pass are implemented.** ProtoMake 0.9.3 is the public-alpha launch pass: it keeps the 0.9.2 reliability/authoring work and makes browser-local persistence, portable backups and zero-cost GitHub Pages deployment explicit. The editor includes recovery/undo discipline, visual gizmos, channel-aware lighting with quality/performance diagnostics, a stronger in-editor TypeScript workflow, reusable perception primitives, mobile/tablet usability and safer optional account continuity. It remains a development release with the documented scope below.
 
 ## Three prototype workshop
 
@@ -27,7 +27,7 @@ npm run dev
 
 Open the local URL printed by Vite. The root page is the editor; `/foundation.html` retains the original Milestone 0 harness. If another server is still running, stop it or check the new URL carefully. IndexedDB project storage is scoped to browser and origin, including port. For optional account-backed project continuity, use `npm run dev:account`; see [account continuity](docs/account-sync.md).
 
-In the editor click **Import JSON** and select:
+In the editor click **Import project** and select:
 
 ```text
 examples/milestones-5-7/Workshop.protomake.json
@@ -61,10 +61,20 @@ Start testing with [TESTING-CHECKLIST.md](TESTING-CHECKLIST.md). Save your test 
 - **Lighting:** static/mixed/dynamic lights now have receiver/shadow channel masks, shadow opacity/bias/softness, cached static contributions and live profiling/debug heatmaps. `ctx.illumination()`, `ctx.lightAt()` and `ctx.canSee()` expose compatible gameplay primitives.
 - **Editor colours:** Settings exposes accent and surface colours. Text/focus colours are derived automatically for readable contrast.
 - **Scripts as assets:** the source editor adds line numbers, syntax colour, diagnostics/jump-to-error, `ctx` completion/API search, templates, exposed-field metadata, Ctrl/Cmd+S and protected drafts.
-- **Project continuity:** Account is optional. The reference Node server has revision conflict protection plus expiring/revocable sessions, bounded auth attempts and storage quotas. Local IndexedDB and JSON export remain independently available.
+- **Project continuity:** Account is optional. The reference Node server has revision conflict protection plus expiring/revocable sessions, bounded auth attempts and storage quotas. Local IndexedDB and portable `.protomake.json` export/import remain independently available.
 - **Mobile/tablet:** <=800 CSS px uses touch-sized panel tabs and explicit Scene controls; Scene view supports pinch zoom and the scripting workspace collapses cleanly on narrow/tablet layouts. Desktop retains the resizable multi-panel layout.
 
 See [ProtoMake 0.9 Editor Quality](docs/editor-quality-0.9.md) for the implementation contracts.
+
+## Public alpha: zero-cost hosting
+
+ProtoMake can be hosted as a static site. **Save locally** writes projects to IndexedDB in the current browser; **Export backup** downloads a portable `.protomake.json`; **Import project** opens that file later or on another device. Accounts are therefore optional for the public alpha. A first-run notice explains the storage model instead of silently implying that browser storage is a cloud backup.
+
+For a free launch, push the repository to GitHub and enable **Settings → Pages → GitHub Actions**. The checked-in Pages workflow verifies ProtoMake, builds `dist/`, and deploys it. Vite uses relative production paths, so a project URL such as `https://YOUR_USERNAME.github.io/ProtoMake/` works without a custom domain. See [zero-cost GitHub Pages deployment](docs/github-pages.md).
+
+Before the first public push, apply the currently recommended dev-tool security upgrades and regenerate the lockfile with `npm install --save-dev vite@7.3.6 vitest@4.1.11 esbuild@0.28.2`, then rerun the launch verification. These packages are build/test tooling and are not served as a development server in production, but a public repository should not knowingly retain avoidable advisories.
+
+The early development-repository reflog format and milestone records are documented in [repository history and reflogs](docs/git-history.md); the public, human-readable timeline is in [HISTORY.md](HISTORY.md).
 
 ## Verification
 
@@ -76,7 +86,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 106 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector and viewport event handlers; graphics are mocked in these DOM tests. The remote browser blocked navigation to the local editor, so GPU appearance, real file picking and input feel still require your browser acceptance run.
+The suite includes 106 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, audio behavior and input feel remain part of the browser acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 
@@ -94,4 +104,4 @@ The suite includes 106 automated tests, with actual Rapier simulation and execut
 
 Prefabs do not yet support nested relationships or structural overrides. Animation transitions are immediate cuts; audio is non-spatial with one voice per source. Export conservatively includes every project scene/asset. Detailed contracts are in [prefabs](docs/prefabs.md) and [animation/audio](docs/animation-audio.md).
 
-See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [lighting](docs/lighting.md), [scripting guide](docs/scripting.md), [account continuity](docs/account-sync.md), [polish-pass notes](docs/polish-pass.md), [0.9 editor quality](docs/editor-quality-0.9.md), [0.9.1 hotfix](docs/hotfix-0.9.1.md), [0.9.2 certification hotfix](docs/hotfix-0.9.2.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).
+See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [lighting](docs/lighting.md), [scripting guide](docs/scripting.md), [account continuity](docs/account-sync.md), [polish-pass notes](docs/polish-pass.md), [0.9 editor quality](docs/editor-quality-0.9.md), [0.9.1 hotfix](docs/hotfix-0.9.1.md), [0.9.2 certification hotfix](docs/hotfix-0.9.2.md), [0.9.3 launch pass](docs/launch-0.9.3.md), [GitHub Pages deployment](docs/github-pages.md), [Git history/reflogs](docs/git-history.md), [project history](HISTORY.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).

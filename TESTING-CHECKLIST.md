@@ -4,7 +4,7 @@ Start with the new Milestones 5–7 checks below, then briefly regress editing/s
 
 ## 1. Start and import
 
-Extract into a fresh folder. Run `npm ci` then `npm run dev` beside package.json and package-lock.json. The first command to start the editor now builds the standalone player first; wait for Vite's URL. Import `examples/milestones-5-7/Workshop.protomake.json` with **Import JSON**.
+Extract into a fresh folder. Run `npm ci` then `npm run dev` beside package.json and package-lock.json. The first command to start the editor now builds the standalone player first; wait for Vite's URL. Import `examples/milestones-5-7/Workshop.protomake.json` with **Import project**.
 
 Expected: the physics playground plus **Enemy 01–10**, all linked to one prefab. The Assets folder selector includes Images, Audio, Animations, Scripts, Prefabs and an empty folder. Existing v1–v3 projects migrate automatically when opened; export a backup before replacing your working copy.
 
@@ -123,3 +123,14 @@ For true phone/desktop testing the account server must be reachable from both de
 - While signed into one account server, change the server URL and apply it. ProtoMake should clear the prior session/revision links and require sign-in on the new server.
 - On two devices, issue concurrent saves from the same cloud revision: exactly one may advance it; the other must receive a revision conflict. Cloud project data returned to the browser must not contain server-internal ownership fields.
 - On touch hardware test one-finger Scene interaction plus two-finger pinch zoom, mobile panel switching, coarse controls and the narrow single-column script workspace.
+
+## Public-alpha storage and GitHub Pages
+
+- [ ] On a fresh browser profile, the one-time storage notice explains Save locally vs Export backup.
+- [ ] **Save locally** survives a normal page refresh on the same origin.
+- [ ] **Open local** lists the saved project and its update timestamp.
+- [ ] **Export backup** downloads a `.protomake.json`; **Import project** reopens it after switching to another throwaway project.
+- [ ] Unsaved changes still trigger the existing before-unload/recovery behavior.
+- [ ] `npm run build` produces `dist/` whose HTML/assets work from a non-root static path.
+- [ ] The GitHub Pages workflow publishes only the production `dist/` artifact, not `.git`, source-only account data, or `node_modules`.
+
