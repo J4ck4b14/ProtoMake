@@ -9,7 +9,7 @@ The automated suite covers the original core/editor/assets/physics/input/script 
 - Audio buffer reuse, output-bus routing, pause/resume offset and one-shot node recreation, activation cleanup and decode failure. These audio tests use a mocked AudioContext; they do not establish audible output or browser codec support.
 - Folder moves/identity, empty-folder persistence and undo; keyboard resizing and saved layout; frame/controller/mixer authoring through DOM controls.
 - The supplied Workshop fixture running actual compiled project scripts, Rapier physics and animation; a jump is verified to request playback on its AudioSource.
-- Static script linking/execution, startup/dependency output, pre-export validation and ZIP integrity checked with Python's independent zipfile reader.
+- Static script linking/execution, startup/dependency output, pre-export validation and store-only ZIP integrity/CRC/UTF-8 filename checks using a platform-independent TypeScript reader.
 
 DOM tests use jsdom, fake IndexedDB and mocked graphics. GPU appearance, audible playback, file-picker/download behavior and Service Worker preview behavior are covered by TESTING-CHECKLIST.md rather than asserted by the mocked DOM suite.
 
@@ -17,8 +17,14 @@ Production verification builds the editor and a separate player, checks that the
 
 Rapier's compat initialization emits an upstream deprecation warning despite its published no-argument API. Large chunks include embedded WASM and, in the editor only, the TypeScript compiler. Their size warnings are documented performance limitations rather than failed builds.
 
-## ProtoMake 0.9 Editor Quality delta
+## ProtoMake 0.9.1 Editor Quality certification delta
 
-The 0.9 pass adds checked-in regression cases for channel-aware/partial-shadow gameplay samples and rich literal script-field metadata, bringing the suite to 103 `it(...)` cases. The release source was additionally checked dependency-independently for TypeScript syntax/transpilation, all example JSON parsing, package-boundary rules and Node script syntax. The account service was exercised end-to-end for sign-up, first save, concurrent writes from the same revision (one success / one `409` conflict), sanitized project reads, explicit session revocation and oversized-password rejection.
+The first clean Windows certification run of 0.9.0 successfully completed `npm ci`, strict `npm run typecheck`, and both production builds. It also exposed three release defects before certification: the new shadow-caster component used the invalid camelCase id `protomake.shadowCaster`, the account server relied on Node globals that were not declared to ESLint, and one export test assumed a `python3` executable. The component-id defect caused registration to abort and cascaded into 54 otherwise unrelated test failures.
 
-Before deployment, run the required gates at the top of this document after a clean `npm ci`. Release certification requires the complete Vitest, semantic TypeScript, lint/boundary and production-build sequence.
+0.9.1 corrects the canonical component id to `protomake.shadow-caster`, imports `Buffer`/`URL` explicitly in the account server, and replaces the Python subprocess ZIP check with a pure TypeScript store-only ZIP reader that verifies UTF-8 flags, CRC32, directory offsets/counts and exact payload bytes. Project/scene validation accepts the briefly shipped `protomake.shadowCaster` alias and canonicalizes it (including prefab documents) on validated load/save, so work authored in the broken build remains recoverable. A regression case covers that compatibility path, bringing the expected suite to 106 tests.
+
+ProtoMake 0.9.1 should be certified with the complete command sequence at the top of this document. The hotfix addresses the component-registration, lint and cross-platform export-test defects exposed by the first clean certification pass.
+
+## 0.9.1 dependency security note
+
+ProtoMake 0.9.1 pins Vite 7.3.2 rather than 7.3.1 because ProtoMake can intentionally expose the development server to a LAN for mobile testing. Continue to inspect `npm audit` output after a clean install; the Vite patch does not imply that every transitive advisory reported by npm has been resolved.

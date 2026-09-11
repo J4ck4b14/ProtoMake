@@ -1,4 +1,6 @@
 import { createServer } from 'node:http';
+import { Buffer } from 'node:buffer';
+import { URL } from 'node:url';
 import { mkdir, readFile, rename, writeFile } from 'node:fs/promises';
 import { dirname, resolve } from 'node:path';
 import { randomBytes, randomUUID, scryptSync, timingSafeEqual } from 'node:crypto';

@@ -41,6 +41,25 @@ it('preserves legacy unlit appearance and serializes lighting defaults', () => {
   );
   expect(sceneLights(reopened.world)).toHaveLength(0);
 });
+it('canonicalizes the briefly shipped camelCase shadow-caster id', () => {
+  const authored = new EditorModel(),
+    wallId = authored.createEntity('Legacy wall');
+  authored.addComponent(ShadowCaster2D.type);
+  const legacy = structuredClone(authored.project),
+    wall = legacy.scenes[0]!.entities.find((entity) => entity.id === wallId)!;
+  wall.components['protomake.shadowCaster'] =
+    wall.components[ShadowCaster2D.type]!;
+  delete wall.components[ShadowCaster2D.type];
+
+  const reopened = new EditorModel();
+  reopened.load(legacy);
+  const canonical = reopened.project.scenes[0]!.entities.find(
+    (entity) => entity.id === wallId,
+  )!;
+  expect(canonical.components[ShadowCaster2D.type]).toBeDefined();
+  expect(canonical.components['protomake.shadowCaster']).toBeUndefined();
+});
+
 it('combines ambient color, distance falloff, spot direction and rectangular extent', () => {
   expect(
     lightTint('#ffffff', 0, 0, [
@@ -63,7 +82,6 @@ it('combines ambient color, distance falloff, spot direction and rectangular ext
     }),
   ).toThrow();
 });
-
 
 it('casts occlusion-aware shadows and exposes matching point illumination', () => {
   const m = new EditorModel();

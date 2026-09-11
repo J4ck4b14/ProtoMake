@@ -58,7 +58,7 @@ export function createProject(name: string): ProjectData {
     schemaVersion: PROJECT_SCHEMA_VERSION,
     id: guid(),
     name,
-    engineVersion: '0.9.0',
+    engineVersion: '0.9.1',
     startupScene: null,
     scenes: [],
     assets: [],
@@ -83,13 +83,17 @@ export function validateProject(
       .map((a) => {
         const base = validateScene(JSON.parse(a.data), registry);
         validatePrefab(base);
+        a.data = deterministicJSON(base);
         return [a.id, base] as const;
       }),
   );
-  for (const scene of project.scenes) {
+  for (let sceneIndex = 0; sceneIndex < project.scenes.length; sceneIndex++) {
+    let scene = validateScene(project.scenes[sceneIndex], registry);
+    project.scenes[sceneIndex] = scene;
     validateLinks(scene, bases);
     for (const [id, base] of bases) propagatePrefab(scene, id, base);
-    validateScene(scene, registry);
+    scene = validateScene(scene, registry);
+    project.scenes[sceneIndex] = scene;
     for (const entity of scene.entities) {
       const animator = entity.components['protomake.animator'] as
         | { controller?: string }

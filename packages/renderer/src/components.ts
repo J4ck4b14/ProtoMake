@@ -96,7 +96,7 @@ const ShadowCasterSchema = z.strictObject({
 });
 export type ShadowCasterData = z.infer<typeof ShadowCasterSchema>;
 export const ShadowCaster2D: ComponentDefinition<ShadowCasterData> = {
-  type: 'protomake.shadowCaster',
+  type: 'protomake.shadow-caster',
   displayName: 'Shadow Caster 2D',
   schema: ShadowCasterSchema,
   defaults: () => ({

@@ -26,6 +26,42 @@ export const SceneSchema = z.strictObject({
 });
 export type SceneData = z.infer<typeof SceneSchema>;
 export const sceneMigrations = new MigrationChain(SCENE_SCHEMA_VERSION);
+
+/**
+ * 0.9.0 briefly shipped an invalid camelCase component id. Keep imported/recovered
+ * projects readable while canonicalizing every subsequent capture/save.
+ */
+function normalizeLegacyComponentTypes(input: unknown): unknown {
+  if (
+    !input ||
+    typeof input !== 'object' ||
+    !('entities' in input) ||
+    !Array.isArray(input.entities)
+  )
+    return input;
+  for (const entity of input.entities) {
+    if (
+      !entity ||
+      typeof entity !== 'object' ||
+      !('components' in entity)
+    )
+      continue;
+    const components = entity.components;
+    if (
+      !components ||
+      typeof components !== 'object' ||
+      Array.isArray(components)
+    )
+      continue;
+    const record = components as Record<string, unknown>;
+    if (Object.hasOwn(record, 'protomake.shadowCaster')) {
+      if (!Object.hasOwn(record, 'protomake.shadow-caster'))
+        record['protomake.shadow-caster'] = record['protomake.shadowCaster'];
+      delete record['protomake.shadowCaster'];
+    }
+  }
+  return input;
+}
 function canonical(value: unknown): unknown {
   if (Array.isArray(value)) return value.map(canonical);
   if (value !== null && typeof value === 'object')
@@ -44,6 +80,7 @@ export function validateScene(
   registry: ComponentRegistry,
 ): SceneData {
   const scene = SceneSchema.parse(sceneMigrations.run(input));
+  normalizeLegacyComponentTypes(scene);
   const parents = new Map<Guid, Guid | null>();
   for (const entity of scene.entities) {
     if (parents.has(entity.id))
@@ -55,7 +92,9 @@ export function validateScene(
       );
     for (const [type, value] of Object.entries(entity.components)) {
       try {
-        registry.get(type).schema.parse(value);
+        entity.components[type] = registry
+          .get(type)
+          .schema.parse(value) as typeof value;
       } catch (error) {
         throw new Error(
           `Entity ${entity.name} (${entity.id}), component ${type}: ${String(error)}`,
