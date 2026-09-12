@@ -11,9 +11,13 @@ import {
 } from '../packages/editor/src/prefab-actions';
 import { PrefabLink } from '@protomake/prefabs';
 import { SpriteRenderer } from '@protomake/renderer';
-import { ScriptBehaviour } from '@protomake/scripting';
+import { Behaviours, type ScriptBehaviourData } from '@protomake/scripting';
 import { guid } from '@protomake/core';
 import { validateProject } from '@protomake/serialization';
+function behaviour(m: EditorModel, entity: string): ScriptBehaviourData {
+  const data = m.world.read(m.entity(entity), Behaviours)!;
+  return data.items[data.order[0]!]!;
+}
 function setup() {
   const m = new EditorModel(),
     root = m.createEntity('Enemy');
@@ -29,11 +33,8 @@ function setup() {
       width: 0,
       height: 0,
     });
-    m.world.add(m.entity(root), ScriptBehaviour.type, {
-      script,
-      values: { speed: 2 },
-    });
   });
+  m.addScriptBehaviour(script, { speed: 2 });
   const prefab = createPrefab(m, 'Assets/Enemy.prefab.json');
   return { m, root, prefab };
 }
@@ -41,7 +42,7 @@ it('propagates a base sprite change to ten instances and preserves one speed ove
   const { m, prefab } = setup();
   for (let i = 0; i < 9; i++) placePrefab(m, prefab);
   const custom = [...m.selection][0]!;
-  m.setProperty(ScriptBehaviour.type, 'values.speed', 7);
+  m.setBehaviourProperty(behaviour(m, custom).id, 'values.speed', 7);
   const base = prefabBases(m).get(prefab)!;
   (base.entities[0]!.components[SpriteRenderer.type] as { tint: string }).tint =
     '#abcdef';
@@ -49,7 +50,7 @@ it('propagates a base sprite change to ten instances and preserves one speed ove
   expect([...m.world.query(SpriteRenderer.type)].length).toBe(10);
   for (const [id] of m.world.query(SpriteRenderer.type))
     expect(m.world.read(id, SpriteRenderer)!.tint).toBe('#abcdef');
-  expect(m.world.read(m.entity(custom), ScriptBehaviour)!.values.speed).toBe(7);
+  expect(behaviour(m, custom).values.speed).toBe(7);
   m.undo();
   expect(m.world.read(m.entity(custom), SpriteRenderer)!.tint).not.toBe(
     '#abcdef',
@@ -57,24 +58,20 @@ it('propagates a base sprite change to ten instances and preserves one speed ove
   m.redo();
   const loaded = new EditorModel();
   loaded.load(m.project);
-  expect(
-    loaded.world.read(loaded.entity(custom), ScriptBehaviour)!.values.speed,
-  ).toBe(7);
+  expect(behaviour(loaded, custom).values.speed).toBe(7);
   revertPrefab(loaded, custom);
-  expect(
-    loaded.world.read(loaded.entity(custom), ScriptBehaviour)!.values.speed,
-  ).toBe(2);
+  expect(behaviour(loaded, custom).values.speed).toBe(2);
 });
 it('applies individual property overrides without publishing root placement', () => {
   const { m, root, prefab } = setup();
   placePrefab(m, prefab);
   const other = [...m.selection][0]!;
-  m.setProperty(ScriptBehaviour.type, 'values.speed', 9);
+  m.setBehaviourProperty(behaviour(m, other).id, 'values.speed', 9);
   const patch = m.world
     .read(m.entity(other), PrefabLink)!
     .overrides.find((p) => p.path.at(-1) === 'speed')!;
   applyPrefabOverride(m, other, patch);
-  expect(m.world.read(m.entity(root), ScriptBehaviour)!.values.speed).toBe(9);
+  expect(behaviour(m, root).values.speed).toBe(9);
   expect(m.world.read(m.entity(other), PrefabLink)!.overrides).toHaveLength(0);
   m.translate(10, 0);
   const transform = m.world.read(m.entity(other), PrefabLink)!.overrides[0]!;
@@ -86,17 +83,16 @@ it('remaps internal references and linked root when duplicating a prefab hierarc
   const child = m.createEntity('Child', root);
   m.select([root]);
   m.change('Internal ref', () => {
-    const s = m.world.read(m.entity(root), ScriptBehaviour)!;
-    m.world.set(m.entity(root), ScriptBehaviour.type, {
-      ...s,
-      values: { ...s.values, target: child },
-    });
+    const data = structuredClone(m.world.read(m.entity(root), Behaviours)!),
+      item = data.items[data.order[0]!]!;
+    item.values = { ...item.values, target: child };
+    m.world.set(m.entity(root), Behaviours.type, data);
   });
   const prefab = createPrefab(m, 'Assets/Parent.prefab.json');
   placePrefab(m, prefab);
   const instance = [...m.selection][0]!;
   const instanceChild = m.world.children(m.entity(instance))[0]!;
-  expect(m.world.read(m.entity(instance), ScriptBehaviour)!.values.target).toBe(
+  expect(behaviour(m, instance).values.target).toBe(
     m.world.get(instanceChild).guid,
   );
   // The source metadata declares target as an entity reference for ordinary clipboard duplication too.
@@ -107,9 +103,9 @@ it('remaps internal references and linked root when duplicating a prefab hierarc
   m.duplicate();
   const duplicate = [...m.selection][0]!;
   expect(m.world.read(m.entity(duplicate), PrefabLink)!.root).toBe(duplicate);
-  expect(
-    m.world.read(m.entity(duplicate), ScriptBehaviour)!.values.target,
-  ).toBe(m.world.get(m.world.children(m.entity(duplicate))[0]!).guid);
+  expect(behaviour(m, duplicate).values.target).toBe(
+    m.world.get(m.world.children(m.entity(duplicate))[0]!).guid,
+  );
 });
 it('blocks incomplete hierarchies and dangling links atomically, and supports unpacking', () => {
   const m = new EditorModel(),
@@ -143,7 +139,7 @@ it('propagates to inactive scenes and rejects nested prefabs', () => {
 });
 it('resolves inherited base properties on project load while retaining recorded overrides', () => {
   const { m, prefab, root } = setup();
-  m.setProperty(ScriptBehaviour.type, 'values.speed', 5);
+  m.setBehaviourProperty(behaviour(m, root).id, 'values.speed', 5);
   const project = structuredClone(m.project),
     asset = project.assets.find((a) => a.id === prefab)!,
     base = JSON.parse(asset.data);
@@ -154,7 +150,5 @@ it('resolves inherited base properties on project load while retaining recorded 
   expect(restored.world.read(restored.entity(root), SpriteRenderer)!.tint).toBe(
     '#112233',
   );
-  expect(
-    restored.world.read(restored.entity(root), ScriptBehaviour)!.values.speed,
-  ).toBe(5);
+  expect(behaviour(restored, root).values.speed).toBe(5);
 });

@@ -1,8 +1,8 @@
 {
-  "schemaVersion": 4,
+  "schemaVersion": 5,
   "id": "0690adb5-d3ec-4b03-a317-eaee54ca62d0",
   "name": "ProtoMake · Prefabs, Animation & Audio",
-  "engineVersion": "0.7.0",
+  "engineVersion": "0.10.0",
   "startupScene": "ec1c34dd-5f72-4e67-a921-5b2b2f2b7cb2",
   "scenes": [
     {
@@ -10,6 +10,124 @@
       "id": "ec1c34dd-5f72-4e67-a921-5b2b2f2b7cb2",
       "name": "Physics playground",
       "entities": [
+        {
+          "id": "03dffeab-0124-491c-970f-9cc78b9888aa",
+          "name": "Enemy 07",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 120, -130]
+            },
+            "protomake.sprite": {
+              "texture": "fb3d6349-21f1-4201-98b0-e338892f8931",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.behaviours": {
+              "order": ["3a121eef-06c4-44cb-9d0c-b1fd12467854"],
+              "items": {
+                "3a121eef-06c4-44cb-9d0c-b1fd12467854": {
+                  "id": "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
+                  "values": {
+                    "speed": 1
+                  }
+                }
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
+              "source": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "root": "03dffeab-0124-491c-970f-9cc78b9888aa",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 07"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 120, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "08381730-d6e7-4db1-84ac-fe9933f3ff09",
+          "name": "Enemy 04",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -120, -130]
+            },
+            "protomake.sprite": {
+              "texture": "fb3d6349-21f1-4201-98b0-e338892f8931",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.behaviours": {
+              "order": ["3a121eef-06c4-44cb-9d0c-b1fd12467854"],
+              "items": {
+                "3a121eef-06c4-44cb-9d0c-b1fd12467854": {
+                  "id": "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
+                  "values": {
+                    "speed": 1
+                  }
+                }
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
+              "source": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "root": "08381730-d6e7-4db1-84ac-fe9933f3ff09",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 04"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, -120, -130]
+                }
+              ]
+            }
+          }
+        },
         {
           "id": "1d4c713d-ca92-45f8-9511-5aed2e1fffbe",
           "name": "Player",
@@ -20,7 +138,10 @@
               "local": [1, 0, 0, 1, -250, 40]
             },
             "protomake.sprite": {
-              "texture": "a6e27c98-a947-4f0a-8377-b7e249033258",
+              "texture": "d59fd115-8c31-4e49-b5ee-3dfd956e45bd",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 36,
               "height": 42,
               "tint": "#ffffff",
@@ -32,6 +153,18 @@
               "anchorY": 0.5,
               "layer": 0,
               "order": 0
+            },
+            "protomake.behaviours": {
+              "order": ["script"],
+              "items": {
+                "script": {
+                  "id": "script",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "dba98b58-fab0-4432-a612-1c4c25d6f3cd",
+                  "values": {}
+                }
+              }
             },
             "protomake.rigidbody": {
               "mode": "dynamic",
@@ -55,69 +188,17 @@
               "width": 36,
               "height": 42
             },
-            "protomake.script": {
-              "script": "dba98b58-fab0-4432-a612-1c4c25d6f3cd",
-              "values": {}
-            },
             "protomake.animator": {
-              "controller": "4490c5fd-3525-4bcd-bb1c-8e7376497522",
+              "controller": "d6ad6191-a3d5-43ea-b1cd-40fe794ab731",
               "speed": 1
             },
             "protomake.audio-source": {
-              "clip": "0ba19900-a31b-424b-b702-00f001b6bbc4",
+              "clip": "4bf2c76d-f71d-49a3-b814-594d12bcee4c",
               "loop": false,
               "volume": 0.7,
               "rate": 1,
               "bus": "SFX",
               "playOnAwake": false
-            }
-          }
-        },
-        {
-          "id": "2427afaf-9e47-44e0-bb3b-0c1cf77380d6",
-          "name": "Enemy 06",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 40, -130]
-            },
-            "protomake.sprite": {
-              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
-              "width": 30,
-              "height": 34,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            },
-            "protomake.script": {
-              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
-              "values": {
-                "speed": 1
-              }
-            },
-            "protomake.prefab": {
-              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
-              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "root": "2427afaf-9e47-44e0-bb3b-0c1cf77380d6",
-              "overrides": [
-                {
-                  "path": ["name"],
-                  "removed": false,
-                  "value": "Enemy 06"
-                },
-                {
-                  "path": ["components", "protomake.transform", "local"],
-                  "removed": false,
-                  "value": [1, 0, 0, 1, 40, -130]
-                }
-              ]
             }
           }
         },
@@ -132,6 +213,9 @@
             },
             "protomake.sprite": {
               "texture": "",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 32,
               "height": 32,
               "tint": "#ffcf72",
@@ -144,46 +228,17 @@
               "layer": 0,
               "order": 0
             },
-            "protomake.script": {
-              "script": "fc8e3582-239c-4c7e-97b3-1991d6001735",
-              "values": {}
-            }
-          }
-        },
-        {
-          "id": "4412e6c7-0b73-4646-b27a-08c877568b80",
-          "name": "Enemy 01",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, -360, -130]
-            },
-            "protomake.sprite": {
-              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
-              "width": 30,
-              "height": 34,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            },
-            "protomake.script": {
-              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
-              "values": {
-                "speed": 1
+            "protomake.behaviours": {
+              "order": ["script"],
+              "items": {
+                "script": {
+                  "id": "script",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "fc8e3582-239c-4c7e-97b3-1991d6001735",
+                  "values": {}
+                }
               }
-            },
-            "protomake.prefab": {
-              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
-              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "root": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "overrides": []
             }
           }
         },
@@ -198,6 +253,9 @@
             },
             "protomake.sprite": {
               "texture": "fa75ebd9-22e4-4e0f-9469-60487e54e153",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 100,
               "height": 22,
               "tint": "#ffffff",
@@ -235,7 +293,7 @@
           }
         },
         {
-          "id": "5665f034-ae06-4f30-a7c7-987a299222dc",
+          "id": "687351a1-e787-4ca9-ae97-c60f42b73ede",
           "name": "Enemy 02",
           "enabled": true,
           "parent": null,
@@ -244,7 +302,10 @@
               "local": [1, 0, 0, 1, -280, -130]
             },
             "protomake.sprite": {
-              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "texture": "fb3d6349-21f1-4201-98b0-e338892f8931",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 30,
               "height": 34,
               "tint": "#ffffff",
@@ -257,16 +318,24 @@
               "layer": 0,
               "order": 0
             },
-            "protomake.script": {
-              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
-              "values": {
-                "speed": 1
+            "protomake.behaviours": {
+              "order": ["3a121eef-06c4-44cb-9d0c-b1fd12467854"],
+              "items": {
+                "3a121eef-06c4-44cb-9d0c-b1fd12467854": {
+                  "id": "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
+                  "values": {
+                    "speed": 1
+                  }
+                }
               }
             },
             "protomake.prefab": {
-              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
-              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "root": "5665f034-ae06-4f30-a7c7-987a299222dc",
+              "prefab": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
+              "source": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "root": "687351a1-e787-4ca9-ae97-c60f42b73ede",
               "overrides": [
                 {
                   "path": ["name"],
@@ -283,102 +352,6 @@
           }
         },
         {
-          "id": "5f1804a2-9774-44d0-8e5a-44a7b008360c",
-          "name": "Enemy 07",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 120, -130]
-            },
-            "protomake.sprite": {
-              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
-              "width": 30,
-              "height": 34,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            },
-            "protomake.script": {
-              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
-              "values": {
-                "speed": 1
-              }
-            },
-            "protomake.prefab": {
-              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
-              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "root": "5f1804a2-9774-44d0-8e5a-44a7b008360c",
-              "overrides": [
-                {
-                  "path": ["name"],
-                  "removed": false,
-                  "value": "Enemy 07"
-                },
-                {
-                  "path": ["components", "protomake.transform", "local"],
-                  "removed": false,
-                  "value": [1, 0, 0, 1, 120, -130]
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": "66a8c713-dc6d-4e7a-ac0c-4021d9214b83",
-          "name": "Enemy 03",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, -200, -130]
-            },
-            "protomake.sprite": {
-              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
-              "width": 30,
-              "height": 34,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            },
-            "protomake.script": {
-              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
-              "values": {
-                "speed": 1
-              }
-            },
-            "protomake.prefab": {
-              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
-              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "root": "66a8c713-dc6d-4e7a-ac0c-4021d9214b83",
-              "overrides": [
-                {
-                  "path": ["name"],
-                  "removed": false,
-                  "value": "Enemy 03"
-                },
-                {
-                  "path": ["components", "protomake.transform", "local"],
-                  "removed": false,
-                  "value": [1, 0, 0, 1, -200, -130]
-                }
-              ]
-            }
-          }
-        },
-        {
           "id": "756c26da-67c5-4384-ad29-a2841cb8cadb",
           "name": "Moving platform",
           "enabled": true,
@@ -389,6 +362,9 @@
             },
             "protomake.sprite": {
               "texture": "",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 130,
               "height": 20,
               "tint": "#e8b278",
@@ -400,6 +376,18 @@
               "anchorY": 0.5,
               "layer": 0,
               "order": 0
+            },
+            "protomake.behaviours": {
+              "order": ["script"],
+              "items": {
+                "script": {
+                  "id": "script",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "078e7248-6e1e-445e-994c-524bf92f7496",
+                  "values": {}
+                }
+              }
             },
             "protomake.rigidbody": {
               "mode": "kinematic",
@@ -422,159 +410,11 @@
               "layer": 1,
               "width": 130,
               "height": 20
-            },
-            "protomake.script": {
-              "script": "078e7248-6e1e-445e-994c-524bf92f7496",
-              "values": {}
             }
           }
         },
         {
-          "id": "7aba3b42-10d2-47d1-9546-c4cd17de0281",
-          "name": "Enemy 04",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, -120, -130]
-            },
-            "protomake.sprite": {
-              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
-              "width": 30,
-              "height": 34,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            },
-            "protomake.script": {
-              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
-              "values": {
-                "speed": 1
-              }
-            },
-            "protomake.prefab": {
-              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
-              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "root": "7aba3b42-10d2-47d1-9546-c4cd17de0281",
-              "overrides": [
-                {
-                  "path": ["name"],
-                  "removed": false,
-                  "value": "Enemy 04"
-                },
-                {
-                  "path": ["components", "protomake.transform", "local"],
-                  "removed": false,
-                  "value": [1, 0, 0, 1, -120, -130]
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": "83f6edc0-a47e-43f1-9582-21d73b1360ee",
-          "name": "Enemy 05",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, -40, -130]
-            },
-            "protomake.sprite": {
-              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
-              "width": 30,
-              "height": 34,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            },
-            "protomake.script": {
-              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
-              "values": {
-                "speed": 1
-              }
-            },
-            "protomake.prefab": {
-              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
-              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "root": "83f6edc0-a47e-43f1-9582-21d73b1360ee",
-              "overrides": [
-                {
-                  "path": ["name"],
-                  "removed": false,
-                  "value": "Enemy 05"
-                },
-                {
-                  "path": ["components", "protomake.transform", "local"],
-                  "removed": false,
-                  "value": [1, 0, 0, 1, -40, -130]
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": "a3de6bf7-9004-4440-958d-7649d748e357",
-          "name": "Enemy 09",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 280, -130]
-            },
-            "protomake.sprite": {
-              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
-              "width": 30,
-              "height": 34,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            },
-            "protomake.script": {
-              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
-              "values": {
-                "speed": 1
-              }
-            },
-            "protomake.prefab": {
-              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
-              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "root": "a3de6bf7-9004-4440-958d-7649d748e357",
-              "overrides": [
-                {
-                  "path": ["name"],
-                  "removed": false,
-                  "value": "Enemy 09"
-                },
-                {
-                  "path": ["components", "protomake.transform", "local"],
-                  "removed": false,
-                  "value": [1, 0, 0, 1, 280, -130]
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": "af95bae2-a0e9-48ec-9a23-c0591f5ac5b3",
+          "id": "8f144e9b-f8bf-4936-ac58-5c2a5605df60",
           "name": "Enemy 10",
           "enabled": true,
           "parent": null,
@@ -583,7 +423,10 @@
               "local": [1, 0, 0, 1, 360, -130]
             },
             "protomake.sprite": {
-              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "texture": "fb3d6349-21f1-4201-98b0-e338892f8931",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 30,
               "height": 34,
               "tint": "#ffffff",
@@ -596,16 +439,24 @@
               "layer": 0,
               "order": 0
             },
-            "protomake.script": {
-              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
-              "values": {
-                "speed": 3
+            "protomake.behaviours": {
+              "order": ["3a121eef-06c4-44cb-9d0c-b1fd12467854"],
+              "items": {
+                "3a121eef-06c4-44cb-9d0c-b1fd12467854": {
+                  "id": "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
+                  "values": {
+                    "speed": 3
+                  }
+                }
               }
             },
             "protomake.prefab": {
-              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
-              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "root": "af95bae2-a0e9-48ec-9a23-c0591f5ac5b3",
+              "prefab": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
+              "source": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "root": "8f144e9b-f8bf-4936-ac58-5c2a5605df60",
               "overrides": [
                 {
                   "path": ["name"],
@@ -618,7 +469,14 @@
                   "value": [1, 0, 0, 1, 360, -130]
                 },
                 {
-                  "path": ["components", "protomake.script", "values", "speed"],
+                  "path": [
+                    "components",
+                    "protomake.behaviours",
+                    "items",
+                    "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                    "values",
+                    "speed"
+                  ],
                   "removed": false,
                   "value": 3
                 }
@@ -627,16 +485,19 @@
           }
         },
         {
-          "id": "be6b1ae6-b95c-4b3f-b7a6-12e896accc76",
-          "name": "Enemy 08",
+          "id": "9944dd03-9237-48f6-a865-7c72b595d8f3",
+          "name": "Enemy 03",
           "enabled": true,
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [1, 0, 0, 1, 200, -130]
+              "local": [1, 0, 0, 1, -200, -130]
             },
             "protomake.sprite": {
-              "texture": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+              "texture": "fb3d6349-21f1-4201-98b0-e338892f8931",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 30,
               "height": 34,
               "tint": "#ffffff",
@@ -649,16 +510,142 @@
               "layer": 0,
               "order": 0
             },
-            "protomake.script": {
-              "script": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
-              "values": {
-                "speed": 1
+            "protomake.behaviours": {
+              "order": ["3a121eef-06c4-44cb-9d0c-b1fd12467854"],
+              "items": {
+                "3a121eef-06c4-44cb-9d0c-b1fd12467854": {
+                  "id": "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
+                  "values": {
+                    "speed": 1
+                  }
+                }
               }
             },
             "protomake.prefab": {
-              "prefab": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
-              "source": "4412e6c7-0b73-4646-b27a-08c877568b80",
-              "root": "be6b1ae6-b95c-4b3f-b7a6-12e896accc76",
+              "prefab": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
+              "source": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "root": "9944dd03-9237-48f6-a865-7c72b595d8f3",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 03"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, -200, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "a75d62da-295e-433b-a822-52c973085676",
+          "name": "Enemy 06",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 40, -130]
+            },
+            "protomake.sprite": {
+              "texture": "fb3d6349-21f1-4201-98b0-e338892f8931",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.behaviours": {
+              "order": ["3a121eef-06c4-44cb-9d0c-b1fd12467854"],
+              "items": {
+                "3a121eef-06c4-44cb-9d0c-b1fd12467854": {
+                  "id": "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
+                  "values": {
+                    "speed": 1
+                  }
+                }
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
+              "source": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "root": "a75d62da-295e-433b-a822-52c973085676",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 06"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 40, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "c0b48b24-f813-4d51-8ac5-5248062ce8f4",
+          "name": "Enemy 08",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 200, -130]
+            },
+            "protomake.sprite": {
+              "texture": "fb3d6349-21f1-4201-98b0-e338892f8931",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.behaviours": {
+              "order": ["3a121eef-06c4-44cb-9d0c-b1fd12467854"],
+              "items": {
+                "3a121eef-06c4-44cb-9d0c-b1fd12467854": {
+                  "id": "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
+                  "values": {
+                    "speed": 1
+                  }
+                }
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
+              "source": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "root": "c0b48b24-f813-4d51-8ac5-5248062ce8f4",
               "overrides": [
                 {
                   "path": ["name"],
@@ -705,6 +692,9 @@
             },
             "protomake.sprite": {
               "texture": "",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 90,
               "height": 80,
               "tint": "#547d70",
@@ -716,6 +706,21 @@
               "anchorY": 0.5,
               "layer": 0,
               "order": 0
+            },
+            "protomake.behaviours": {
+              "order": ["script"],
+              "items": {
+                "script": {
+                  "id": "script",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "796add1a-8b24-4db3-a399-3c46b5595c8d",
+                  "values": {
+                    "target": "1d4c713d-ca92-45f8-9511-5aed2e1fffbe",
+                    "color": "#8bffb3"
+                  }
+                }
+              }
             },
             "protomake.rigidbody": {
               "mode": "static",
@@ -738,13 +743,65 @@
               "layer": 3,
               "width": 90,
               "height": 80
+            }
+          }
+        },
+        {
+          "id": "cce4a349-786e-483d-979f-780df72fd8f9",
+          "name": "Enemy 09",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 280, -130]
             },
-            "protomake.script": {
-              "script": "796add1a-8b24-4db3-a399-3c46b5595c8d",
-              "values": {
-                "target": "1d4c713d-ca92-45f8-9511-5aed2e1fffbe",
-                "color": "#8bffb3"
+            "protomake.sprite": {
+              "texture": "fb3d6349-21f1-4201-98b0-e338892f8931",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.behaviours": {
+              "order": ["3a121eef-06c4-44cb-9d0c-b1fd12467854"],
+              "items": {
+                "3a121eef-06c4-44cb-9d0c-b1fd12467854": {
+                  "id": "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
+                  "values": {
+                    "speed": 1
+                  }
+                }
               }
+            },
+            "protomake.prefab": {
+              "prefab": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
+              "source": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "root": "cce4a349-786e-483d-979f-780df72fd8f9",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 09"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 280, -130]
+                }
+              ]
             }
           }
         },
@@ -759,6 +816,9 @@
             },
             "protomake.sprite": {
               "texture": "",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 140,
               "height": 22,
               "tint": "#8ca1c7",
@@ -796,6 +856,65 @@
           }
         },
         {
+          "id": "d30f72ce-7b8b-4ed0-8853-2cbe76b6d0c3",
+          "name": "Enemy 05",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -40, -130]
+            },
+            "protomake.sprite": {
+              "texture": "fb3d6349-21f1-4201-98b0-e338892f8931",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.behaviours": {
+              "order": ["3a121eef-06c4-44cb-9d0c-b1fd12467854"],
+              "items": {
+                "3a121eef-06c4-44cb-9d0c-b1fd12467854": {
+                  "id": "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
+                  "values": {
+                    "speed": 1
+                  }
+                }
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
+              "source": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "root": "d30f72ce-7b8b-4ed0-8853-2cbe76b6d0c3",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Enemy 05"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, -40, -130]
+                }
+              ]
+            }
+          }
+        },
+        {
           "id": "dbba21c3-082e-4f11-8b74-79d882e1357e",
           "name": "Floor",
           "enabled": true,
@@ -806,6 +925,9 @@
             },
             "protomake.sprite": {
               "texture": "",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 900,
               "height": 32,
               "tint": "#648a9f",
@@ -839,6 +961,54 @@
               "layer": 1,
               "width": 900,
               "height": 32
+            }
+          }
+        },
+        {
+          "id": "f305487c-228f-4f22-9602-e26e5c42b318",
+          "name": "Enemy 01",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -360, -130]
+            },
+            "protomake.sprite": {
+              "texture": "fb3d6349-21f1-4201-98b0-e338892f8931",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 30,
+              "height": 34,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.behaviours": {
+              "order": ["3a121eef-06c4-44cb-9d0c-b1fd12467854"],
+              "items": {
+                "3a121eef-06c4-44cb-9d0c-b1fd12467854": {
+                  "id": "3a121eef-06c4-44cb-9d0c-b1fd12467854",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
+                  "values": {
+                    "speed": 1
+                  }
+                }
+              }
+            },
+            "protomake.prefab": {
+              "prefab": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
+              "source": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "root": "f305487c-228f-4f22-9602-e26e5c42b318",
+              "overrides": []
             }
           }
         }
@@ -901,7 +1071,7 @@
       "height": 0
     },
     {
-      "id": "a6e27c98-a947-4f0a-8377-b7e249033258",
+      "id": "d59fd115-8c31-4e49-b5ee-3dfd956e45bd",
       "path": "Assets/Images/Frame-1.png",
       "kind": "image",
       "mime": "image/png",
@@ -910,7 +1080,7 @@
       "height": 48
     },
     {
-      "id": "f9715c82-5e44-4bc5-bb10-4fdc7b6ffce8",
+      "id": "41734f49-b76c-4bda-8a43-57901d0783ee",
       "path": "Assets/Images/Frame-2.png",
       "kind": "image",
       "mime": "image/png",
@@ -919,7 +1089,7 @@
       "height": 48
     },
     {
-      "id": "8c4ab89e-79fc-47ba-bce2-fced39f9b28e",
+      "id": "fb3d6349-21f1-4201-98b0-e338892f8931",
       "path": "Assets/Images/Frame-3.png",
       "kind": "image",
       "mime": "image/png",
@@ -928,7 +1098,7 @@
       "height": 48
     },
     {
-      "id": "4e18995a-6de5-46d9-80fb-2a7430951ad1",
+      "id": "338854c8-fd41-45a2-b681-1771c69acdc3",
       "path": "Assets/Images/Frame-4.png",
       "kind": "image",
       "mime": "image/png",
@@ -937,7 +1107,7 @@
       "height": 48
     },
     {
-      "id": "0ba19900-a31b-424b-b702-00f001b6bbc4",
+      "id": "4bf2c76d-f71d-49a3-b814-594d12bcee4c",
       "path": "Assets/Audio/Jump.wav",
       "kind": "audio",
       "mime": "audio/wav",
@@ -946,47 +1116,47 @@
       "height": 0
     },
     {
-      "id": "54c0af84-53a2-43b0-88d6-9a53d8f95141",
+      "id": "19dfb79f-3bb0-4019-a24f-86a598681fe8",
       "path": "Assets/Animations/Rest.animation.json",
       "kind": "text",
       "mime": "application/x-protomake-animation",
-      "data": "{\"version\":1,\"name\":\"Rest\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"a6e27c98-a947-4f0a-8377-b7e249033258\",\"duration\":0.35},{\"texture\":\"f9715c82-5e44-4bc5-bb10-4fdc7b6ffce8\",\"duration\":0.35}]}",
+      "data": "{\"version\":1,\"name\":\"Rest\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"d59fd115-8c31-4e49-b5ee-3dfd956e45bd\",\"duration\":0.35},{\"texture\":\"41734f49-b76c-4bda-8a43-57901d0783ee\",\"duration\":0.35}]}",
       "width": 0,
       "height": 0
     },
     {
-      "id": "2c3138ca-61d2-4805-8a53-c358c7b724cf",
+      "id": "d6d66288-9260-4964-9b07-4e14aa5b6d3a",
       "path": "Assets/Animations/Moving.animation.json",
       "kind": "text",
       "mime": "application/x-protomake-animation",
-      "data": "{\"version\":1,\"name\":\"Moving\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"8c4ab89e-79fc-47ba-bce2-fced39f9b28e\",\"duration\":0.09},{\"texture\":\"4e18995a-6de5-46d9-80fb-2a7430951ad1\",\"duration\":0.09}]}",
+      "data": "{\"version\":1,\"name\":\"Moving\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"fb3d6349-21f1-4201-98b0-e338892f8931\",\"duration\":0.09},{\"texture\":\"338854c8-fd41-45a2-b681-1771c69acdc3\",\"duration\":0.09}]}",
       "width": 0,
       "height": 0
     },
     {
-      "id": "4490c5fd-3525-4bcd-bb1c-8e7376497522",
+      "id": "d6ad6191-a3d5-43ea-b1cd-40fe794ab731",
       "path": "Assets/Animations/Player.animator.json",
       "kind": "text",
       "mime": "application/x-protomake-animator",
-      "data": "{\"version\":1,\"initial\":\"Rest\",\"parameters\":{\"moving\":{\"type\":\"bool\",\"default\":false}},\"states\":[{\"name\":\"Rest\",\"clip\":\"54c0af84-53a2-43b0-88d6-9a53d8f95141\",\"speed\":1},{\"name\":\"Moving\",\"clip\":\"2c3138ca-61d2-4805-8a53-c358c7b724cf\",\"speed\":1}],\"transitions\":[{\"from\":\"Rest\",\"to\":\"Moving\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"moving\",\"operator\":\"==\",\"value\":true}]},{\"from\":\"Moving\",\"to\":\"Rest\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"moving\",\"operator\":\"==\",\"value\":false}]}]}",
+      "data": "{\"version\":1,\"initial\":\"Rest\",\"parameters\":{\"moving\":{\"type\":\"bool\",\"default\":false}},\"states\":[{\"name\":\"Rest\",\"clip\":\"19dfb79f-3bb0-4019-a24f-86a598681fe8\",\"speed\":1},{\"name\":\"Moving\",\"clip\":\"d6d66288-9260-4964-9b07-4e14aa5b6d3a\",\"speed\":1}],\"transitions\":[{\"from\":\"Rest\",\"to\":\"Moving\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"moving\",\"operator\":\"==\",\"value\":true}]},{\"from\":\"Moving\",\"to\":\"Rest\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"moving\",\"operator\":\"==\",\"value\":false}]}]}",
       "width": 0,
       "height": 0
     },
     {
-      "id": "1cc04d87-4097-4586-8a65-6e6f5fb84b50",
+      "id": "16b3227a-03f0-4c77-b68a-4faaa8276ba5",
       "path": "Assets/Scripts/Enemy.ts",
       "kind": "text",
       "mime": "text/typescript",
-      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = {speed:{type:'number',default:1}} as const;\nexport default class Enemy {\n speed=1;\n private x=0; private y=0;\n start(ctx:ScriptContext){[this.x,this.y]=ctx.position();}\n update(ctx:ScriptContext){ctx.setPosition(this.x+Math.sin(ctx.elapsed*this.speed)*10,this.y);}\n}\n",
+      "data": "import type { ScriptContext } from '@protomake/scripting';\nexport const fields = { speed: { type: 'number', default: 1 } } as const;\nexport default class Enemy {\n  speed = 1;\n  private x = 0;\n  private y = 0;\n  start(ctx: ScriptContext) {\n    [this.x, this.y] = ctx.position();\n  }\n  update(ctx: ScriptContext) {\n    ctx.setPosition(this.x + Math.sin(ctx.elapsed * this.speed) * 10, this.y);\n  }\n}\n",
       "width": 0,
       "height": 0
     },
     {
-      "id": "08f650ba-f014-47a5-b4b4-0e3475642b7d",
+      "id": "a7223242-bfd7-477f-b60d-e3cf8671a88b",
       "path": "Assets/Prefabs/Enemy.prefab.json",
       "kind": "text",
       "mime": "application/x-protomake-prefab",
-      "data": "{\"schemaVersion\":1,\"id\":\"08f650ba-f014-47a5-b4b4-0e3475642b7d\",\"name\":\"Assets/Prefabs/Enemy.prefab.json\",\"entities\":[{\"id\":\"4412e6c7-0b73-4646-b27a-08c877568b80\",\"name\":\"Enemy 01\",\"enabled\":true,\"parent\":null,\"components\":{\"protomake.transform\":{\"local\":[1,0,0,1,-360,-130]},\"protomake.sprite\":{\"texture\":\"8c4ab89e-79fc-47ba-bce2-fced39f9b28e\",\"width\":30,\"height\":34,\"tint\":\"#ffffff\",\"opacity\":1,\"visible\":true,\"flipX\":false,\"flipY\":false,\"anchorX\":0.5,\"anchorY\":0.5,\"layer\":0,\"order\":0},\"protomake.script\":{\"script\":\"1cc04d87-4097-4586-8a65-6e6f5fb84b50\",\"values\":{\"speed\":1}}}}]}",
+      "data": "{\"schemaVersion\":1,\"id\":\"a7223242-bfd7-477f-b60d-e3cf8671a88b\",\"name\":\"Assets/Prefabs/Enemy.prefab.json\",\"entities\":[{\"id\":\"f305487c-228f-4f22-9602-e26e5c42b318\",\"name\":\"Enemy 01\",\"enabled\":true,\"parent\":null,\"components\":{\"protomake.transform\":{\"local\":[1,0,0,1,-360,-130]},\"protomake.sprite\":{\"texture\":\"fb3d6349-21f1-4201-98b0-e338892f8931\",\"lit\":true,\"castShadow\":false,\"lightingChannel\":\"World\",\"width\":30,\"height\":34,\"tint\":\"#ffffff\",\"opacity\":1,\"visible\":true,\"flipX\":false,\"flipY\":false,\"anchorX\":0.5,\"anchorY\":0.5,\"layer\":0,\"order\":0},\"protomake.behaviours\":{\"order\":[\"3a121eef-06c4-44cb-9d0c-b1fd12467854\"],\"items\":{\"3a121eef-06c4-44cb-9d0c-b1fd12467854\":{\"id\":\"3a121eef-06c4-44cb-9d0c-b1fd12467854\",\"kind\":\"script\",\"enabled\":true,\"script\":\"16b3227a-03f0-4c77-b68a-4faaa8276ba5\",\"values\":{\"speed\":1}}}}}}]}",
       "width": 0,
       "height": 0
     }
@@ -1005,7 +1175,12 @@
   "input": [
     {
       "name": "Move",
+      "map": "Gameplay",
       "kind": "vector2",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyD", "ArrowRight", "GamepadAxis0+"],
       "negativeX": ["KeyA", "ArrowLeft", "GamepadAxis0-"],
       "positiveY": ["KeyS", "ArrowDown", "GamepadAxis1+"],
@@ -1013,7 +1188,12 @@
     },
     {
       "name": "Jump",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["Space", "GamepadButton0"],
       "negativeX": [],
       "positiveY": [],
@@ -1021,7 +1201,12 @@
     },
     {
       "name": "Interact",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyE", "Mouse0"],
       "negativeX": [],
       "positiveY": [],

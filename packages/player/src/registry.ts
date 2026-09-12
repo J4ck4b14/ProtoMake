@@ -1,4 +1,4 @@
-import { Perception2D, ScriptBehaviour } from '@protomake/scripting';
+import { Behaviours, Perception2D } from '@protomake/scripting';
 import { PrefabLink } from '@protomake/prefabs';
 import { Animator } from '@protomake/animation';
 import { AudioSource } from '@protomake/audio';
@@ -32,7 +32,7 @@ export function runtimeRegistry(): ComponentRegistry {
   registry.register(NoteComponent);
   registerRendering(registry);
   registerPhysics(registry);
-  registry.register(ScriptBehaviour);
+  registry.register(Behaviours);
   registry.register(Perception2D);
   registry.register(PrefabLink);
   registry.register(Animator);

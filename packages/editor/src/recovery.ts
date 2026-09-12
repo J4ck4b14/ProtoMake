@@ -67,10 +67,17 @@ export class RecoveryManager {
     try {
       for (let i = 0; i < localStorage.length; i++) {
         const key = localStorage.key(i);
-        if (!key || (!key.startsWith(EMERGENCY_PREFIX) && key !== LEGACY_EMERGENCY_KEY)) continue;
+        if (
+          !key ||
+          (!key.startsWith(EMERGENCY_PREFIX) && key !== LEGACY_EMERGENCY_KEY)
+        )
+          continue;
         try {
-          const value = JSON.parse(localStorage.getItem(key) ?? 'null') as RecoverySnapshot | null;
-          if (value?.project && typeof value.updated === 'number') snapshots.push(value);
+          const value = JSON.parse(
+            localStorage.getItem(key) ?? 'null',
+          ) as RecoverySnapshot | null;
+          if (value?.project && typeof value.updated === 'number')
+            snapshots.push(value);
         } catch {
           // Ignore one corrupt emergency entry without hiding the rest.
         }
@@ -89,7 +96,8 @@ export class RecoveryManager {
         if (legacy) {
           try {
             const value = JSON.parse(legacy) as RecoverySnapshot;
-            if (value.projectId === projectId) localStorage.removeItem(LEGACY_EMERGENCY_KEY);
+            if (value.projectId === projectId)
+              localStorage.removeItem(LEGACY_EMERGENCY_KEY);
           } catch {
             localStorage.removeItem(LEGACY_EMERGENCY_KEY);
           }
@@ -104,10 +112,13 @@ export class RecoveryManager {
     }
   }
 
-  async capture(reason: RecoverySnapshot['reason'] = 'autosave'): Promise<void> {
+  async capture(
+    reason: RecoverySnapshot['reason'] = 'autosave',
+  ): Promise<void> {
     if (this.disposed || this.model.locked) return;
     if (!this.model.dirty) {
-      if (reason === 'checkpoint') this.report('No unsaved changes to checkpoint');
+      if (reason === 'checkpoint')
+        this.report('No unsaved changes to checkpoint');
       return;
     }
     const fingerprint = this.fingerprint();
@@ -121,7 +132,11 @@ export class RecoveryManager {
       );
       this.lastFingerprint = fingerprint;
       this.clearEmergency(this.model.project.id);
-      this.report(reason === 'checkpoint' ? 'Recovery checkpoint created' : 'Autosave recovery snapshot updated');
+      this.report(
+        reason === 'checkpoint'
+          ? 'Recovery checkpoint created'
+          : 'Autosave recovery snapshot updated',
+      );
     } catch (error) {
       this.report(`Recovery snapshot failed: ${String(error)}`, true);
     }
@@ -141,12 +156,14 @@ export class RecoveryManager {
   async list(): Promise<RecoverySnapshot[]> {
     const snapshots = await this.storage.listRecovery();
     for (const emergency of this.emergencies())
-      if (!snapshots.some((item) => item.key === emergency.key)) snapshots.push(emergency);
+      if (!snapshots.some((item) => item.key === emergency.key))
+        snapshots.push(emergency);
     return snapshots.sort((a, b) => b.updated - a.updated);
   }
 
   async discard(snapshot: RecoverySnapshot): Promise<void> {
-    if (snapshot.key.startsWith('emergency:')) this.clearEmergency(snapshot.projectId);
+    if (snapshot.key.startsWith('emergency:'))
+      this.clearEmergency(snapshot.projectId);
     else await this.storage.deleteRecovery(snapshot.key);
   }
 

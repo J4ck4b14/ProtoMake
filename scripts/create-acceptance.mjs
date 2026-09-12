@@ -134,14 +134,17 @@ try {
     ),
   );
   const player = [...model.world.all()].find((e) => e.name === 'Player'),
-    script = model.world.components(player.id).get('protomake.script').script;
+    playerBehaviours = model.world
+      .components(player.id)
+      .get('protomake.behaviours'),
+    script = playerBehaviours.items[playerBehaviours.order[0]].script;
   const playerSource = await readFile(
     'examples/milestones-5-7/Scripts/PlayerController.ts',
     'utf8',
   );
   model.change('Example media', () => {
     model.project.name = 'ProtoMake · Prefabs, Animation & Audio';
-    model.project.engineVersion = '0.7.0';
+    model.project.engineVersion = '0.10.0';
     model.project.assets.push(...assets);
     model.project.assets.find((a) => a.id === script).data = playerSource;
     model.project.folders = [
@@ -171,11 +174,8 @@ try {
   });
   const root = model.createEntity('Enemy 01');
   model.addComponent('protomake.sprite');
+  model.addScriptBehaviour(enemyScript, { speed: 1 });
   model.change('Enemy behaviour', () => {
-    model.world.add(model.entity(root), 'protomake.script', {
-      script: enemyScript,
-      values: { speed: 1 },
-    });
     model.world.set(model.entity(root), 'protomake.sprite', {
       ...model.world.components(model.entity(root)).get('protomake.sprite'),
       texture: images[2],
@@ -202,7 +202,12 @@ try {
         -130,
       ]);
     });
-    if (i === 9) model.setProperty('protomake.script', 'values.speed', 3);
+    if (i === 9) {
+      const behaviours = model.world
+        .components(model.entity(id))
+        .get('protomake.behaviours');
+      model.setBehaviourProperty(behaviours.order[0], 'values.speed', 3);
+    }
   }
   model.select([player.guid]);
   await writeFile(

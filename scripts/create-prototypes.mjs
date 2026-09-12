@@ -73,7 +73,7 @@ try {
         platformer: 'Lantern Steps',
         fighter: 'Sparring Room',
       }[game];
-      m.project.engineVersion = '0.8.0';
+      m.project.engineVersion = '0.10.0';
       m.project.folders = [
         'Assets',
         'Assets/Images',
@@ -231,7 +231,12 @@ try {
       ]);
       const button = (name, keys) => ({
         name,
+        map: 'Gameplay',
         kind: 'button',
+        sensitivity: 1,
+        deadZone: 0.15,
+        invertX: false,
+        invertY: false,
         positiveX: keys,
         negativeX: [],
         positiveY: [],
@@ -258,12 +263,21 @@ try {
           volume: 0.3,
           bus: 'SFX',
         });
-        component(player, 'protomake.script', {
-          script:
-            assetIds[
-              `Scripts/${game === 'shooter' ? 'Shooter' : 'Platformer'}.ts`
-            ],
-          values: {},
+        const behaviour = randomUUID();
+        component(player, 'protomake.behaviours', {
+          order: [behaviour],
+          items: {
+            [behaviour]: {
+              id: behaviour,
+              kind: 'script',
+              enabled: true,
+              script:
+                assetIds[
+                  `Scripts/${game === 'shooter' ? 'Shooter' : 'Platformer'}.ts`
+                ],
+              values: {},
+            },
+          },
         });
         if (game === 'shooter') {
           m.project.input.push(button('Fire', ['Space', 'Mouse0']));
@@ -347,9 +361,18 @@ try {
         }
       } else {
         const arena = entity('Arena logic', 0, 0, 0, 0);
-        component(arena, 'protomake.script', {
-          script: assetIds['Scripts/Fighter.ts'],
-          values: {},
+        const behaviour = randomUUID();
+        component(arena, 'protomake.behaviours', {
+          order: [behaviour],
+          items: {
+            [behaviour]: {
+              id: behaviour,
+              kind: 'script',
+              enabled: true,
+              script: assetIds['Scripts/Fighter.ts'],
+              values: {},
+            },
+          },
         });
         component(arena, 'protomake.audio-source', {
           clip: assetIds['Audio/Action.wav'],

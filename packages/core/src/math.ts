@@ -51,3 +51,54 @@ export function compose(
     s = Math.sin(rotation);
   return matrix([c * sx, s * sx, -s * sy, c * sy, x, y]);
 }
+
+export interface AffineParts {
+  readonly x: number;
+  readonly y: number;
+  readonly rotation: number;
+  readonly scaleX: number;
+  readonly scaleY: number;
+  readonly shear: number;
+}
+
+/** Decomposes an affine matrix into the editor-facing TRS values plus residual shear. */
+export function decompose(value: Matrix2D): AffineParts {
+  const scaleX = Math.hypot(value[0], value[1]);
+  if (scaleX < 1e-12)
+    return {
+      x: value[4],
+      y: value[5],
+      rotation: Math.atan2(-value[2], value[3]),
+      scaleX: 0,
+      scaleY: Math.hypot(value[2], value[3]),
+      shear: 0,
+    };
+  const determinant = value[0] * value[3] - value[1] * value[2],
+    scaleY = determinant / scaleX;
+  return {
+    x: value[4],
+    y: value[5],
+    rotation: Math.atan2(value[1], value[0]),
+    scaleX,
+    scaleY,
+    shear:
+      Math.abs(scaleY) < 1e-12
+        ? 0
+        : (value[0] * value[2] + value[1] * value[3]) / (scaleX * scaleY),
+  };
+}
+
+/** Recombines editor-facing TRS without discarding affine shear. */
+export function composeAffine(parts: AffineParts): Matrix2D {
+  const c = Math.cos(parts.rotation),
+    s = Math.sin(parts.rotation),
+    shearY = parts.shear * parts.scaleY;
+  return matrix([
+    c * parts.scaleX,
+    s * parts.scaleX,
+    c * shearY - s * parts.scaleY,
+    s * shearY + c * parts.scaleY,
+    parts.x,
+    parts.y,
+  ]);
+}

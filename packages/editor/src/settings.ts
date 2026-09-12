@@ -1,8 +1,8 @@
 import { PhysicsSettingsSchema } from '@protomake/physics2d';
-import { InputMapSchema } from '@protomake/input';
 import type { EditorModel } from './model';
 import { node, button, input } from './dom';
 import { applyAppearance, loadAppearance } from './appearance';
+import { createInputActionsEditor } from './input-actions-editor';
 export function showSettings(
   model: EditorModel,
   report: (message: string, error?: boolean) => void,
@@ -15,16 +15,16 @@ export function showSettings(
     gy = input('Gravity Y', String(physics.gravityY), 'number'),
     names = input('Layer names', physics.layers.join(', ')),
     matrixHost = node('div', 'matrix'),
-    bindings = node('textarea'),
+    inputActions = createInputActionsEditor(model.project.input),
     error = node('p', 'error'),
     appearance = loadAppearance(),
     accent = input('UI accent', appearance.accent, 'color'),
     surface = input('UI surface', appearance.surface, 'color'),
-    contrastNote = node('p', 'settings-note', 'Text and focus colours are chosen automatically for readable contrast.');
-  bindings.setAttribute('aria-label', 'Input action definitions');
-  bindings.value = JSON.stringify(model.project.input, null, 2);
-  bindings.rows = 15;
-  bindings.spellcheck = false;
+    contrastNote = node(
+      'p',
+      'settings-note',
+      'Text and focus colours are chosen automatically for readable contrast.',
+    );
   function renderMatrix(): void {
     matrixHost.replaceChildren();
     const table = node('table');
@@ -87,14 +87,15 @@ export function showSettings(
         physics.gravityX = gx.input.valueAsNumber;
         physics.gravityY = gy.input.valueAsNumber;
         const settings = PhysicsSettingsSchema.parse(physics),
-          inputMap = InputMapSchema.parse(
-            JSON.parse(bindings.value) as unknown,
-          );
+          inputMap = inputActions.value();
         model.change('Project settings', () => {
           model.project.physics = settings;
           model.project.input = inputMap;
         });
-        applyAppearance({ accent: accent.input.value, surface: surface.input.value });
+        applyAppearance({
+          accent: accent.input.value,
+          surface: surface.input.value,
+        });
         dialog.close();
         report('Project and editor appearance settings updated');
       } catch (reason) {
@@ -117,9 +118,9 @@ export function showSettings(
     node(
       'p',
       '',
-      'Bindings use KeyboardEvent.code, Mouse0/1/2, GamepadButton0… and GamepadAxis0+/-. Edit action names and bindings below.',
+      'Create action maps and edit keyboard, mouse and gamepad bindings without raw project JSON.',
     ),
-    bindings,
+    inputActions.host,
     error,
     actions,
   );

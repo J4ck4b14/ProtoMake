@@ -7,7 +7,7 @@ import {
   Graphics,
 } from 'pixi.js';
 import { loadImage, type AssetData } from '@protomake/assets';
-import type { World } from '@protomake/core';
+import { inverse, type World } from '@protomake/core';
 import {
   Camera2D,
   SpriteRenderer,
@@ -101,19 +101,26 @@ function convexHull(points: readonly [number, number][]): [number, number][] {
   const half = (source: readonly [number, number][]) => {
     const result: [number, number][] = [];
     for (const p of source) {
-      while (result.length >= 2 && cross(result.at(-2)!, result.at(-1)!, p) <= 0)
+      while (
+        result.length >= 2 &&
+        cross(result.at(-2)!, result.at(-1)!, p) <= 0
+      )
         result.pop();
       result.push(p);
     }
     return result;
   };
-  const lower = half(sorted), upper = half([...sorted].reverse());
+  const lower = half(sorted),
+    upper = half([...sorted].reverse());
   lower.pop();
   upper.pop();
   return [...lower, ...upper];
 }
 
-function spritePolygon(world: World, id: number): readonly [number, number][] | undefined {
+function spritePolygon(
+  world: World,
+  id: number,
+): readonly [number, number][] | undefined {
   const data = world.read(id, SpriteRenderer);
   if (!data) return undefined;
   const m = world.worldMatrix(id),
@@ -128,7 +135,10 @@ function spritePolygon(world: World, id: number): readonly [number, number][] | 
   return [p(x0, y0), p(x1, y0), p(x1, y1), p(x0, y1)];
 }
 
-function canvasContext(canvas: HTMLCanvasElement, message: string): CanvasRenderingContext2D {
+function canvasContext(
+  canvas: HTMLCanvasElement,
+  message: string,
+): CanvasRenderingContext2D {
   const context = canvas.getContext('2d');
   if (!context) throw new Error(message);
   return context;
@@ -139,7 +149,10 @@ export class PixiRenderer implements Renderer2D {
   private readonly debugLines = new Graphics();
   private readonly mask = new Graphics();
   private readonly sprites = new Map<string, Sprite>();
-  private readonly textures = new Map<string, { data: string; texture: Texture }>();
+  private readonly textures = new Map<
+    string,
+    { data: string; texture: Texture }
+  >();
   private readonly lightSurfaces = new Map<LightingChannel, LightSurface>();
   private readonly perLightCanvas: HTMLCanvasElement;
   private readonly perLightContext: CanvasRenderingContext2D;
@@ -185,17 +198,29 @@ export class PixiRenderer implements Renderer2D {
       parent?.insertBefore(surface, canvas.nextSibling);
       this.lightSurfaces.set(channel, {
         canvas: surface,
-        context: canvasContext(surface, `Lighting Canvas 2D unavailable for ${channel}`),
+        context: canvasContext(
+          surface,
+          `Lighting Canvas 2D unavailable for ${channel}`,
+        ),
         staticCanvas,
-        staticContext: canvasContext(staticCanvas, `Static lighting buffer unavailable for ${channel}`),
+        staticContext: canvasContext(
+          staticCanvas,
+          `Static lighting buffer unavailable for ${channel}`,
+        ),
         staticKey: '',
       });
     }
     this.perLightCanvas = document.createElement('canvas');
-    this.perLightContext = canvasContext(this.perLightCanvas, 'Lighting buffer unavailable');
+    this.perLightContext = canvasContext(
+      this.perLightCanvas,
+      'Lighting buffer unavailable',
+    );
   }
 
-  static async create(canvas: HTMLCanvasElement, transparent = false): Promise<PixiRenderer> {
+  static async create(
+    canvas: HTMLCanvasElement,
+    transparent = false,
+  ): Promise<PixiRenderer> {
     const app = new Application();
     await app.init({
       canvas,
@@ -219,7 +244,9 @@ export class PixiRenderer implements Renderer2D {
     const revision = ++this.revision,
       images = assets.filter((asset) => asset.kind === 'image');
     for (const [id, cached] of this.textures)
-      if (!images.some((asset) => asset.id === id && asset.data === cached.data)) {
+      if (
+        !images.some((asset) => asset.id === id && asset.data === cached.data)
+      ) {
         cached.texture.destroy(true);
         this.textures.delete(id);
       }
@@ -228,13 +255,20 @@ export class PixiRenderer implements Renderer2D {
         if (this.textures.has(asset.id)) return;
         const image = await loadImage(asset.data);
         if (this.disposed || revision !== this.revision) return;
-        this.textures.set(asset.id, { data: asset.data, texture: Texture.from(image) });
+        this.textures.set(asset.id, {
+          data: asset.data,
+          texture: Texture.from(image),
+        });
       }),
     );
   }
 
   resize(width: number, height: number): void {
-    if (this.width === Math.max(1, width) && this.height === Math.max(1, height)) return;
+    if (
+      this.width === Math.max(1, width) &&
+      this.height === Math.max(1, height)
+    )
+      return;
     this.width = Math.max(1, width);
     this.height = Math.max(1, height);
     this.app.renderer.resize(this.width, this.height);
@@ -263,6 +297,69 @@ export class PixiRenderer implements Renderer2D {
     for (const surface of this.lightSurfaces.values()) surface.staticKey = '';
   }
 
+  private runtimeScreenMatrix(world: World): ScreenMatrix {
+    const cameras = [...world.query(Camera2D.type)]
+        .map(([id]) => ({ id, data: world.read(id, Camera2D)! }))
+        .filter((camera) => world.isActive(camera.id))
+        .sort(
+          (a, b) =>
+            b.data.priority - a.data.priority ||
+            world.get(a.id).guid.localeCompare(world.get(b.id).guid),
+        ),
+      camera = cameras[0];
+    let x = 0,
+      y = 0,
+      zoom = 1,
+      rotation = 0,
+      vx = 0,
+      vy = 0,
+      vw = this.width,
+      vh = this.height;
+    if (camera) {
+      const matrix = world.worldMatrix(camera.id);
+      x = matrix[4];
+      y = matrix[5];
+      rotation = Math.atan2(matrix[1], matrix[0]);
+      zoom = camera.data.zoom;
+      vx = camera.data.viewportX * this.width;
+      vy = camera.data.viewportY * this.height;
+      vw = camera.data.viewportWidth * this.width;
+      vh = camera.data.viewportHeight * this.height;
+    }
+    const cosine = Math.cos(-rotation) * zoom,
+      sine = Math.sin(-rotation) * zoom;
+    return [
+      cosine,
+      sine,
+      -sine,
+      cosine,
+      vx + vw / 2 - cosine * x + sine * y,
+      vy + vh / 2 - sine * x - cosine * y,
+    ];
+  }
+
+  screenToWorld(
+    world: World,
+    position: readonly [number, number],
+  ): readonly [number, number] {
+    const matrix = inverse(this.runtimeScreenMatrix(world));
+    return [
+      matrix[0] * position[0] + matrix[2] * position[1] + matrix[4],
+      matrix[1] * position[0] + matrix[3] * position[1] + matrix[5],
+    ];
+  }
+
+  worldToScreen(
+    world: World,
+    position: readonly [number, number],
+  ): readonly [number, number] {
+    const matrix = this.runtimeScreenMatrix(world);
+    return [
+      matrix[0] * position[0] + matrix[2] * position[1] + matrix[4],
+      matrix[1] * position[0] + matrix[3] * position[1] + matrix[5],
+    ];
+  }
+
   private resolvedLight(light: LightSample): LightSample {
     if (light.data.mobility === 'dynamic' || !light.id) return light;
     let frozen = this.frozenLights.get(light.id);
@@ -287,7 +384,14 @@ export class PixiRenderer implements Renderer2D {
   ): void {
     const center = transformPoint(screen, [light.x, light.y]),
       radius = Math.max(1, light.data.range * zoom),
-      gradient = context.createRadialGradient(center[0], center[1], 0, center[0], center[1], radius),
+      gradient = context.createRadialGradient(
+        center[0],
+        center[1],
+        0,
+        center[0],
+        center[1],
+        radius,
+      ),
       steps = 10;
     for (let i = 0; i <= steps; i++) {
       const t = i / steps,
@@ -300,11 +404,22 @@ export class PixiRenderer implements Renderer2D {
         direction = light.angle + Math.atan2(screen[1], screen[0]);
       context.beginPath();
       context.moveTo(center[0], center[1]);
-      context.arc(center[0], center[1], radius, direction - half, direction + half);
+      context.arc(
+        center[0],
+        center[1],
+        radius,
+        direction - half,
+        direction + half,
+      );
       context.closePath();
       context.fill();
     } else {
-      context.fillRect(center[0] - radius, center[1] - radius, radius * 2, radius * 2);
+      context.fillRect(
+        center[0] - radius,
+        center[1] - radius,
+        radius * 2,
+        radius * 2,
+      );
     }
   }
 
@@ -322,7 +437,9 @@ export class PixiRenderer implements Renderer2D {
     for (let i = steps; i >= 0; i--) {
       const t = i / steps,
         expand = light.data.range * t,
-        alpha = (light.data.intensity / (steps + 1)) * Math.pow(1 - t, light.data.falloff);
+        alpha =
+          (light.data.intensity / (steps + 1)) *
+          Math.pow(1 - t, light.data.falloff);
       context.fillStyle = rgba(light.data.color, alpha);
       context.fillRect(
         -light.data.width / 2 - expand,
@@ -342,12 +459,19 @@ export class PixiRenderer implements Renderer2D {
     screen: ScreenMatrix,
     zoom: number,
   ): void {
-    if (light.data.kind === 'ambient' || !light.data.castShadows || light.data.shadowOpacity <= 0)
+    if (
+      light.data.kind === 'ambient' ||
+      !light.data.castShadows ||
+      light.data.shadowOpacity <= 0
+    )
       return;
     context.save();
     context.globalCompositeOperation = 'destination-out';
     context.globalAlpha = light.data.shadowOpacity;
-    const softness = Math.min(32, light.data.shadowSoftness * Math.max(0.25, zoom));
+    const softness = Math.min(
+      32,
+      light.data.shadowSoftness * Math.max(0.25, zoom),
+    );
     if (softness > 0) context.filter = `blur(${softness}px)`;
     const reach = Math.max(
       light.data.range * 1.4,
@@ -358,7 +482,8 @@ export class PixiRenderer implements Renderer2D {
       this.statsValue.shadowCasterTests++;
       const points = caster.points;
       if (pointInPolygon(light.x, light.y, points)) continue;
-      const biased: [number, number][] = [], projected: [number, number][] = [];
+      const biased: [number, number][] = [],
+        projected: [number, number][] = [];
       for (const p of points) {
         const dx = p[0] - light.x,
           dy = p[1] - light.y,
@@ -372,11 +497,14 @@ export class PixiRenderer implements Renderer2D {
         biased.push(start);
         projected.push([start[0] + ux * reach, start[1] + uy * reach]);
       }
-      const hull = convexHull([...biased, ...projected]).map((point) => transformPoint(screen, point));
+      const hull = convexHull([...biased, ...projected]).map((point) =>
+        transformPoint(screen, point),
+      );
       if (hull.length < 3) continue;
       context.beginPath();
       context.moveTo(hull[0]![0], hull[0]![1]);
-      for (let i = 1; i < hull.length; i++) context.lineTo(hull[i]![0], hull[i]![1]);
+      for (let i = 1; i < hull.length; i++)
+        context.lineTo(hull[i]![0], hull[i]![1]);
       context.closePath();
       context.fill();
     }
@@ -395,7 +523,8 @@ export class PixiRenderer implements Renderer2D {
     vw: number,
     vh: number,
   ): void {
-    const ratio = Math.min(devicePixelRatio || 1, 2), layer = this.perLightContext;
+    const ratio = Math.min(devicePixelRatio || 1, 2),
+      layer = this.perLightContext;
     layer.setTransform(ratio, 0, 0, ratio, 0, 0);
     layer.clearRect(0, 0, this.width, this.height);
     layer.save();
@@ -428,8 +557,17 @@ export class PixiRenderer implements Renderer2D {
     return JSON.stringify([
       channel,
       ...screen.map((value) => Math.round(value * 1000) / 1000),
-      vx, vy, vw, vh,
-      staticLights.map((light) => [light.id, light.x, light.y, light.angle, light.data]),
+      vx,
+      vy,
+      vw,
+      vh,
+      staticLights.map((light) => [
+        light.id,
+        light.x,
+        light.y,
+        light.angle,
+        light.data,
+      ]),
     ]);
   }
 
@@ -447,13 +585,20 @@ export class PixiRenderer implements Renderer2D {
     let receivers = 0;
     for (const [id] of world.query(SpriteRenderer.type)) {
       const data = world.read(id, SpriteRenderer)!;
-      if (!world.isActive(id) || !data.visible || !data.lit || data.lightingChannel !== channel) continue;
+      if (
+        !world.isActive(id) ||
+        !data.visible ||
+        !data.lit ||
+        data.lightingChannel !== channel
+      )
+        continue;
       const polygon = spritePolygon(world, id);
       if (!polygon) continue;
       const points = polygon.map((point) => transformPoint(screen, point));
       context.beginPath();
       context.moveTo(points[0]![0], points[0]![1]);
-      for (let i = 1; i < points.length; i++) context.lineTo(points[i]![0], points[i]![1]);
+      for (let i = 1; i < points.length; i++)
+        context.lineTo(points[i]![0], points[i]![1]);
       context.closePath();
       context.fill();
       receivers++;
@@ -478,9 +623,12 @@ export class PixiRenderer implements Renderer2D {
     this.statsValue = {
       ...emptyStats(),
       lights: lights.length,
-      staticLights: lights.filter((light) => light.data.mobility === 'static').length,
-      mixedLights: lights.filter((light) => light.data.mobility === 'mixed').length,
-      dynamicLights: lights.filter((light) => light.data.mobility === 'dynamic').length,
+      staticLights: lights.filter((light) => light.data.mobility === 'static')
+        .length,
+      mixedLights: lights.filter((light) => light.data.mobility === 'mixed')
+        .length,
+      dynamicLights: lights.filter((light) => light.data.mobility === 'dynamic')
+        .length,
       casters: casters.length,
     };
     for (const surface of this.lightSurfaces.values()) {
@@ -491,26 +639,49 @@ export class PixiRenderer implements Renderer2D {
       this.statsValue.renderMs = performance.now() - started;
       return; // Exact legacy appearance when a scene has no lights.
     }
-    if (lights.some((light) => light.data.mobility === 'static') && !this.frozenStaticCasters)
+    if (
+      lights.some((light) => light.data.mobility === 'static') &&
+      !this.frozenStaticCasters
+    )
       this.frozenStaticCasters = structuredClone(casters);
 
     const resolved = lights.map((light) => this.resolvedLight(light));
     for (const channel of LIGHTING_CHANNELS) {
       const surface = this.lightSurfaces.get(channel)!,
-        affecting = resolved.filter((light) => channelEnabled(light.data.channelMask, channel));
+        affecting = resolved.filter((light) =>
+          channelEnabled(light.data.channelMask, channel),
+        );
       // A channel with no receivers should not cost shadow work or add an overlay.
-      if (![...world.query(SpriteRenderer.type)].some(([id]) => {
-        const sprite = world.read(id, SpriteRenderer)!;
-        return world.isActive(id) && sprite.visible && sprite.lit && sprite.lightingChannel === channel;
-      })) continue;
+      if (
+        ![...world.query(SpriteRenderer.type)].some(([id]) => {
+          const sprite = world.read(id, SpriteRenderer)!;
+          return (
+            world.isActive(id) &&
+            sprite.visible &&
+            sprite.lit &&
+            sprite.lightingChannel === channel
+          );
+        })
+      )
+        continue;
       this.statsValue.channelsRendered++;
       const target = surface.context;
       target.setTransform(ratio, 0, 0, ratio, 0, 0);
       target.fillStyle = '#000000';
       target.fillRect(vx, vy, vw, vh);
 
-      const staticLights = affecting.filter((light) => light.data.mobility === 'static'),
-        staticKey = this.staticCacheKey(channel, screen, vx, vy, vw, vh, staticLights);
+      const staticLights = affecting.filter(
+          (light) => light.data.mobility === 'static',
+        ),
+        staticKey = this.staticCacheKey(
+          channel,
+          screen,
+          vx,
+          vy,
+          vw,
+          vh,
+          staticLights,
+        );
       if (surface.staticKey !== staticKey) {
         this.statsValue.staticCacheMisses++;
         surface.staticKey = staticKey;
@@ -539,7 +710,18 @@ export class PixiRenderer implements Renderer2D {
       }
       for (const light of affecting)
         if (light.data.mobility !== 'static')
-          this.drawLightContribution(target, light, casters, channel, screen, zoom, vx, vy, vw, vh);
+          this.drawLightContribution(
+            target,
+            light,
+            casters,
+            channel,
+            screen,
+            zoom,
+            vx,
+            vy,
+            vw,
+            vh,
+          );
       this.applyReceiverMask(target, world, channel, screen);
     }
     this.statsValue.renderMs = performance.now() - started;
@@ -547,8 +729,14 @@ export class PixiRenderer implements Renderer2D {
 
   render(world: World, view?: View): void {
     if (this.disposed) return;
-    let x = view?.x ?? 0, y = view?.y ?? 0, zoom = view?.zoom ?? 1;
-    let vx = 0, vy = 0, vw = this.width, vh = this.height, rotation = 0;
+    let x = view?.x ?? 0,
+      y = view?.y ?? 0,
+      zoom = view?.zoom ?? 1;
+    let vx = 0,
+      vy = 0,
+      vw = this.width,
+      vh = this.height,
+      rotation = 0;
     if (!view) {
       const cameras = [...world.query(Camera2D.type)]
         .map(([id]) => ({ id, data: world.read(id, Camera2D)! }))
@@ -585,7 +773,8 @@ export class PixiRenderer implements Renderer2D {
       ];
     this.root.setFromMatrix(new Matrix(...screen));
     this.mask.clear().rect(vx, vy, vw, vh).fill(0xffffff);
-    const seen = new Set<string>(), ordered = renderList(world);
+    const seen = new Set<string>(),
+      ordered = renderList(world);
     for (const { id, guid, data } of ordered) {
       seen.add(guid);
       let sprite = this.sprites.get(guid);
@@ -598,7 +787,8 @@ export class PixiRenderer implements Renderer2D {
         ? (this.textures.get(data.texture)?.texture ?? Texture.WHITE)
         : Texture.WHITE;
       sprite.visible = world.isActive(id) && data.visible;
-      sprite.tint = data.texture && !this.textures.has(data.texture) ? 0xff00ff : data.tint;
+      sprite.tint =
+        data.texture && !this.textures.has(data.texture) ? 0xff00ff : data.tint;
       sprite.alpha = data.opacity;
       sprite.anchor.set(data.anchorX, data.anchorY);
       const m = world.worldMatrix(id),

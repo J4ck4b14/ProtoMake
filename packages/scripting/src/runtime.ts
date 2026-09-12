@@ -2,8 +2,21 @@ import { inverse, multiply, type World, type Guid } from '@protomake/core';
 import type { EngineContext, System } from '@protomake/runtime';
 import type { InputService } from '@protomake/input';
 import type { Physics2D, ContactEvent } from '@protomake/physics2d/rapier';
-import { hasLineOfSight, sampleLighting, SpriteRenderer, type LightingChannel } from '@protomake/renderer';
-import { ScriptBehaviour, type ScriptFields } from './component';
+import type {
+  SignalService,
+  TimerHandle,
+  TimerService,
+  TweenHandle,
+  TweenOptions,
+  TweenService,
+} from '@protomake/runtime';
+import {
+  hasLineOfSight,
+  sampleLighting,
+  SpriteRenderer,
+  type LightingChannel,
+} from '@protomake/renderer';
+import { Behaviours, type ScriptFields } from './component';
 export interface MediaServices {
   animation?: {
     setParameter(id: Guid, name: string, value: boolean | number): void;
@@ -17,6 +30,32 @@ export interface MediaServices {
     setBus(name: string, volume: number, muted?: boolean): void;
   };
 }
+export interface RuntimePrefabService {
+  instantiate(
+    prefab: string,
+    options?: {
+      readonly position?: readonly [number, number];
+      readonly rotation?: number;
+      readonly parent?: Guid;
+    },
+  ): Guid;
+  destroy(entity: Guid): void;
+}
+export interface CoordinateService {
+  screenPosition(): readonly [number, number];
+  worldPosition(): readonly [number, number];
+  delta(): readonly [number, number];
+  wheel(): number;
+  screenToWorld(position: readonly [number, number]): readonly [number, number];
+  worldToScreen(position: readonly [number, number]): readonly [number, number];
+}
+export interface RuntimeScriptServices {
+  readonly signals?: SignalService;
+  readonly timers?: TimerService;
+  readonly tweens?: TweenService;
+  readonly prefabs?: RuntimePrefabService;
+  readonly coordinates?: CoordinateService;
+}
 export interface ScriptContext {
   setParameter(name: string, value: boolean | number, entity?: Guid): void;
   trigger(name: string, entity?: Guid): void;
@@ -26,6 +65,7 @@ export interface ScriptContext {
   stopAudio(entity?: Guid): void;
   setBus(name: string, volume: number, muted?: boolean): void;
   readonly entity: Guid;
+  readonly behaviour: string;
   readonly world: World;
   readonly input: InputService;
   readonly physics: Physics2D;
@@ -38,10 +78,56 @@ export interface ScriptContext {
   /** Perceptual 0..1 illumination at an arbitrary world point. */
   lightAt(x: number, y: number, channel?: LightingChannel): number;
   /** True when target is within range/FOV and not blocked by a shadow-caster shape. */
-  canSee(target: Guid, range?: number, fovDegrees?: number, observer?: Guid): boolean;
+  canSee(
+    target: Guid,
+    range?: number,
+    fovDegrees?: number,
+    observer?: Guid,
+  ): boolean;
   get<T = unknown>(type: string, entity?: Guid): T | undefined;
   set(type: string, value: unknown, entity?: Guid): void;
   find(name: string): Guid | undefined;
+  readonly entities: {
+    withTag(tag: string): readonly Guid[];
+    withComponent(type: string): readonly Guid[];
+    withComponents(...types: readonly string[]): readonly Guid[];
+    closestWithTag(
+      tag: string,
+      position?: readonly [number, number],
+    ): Guid | undefined;
+    inRadius(
+      position: readonly [number, number],
+      radius: number,
+    ): readonly Guid[];
+  };
+  readonly events: {
+    emit(name: string, payload?: unknown): void;
+    on(name: string, handler: (payload: unknown) => void): () => void;
+  };
+  readonly time: {
+    after(seconds: number, callback: () => void): TimerHandle;
+    every(seconds: number, callback: () => void): TimerHandle;
+    cancel(handle: TimerHandle): void;
+  };
+  readonly tween: {
+    to(entity: Guid, options: TweenOptions): TweenHandle;
+    cancel(handle: TweenHandle): void;
+  };
+  readonly prefabs: RuntimePrefabService;
+  readonly pointer: {
+    readonly screenPosition: readonly [number, number];
+    readonly worldPosition: readonly [number, number];
+    readonly delta: readonly [number, number];
+    readonly wheel: number;
+  };
+  readonly camera: {
+    screenToWorld(
+      position: readonly [number, number],
+    ): readonly [number, number];
+    worldToScreen(
+      position: readonly [number, number],
+    ): readonly [number, number];
+  };
   loadScene(idOrName: string): void;
   log(message: string): void;
 }
@@ -65,6 +151,8 @@ export interface ScriptModule {
 }
 interface Instance {
   id: Guid;
+  owner: string;
+  behaviourId: string;
   script: string;
   behaviour: Behaviour;
   active: boolean;
@@ -73,7 +161,7 @@ interface Instance {
 }
 export class ScriptSystem implements System {
   readonly id = 'protomake.scripts';
-  private instances = new Map<Guid, Instance>();
+  private instances = new Map<string, Instance>();
   private off: (() => void) | undefined;
   private time = { delta: 0, elapsed: 0 };
   constructor(
@@ -85,14 +173,26 @@ export class ScriptSystem implements System {
     private readonly log: (message: string) => void,
     private readonly loadScene: (id: string) => void,
     private readonly media: MediaServices = {},
+    private readonly services: RuntimeScriptServices = {},
   ) {}
-  private context(id: Guid): ScriptContext {
+  private context(
+    id: Guid,
+    behaviourId: string,
+    owner: string,
+    active: () => boolean,
+  ): ScriptContext {
     const clock = () => this.time,
       entity = (stable: Guid = id) => {
         const found = this.world.find(stable);
         if (found === undefined)
           throw new Error(`Missing entity reference ${stable}`);
         return found;
+      },
+      ids = (items: readonly number[]) =>
+        items.map((item) => this.world.get(item).guid),
+      coordinates = this.services.coordinates,
+      unavailable = (name: string): never => {
+        throw new Error(`${name} service unavailable`);
       };
     return {
       setParameter: (name, value, stable = id) => {
@@ -121,6 +221,7 @@ export class ScriptSystem implements System {
         this.media.audio.setBus(name, volume, muted);
       },
       entity: id,
+      behaviour: behaviourId,
       world: this.world,
       input: this.input,
       physics: this.physics,
@@ -134,7 +235,8 @@ export class ScriptSystem implements System {
       illumination: (stable = id) => {
         const target = entity(stable),
           [x, y] = this.world.worldPosition(target),
-          channel = this.world.read(target, SpriteRenderer)?.lightingChannel ?? 'World';
+          channel =
+            this.world.read(target, SpriteRenderer)?.lightingChannel ?? 'World';
         return sampleLighting(this.world, x, y, stable, channel).intensity;
       },
       lightAt: (x, y, channel = 'World') => {
@@ -143,20 +245,36 @@ export class ScriptSystem implements System {
         return sampleLighting(this.world, x, y, undefined, channel).intensity;
       },
       canSee: (target, range = 500, fovDegrees = 90, observer = id) => {
-        if (!Number.isFinite(range) || range < 0 || !Number.isFinite(fovDegrees) || fovDegrees < 0 || fovDegrees > 360)
-          throw new Error('canSee expects a non-negative range and FOV between 0 and 360 degrees');
-        const observerId = entity(observer), targetId = entity(target),
+        if (
+          !Number.isFinite(range) ||
+          range < 0 ||
+          !Number.isFinite(fovDegrees) ||
+          fovDegrees < 0 ||
+          fovDegrees > 360
+        )
+          throw new Error(
+            'canSee expects a non-negative range and FOV between 0 and 360 degrees',
+          );
+        const observerId = entity(observer),
+          targetId = entity(target),
           observerMatrix = this.world.worldMatrix(observerId),
-          [ax, ay] = this.world.worldPosition(observerId), [bx, by] = this.world.worldPosition(targetId),
-          dx = bx - ax, dy = by - ay, distance = Math.hypot(dx, dy);
+          [ax, ay] = this.world.worldPosition(observerId),
+          [bx, by] = this.world.worldPosition(targetId),
+          dx = bx - ax,
+          dy = by - ay,
+          distance = Math.hypot(dx, dy);
         if (distance > range) return false;
         if (distance > Number.EPSILON && fovDegrees < 360) {
           const forward = Math.atan2(observerMatrix[1], observerMatrix[0]),
             targetAngle = Math.atan2(dy, dx),
-            delta = Math.atan2(Math.sin(targetAngle - forward), Math.cos(targetAngle - forward));
+            delta = Math.atan2(
+              Math.sin(targetAngle - forward),
+              Math.cos(targetAngle - forward),
+            );
           if (Math.abs(delta) > (fovDegrees * Math.PI) / 360) return false;
         }
-        const channel = this.world.read(targetId, SpriteRenderer)?.lightingChannel ?? 'World';
+        const channel =
+          this.world.read(targetId, SpriteRenderer)?.lightingChannel ?? 'World';
         return hasLineOfSight(this.world, observer, target, channel);
       },
       setPosition: (x, y, stable = id) => {
@@ -182,9 +300,106 @@ export class ScriptSystem implements System {
       set: (type, value, stable = id) =>
         this.world.set(entity(stable), type, value),
       find: (name) => [...this.world.all()].find((e) => e.name === name)?.guid,
+      entities: {
+        withTag: (tag) => ids(this.world.withTag(tag)),
+        withComponent: (type) => ids(this.world.withComponent(type)),
+        withComponents: (...types) => ids(this.world.withComponents(...types)),
+        closestWithTag: (
+          tag,
+          position = this.world.worldPosition(entity()),
+        ) => {
+          const found = this.world.closestWithTag(tag, position);
+          return found === undefined ? undefined : this.world.get(found).guid;
+        },
+        inRadius: (position, radius) =>
+          ids(this.world.inRadius(position, radius)),
+      },
+      events: {
+        emit: (name, payload) => {
+          const signals = this.services.signals;
+          if (!signals) throw new Error('Signal service unavailable');
+          signals.emit(name, payload);
+        },
+        on: (name, handler) => {
+          const signals = this.services.signals;
+          if (!signals) return unavailable('Signal');
+          return signals.on(name, owner, (payload) => {
+            if (active()) handler(payload);
+          });
+        },
+      },
+      time: {
+        after: (seconds, callback) =>
+          this.services.timers?.after(owner, seconds, () => {
+            if (active()) callback();
+          }) ?? unavailable('Timer'),
+        every: (seconds, callback) =>
+          this.services.timers?.every(owner, seconds, () => {
+            if (active()) callback();
+          }) ?? unavailable('Timer'),
+        cancel: (handle) => this.services.timers?.cancel(handle),
+      },
+      tween: {
+        to: (stable, options) =>
+          this.services.tweens?.to(owner, stable, options) ??
+          unavailable('Tween'),
+        cancel: (handle) => this.services.tweens?.cancel(handle),
+      },
+      prefabs: {
+        instantiate: (prefab, options) => {
+          const prefabs = this.services.prefabs;
+          if (!prefabs) return unavailable('Prefab');
+          return prefabs.instantiate(prefab, options);
+        },
+        destroy: (stable) => {
+          const prefabs = this.services.prefabs;
+          if (!prefabs) throw new Error('Prefab service unavailable');
+          prefabs.destroy(stable);
+        },
+      },
+      pointer: {
+        get screenPosition() {
+          return coordinates?.screenPosition() ?? [0, 0];
+        },
+        get worldPosition() {
+          return coordinates?.worldPosition() ?? [0, 0];
+        },
+        get delta() {
+          return coordinates?.delta() ?? [0, 0];
+        },
+        get wheel() {
+          return coordinates?.wheel() ?? 0;
+        },
+      },
+      camera: {
+        screenToWorld: (position) =>
+          coordinates?.screenToWorld(position) ?? position,
+        worldToScreen: (position) =>
+          coordinates?.worldToScreen(position) ?? position,
+      },
       loadScene: this.loadScene,
       log: (message) => this.log(`[${id}] ${message}`),
     };
+  }
+  private dispose(instance: Instance): void {
+    const errors: unknown[] = [];
+    try {
+      if (instance.active) this.call(instance, 'onDisable');
+    } catch (error) {
+      errors.push(error);
+    }
+    try {
+      this.call(instance, 'onDestroy');
+    } catch (error) {
+      errors.push(error);
+    } finally {
+      this.services.signals?.clearOwner(instance.owner);
+      this.services.timers?.cancelOwner(instance.owner);
+      this.services.tweens?.cancelOwner(instance.owner);
+      this.instances.delete(instance.owner);
+    }
+    if (errors.length)
+      throw new AggregateError(errors, 'Behaviour cleanup failed');
   }
   private call(
     instance: Instance,
@@ -208,94 +423,99 @@ export class ScriptSystem implements System {
   }
   private synchronize(): void {
     const present = new Set<Guid>();
-    for (const [numeric] of this.world.query(ScriptBehaviour.type)) {
-      const data = this.world.read(numeric, ScriptBehaviour)!;
-      if (!data.script) continue;
-      const id = this.world.get(numeric).guid;
-      present.add(id);
-      let instance = this.instances.get(id);
-      if (instance && instance.script !== data.script) {
-        if (instance.active) this.call(instance, 'onDisable');
-        this.call(instance, 'onDestroy');
-        this.instances.delete(id);
-        instance = undefined;
-      }
-      if (!instance) {
-        const module = this.modules.get(data.script),
-          fields = this.fields.get(data.script);
-        if (!module || typeof module.default !== 'function' || !fields)
-          throw new Error(
-            `Entity ${this.world.get(numeric).name}: missing compiled script ${data.script}`,
-          );
-        const behaviour = new module.default();
-        for (const [name, field] of Object.entries(fields)) {
-          const value = data.values[name] ?? field.default;
-          const expected =
-            field.type === 'number'
-              ? 'number'
-              : field.type === 'boolean'
-                ? 'boolean'
-                : 'string';
-          if (typeof value !== expected)
-            throw new Error(`Invalid script property ${name}`);
-          if (
-            field.type === 'entity' &&
-            value !== '' &&
-            this.world.find(String(value)) === undefined
-          )
-            throw new Error(`Missing entity reference ${value} in ${name}`);
-          Object.defineProperty(behaviour, name, {
-            value,
-            writable: true,
-            enumerable: true,
-            configurable: true,
-          });
+    for (const [numeric] of this.world.query(Behaviours.type)) {
+      const data = this.world.read(numeric, Behaviours)!,
+        id = this.world.get(numeric).guid;
+      for (const behaviourId of data.order) {
+        const dataItem = data.items[behaviourId]!;
+        if (!dataItem.script) continue;
+        const owner = `${id}:${behaviourId}`;
+        present.add(owner);
+        let instance = this.instances.get(owner);
+        if (instance && instance.script !== dataItem.script) {
+          this.dispose(instance);
+          instance = undefined;
         }
-        instance = {
-          id,
-          script: data.script,
-          behaviour,
-          active: false,
-          started: false,
-          context: this.context(id),
-        };
-        this.instances.set(id, instance);
-        this.call(instance, 'awake');
-      }
-      const active = this.world.isActive(numeric);
-      if (active !== instance.active) {
-        instance.active = active;
-        this.call(instance, active ? 'onEnable' : 'onDisable');
-      }
-      if (active && !instance.started) {
-        instance.started = true;
-        this.call(instance, 'start');
+        if (!instance) {
+          const module = this.modules.get(dataItem.script),
+            fields = this.fields.get(dataItem.script);
+          if (!module || typeof module.default !== 'function' || !fields)
+            throw new Error(
+              `Entity ${this.world.get(numeric).name}: missing compiled script ${dataItem.script}`,
+            );
+          const behaviour = new module.default();
+          for (const [name, field] of Object.entries(fields)) {
+            const value = dataItem.values[name] ?? field.default;
+            const expected =
+              field.type === 'number'
+                ? 'number'
+                : field.type === 'boolean'
+                  ? 'boolean'
+                  : 'string';
+            if (typeof value !== expected)
+              throw new Error(`Invalid script property ${name}`);
+            if (
+              field.type === 'entity' &&
+              value !== '' &&
+              this.world.find(String(value)) === undefined
+            )
+              throw new Error(`Missing entity reference ${value} in ${name}`);
+            Object.defineProperty(behaviour, name, {
+              value,
+              writable: true,
+              enumerable: true,
+              configurable: true,
+            });
+          }
+          const context = this.context(
+            id,
+            behaviourId,
+            owner,
+            () => this.instances.get(owner)?.active ?? false,
+          );
+          instance = {
+            id,
+            owner,
+            behaviourId,
+            script: dataItem.script,
+            behaviour,
+            active: false,
+            started: false,
+            context,
+          };
+          this.instances.set(owner, instance);
+          this.call(instance, 'awake');
+        }
+        const active = this.world.isActive(numeric) && dataItem.enabled;
+        if (active !== instance.active) {
+          instance.active = active;
+          this.call(instance, active ? 'onEnable' : 'onDisable');
+        }
+        if (active && !instance.started) {
+          instance.started = true;
+          this.call(instance, 'start');
+        }
       }
     }
-    for (const [id, instance] of this.instances)
-      if (!present.has(id)) {
-        if (instance.active) this.call(instance, 'onDisable');
-        this.call(instance, 'onDestroy');
-        this.instances.delete(id);
-      }
+    for (const [owner, instance] of [...this.instances])
+      if (!present.has(owner)) this.dispose(instance);
   }
   start(): void {
     this.off = this.physics.events.on('contact', (event) => {
-      for (const id of new Set([event.a, event.b])) {
-        const instance = this.instances.get(id);
-        if (instance?.active)
-          this.call(
-            instance,
-            event.sensor
-              ? event.started
-                ? 'onTriggerEnter'
-                : 'onTriggerExit'
-              : event.started
-                ? 'onCollisionEnter'
-                : 'onCollisionExit',
-            event,
-          );
-      }
+      for (const id of new Set([event.a, event.b]))
+        for (const instance of this.instances.values())
+          if (instance.id === id && instance.active)
+            this.call(
+              instance,
+              event.sensor
+                ? event.started
+                  ? 'onTriggerEnter'
+                  : 'onTriggerExit'
+                : event.started
+                  ? 'onCollisionEnter'
+                  : 'onCollisionExit',
+              event,
+            );
     });
     this.synchronize();
   }
@@ -330,12 +550,7 @@ export class ScriptSystem implements System {
     const errors: unknown[] = [];
     for (const instance of [...this.instances.values()].reverse()) {
       try {
-        if (instance.active) this.call(instance, 'onDisable');
-      } catch (error) {
-        errors.push(error);
-      }
-      try {
-        this.call(instance, 'onDestroy');
+        this.dispose(instance);
       } catch (error) {
         errors.push(error);
       }

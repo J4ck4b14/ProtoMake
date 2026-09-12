@@ -12,7 +12,8 @@ import {
   unpackPrefab,
 } from './prefab-actions';
 import { scriptFields } from '@protomake/scripting/compiler';
-import { ScriptBehaviour } from '@protomake/scripting';
+import { Behaviours } from '@protomake/scripting';
+import { Tags, TransformComponent, decompose } from '@protomake/core';
 import { EditorModel, getPath } from './model';
 import { node, button, input } from './dom';
 export class Inspector {
@@ -109,6 +110,18 @@ export class Inspector {
     this.host.append(parentLabel);
     for (const [type, data] of model.world.components(entity.id)) {
       if (type === PrefabLink.type) continue;
+      if (type === TransformComponent.type) {
+        this.renderTransform(data);
+        continue;
+      }
+      if (type === Tags.type) {
+        this.renderTags(data);
+        continue;
+      }
+      if (type === Behaviours.type) {
+        this.renderBehaviours(data);
+        continue;
+      }
       const definition = model.registry.get(type),
         section = node('section', 'component'),
         header = node('div', 'component-header');
@@ -149,45 +162,8 @@ export class Inspector {
         }
       }
       const inspectorFields = [...definition.inspector];
-      if (type === ScriptBehaviour.type) {
-        const script = model.project.assets.find(
-          (a) => a.id === getPath(data, 'script'),
-        );
-        if (script) {
-          if (this.openScript)
-            section.append(button(`Open script · ${script.path.split('/').at(-1)}`, () => this.openScript?.(script.id)));
-          try {
-            const fields = scriptFields(script.data, script.path);
-            for (const [name, field] of Object.entries(fields))
-              inspectorFields.push({
-                path: `values.${name}`,
-                label: field.label || name,
-                kind: field.type === 'string' && field.options?.length ? 'enum' : field.type,
-                ...(field.options?.length ? { options: field.options } : {}),
-                ...(field.help ? { help: field.help } : {}),
-                ...(field.min !== undefined ? { min: field.min } : {}),
-                ...(field.max !== undefined ? { max: field.max } : {}),
-                ...(field.step !== undefined ? { step: field.step } : {}),
-              });
-          } catch (error) {
-            section.append(node('p', 'error', String(error)));
-          }
-        }
-      }
       for (const field of inspectorFields) {
-        let value = getPath(data, field.path);
-        if (
-          value === undefined &&
-          type === ScriptBehaviour.type &&
-          field.path.startsWith('values.')
-        ) {
-          const script = model.project.assets.find(
-            (a) => a.id === getPath(data, 'script'),
-          );
-          if (script)
-            value = scriptFields(script.data, script.path)[field.path.slice(7)]
-              ?.default;
-        }
+        const value = getPath(data, field.path);
         if (field.kind === 'mask') {
           const row = node('fieldset', 'field mask-field'),
             legend = node('legend', '', field.label),
@@ -201,7 +177,9 @@ export class Inspector {
             checkbox.checked = (current & (1 << index)) !== 0;
             checkbox.onchange = () => {
               let mask = 0;
-              for (const [bit, input] of [...row.querySelectorAll<HTMLInputElement>('input')].entries())
+              for (const [bit, input] of [
+                ...row.querySelectorAll<HTMLInputElement>('input'),
+              ].entries())
                 if (input.checked) mask |= 1 << bit;
               this.run(() => model.setProperty(type, field.path, mask));
             };
@@ -219,20 +197,21 @@ export class Inspector {
           const row = node('label', 'field'),
             select = node('select');
           select.setAttribute('aria-label', field.label);
-          if (field.help) { row.title = field.help; select.title = field.help; }
+          if (field.help) {
+            row.title = field.help;
+            select.title = field.help;
+          }
           if (field.kind !== 'enum') select.append(new Option('None', ''));
           if (field.kind === 'asset') {
             for (const asset of model.project.assets) {
               const suitable =
-                type === ScriptBehaviour.type && field.path === 'script'
-                  ? asset.mime === 'text/typescript'
-                  : type === 'protomake.animator'
-                    ? asset.mime === 'application/x-protomake-animator'
-                    : type === 'protomake.audio-source'
-                      ? asset.kind === 'audio'
-                      : type === 'protomake.sprite'
-                        ? asset.kind === 'image'
-                        : true;
+                type === 'protomake.animator'
+                  ? asset.mime === 'application/x-protomake-animator'
+                  : type === 'protomake.audio-source'
+                    ? asset.kind === 'audio'
+                    : type === 'protomake.sprite'
+                      ? asset.kind === 'image'
+                      : true;
               if (suitable) select.append(new Option(asset.path, asset.id));
             }
           } else if (field.kind === 'entity') {
@@ -265,7 +244,10 @@ export class Inspector {
           if (field.min !== undefined) control.input.min = String(field.min);
           if (field.max !== undefined) control.input.max = String(field.max);
         }
-        if (field.help) { control.row.title = field.help; control.input.title = field.help; }
+        if (field.help) {
+          control.row.title = field.help;
+          control.input.title = field.help;
+        }
         if (field.path === 'restitution')
           control.input.title =
             '0 absorbs bounce; 1 is elastic. Values above 1 add energy.';
@@ -316,5 +298,226 @@ export class Inspector {
         'input,select,button',
       ))
         control.disabled = true;
+  }
+
+  private renderTransform(data: unknown): void {
+    const transform = TransformComponent.schema.parse(data),
+      parts = decompose(transform.local),
+      section = node('section', 'component'),
+      header = node('div', 'component-header');
+    header.append(
+      node('h3', '', 'Transform'),
+      button('Reset', () =>
+        this.run(() => this.model.resetComponent(TransformComponent.type)),
+      ),
+    );
+    section.append(header);
+    const values: readonly [
+      string,
+      keyof Pick<typeof parts, 'x' | 'y' | 'rotation' | 'scaleX' | 'scaleY'>,
+      number,
+    ][] = [
+      ['Position X', 'x', parts.x],
+      ['Position Y', 'y', parts.y],
+      ['Rotation', 'rotation', (parts.rotation * 180) / Math.PI],
+      ['Scale X', 'scaleX', parts.scaleX],
+      ['Scale Y', 'scaleY', parts.scaleY],
+    ];
+    for (const [label, property, value] of values) {
+      const control = input(label, String(value), 'number');
+      control.input.step = property === 'rotation' ? '1' : 'any';
+      control.input.onchange = () =>
+        this.run(() =>
+          this.model.setTransformProperty(
+            property,
+            property === 'rotation'
+              ? (control.input.valueAsNumber * Math.PI) / 180
+              : control.input.valueAsNumber,
+          ),
+        );
+      section.append(control.row);
+    }
+    const advanced = node('details'),
+      summary = node('summary', '', 'Advanced matrix / shear');
+    advanced.append(summary);
+    transform.local.forEach((value, index) => {
+      const control = input(
+        ['a', 'b', 'c', 'd', 'x', 'y'][index]!,
+        String(value),
+        'number',
+      );
+      control.input.step = 'any';
+      control.input.onchange = () =>
+        this.run(() =>
+          this.model.setProperty(
+            TransformComponent.type,
+            `local.${index}`,
+            control.input.valueAsNumber,
+          ),
+        );
+      advanced.append(control.row);
+    });
+    section.append(advanced);
+    this.host.append(section);
+  }
+
+  private renderTags(data: unknown): void {
+    const tags = Tags.schema.parse(data),
+      section = node('section', 'component'),
+      header = node('div', 'component-header'),
+      control = input('Tags', tags.values.join(', '));
+    header.append(
+      node('h3', '', 'Tags'),
+      button('Remove', () =>
+        this.run(() => this.model.removeComponent(Tags.type)),
+      ),
+    );
+    control.input.placeholder = 'Enemy, Boss, Damageable';
+    control.input.onchange = () =>
+      this.run(() =>
+        this.model.setTags(
+          control.input.value
+            .split(',')
+            .map((tag) => tag.trim())
+            .filter(Boolean),
+        ),
+      );
+    section.append(header, control.row);
+    this.host.append(section);
+  }
+
+  private renderBehaviours(data: unknown): void {
+    const behaviours = Behaviours.schema.parse(data),
+      section = node('section', 'component behaviours'),
+      header = node('div', 'component-header'),
+      scripts = this.model.project.assets.filter(
+        (asset) => asset.mime === 'text/typescript',
+      );
+    header.append(node('h3', '', 'Behaviours'));
+    section.append(header);
+    for (const id of behaviours.order) {
+      const item = behaviours.items[id]!,
+        card = node('article', 'behaviour-card'),
+        cardHeader = node('div', 'component-header'),
+        enabled = input('Enabled', '', 'checkbox'),
+        select = node('select');
+      enabled.input.checked = item.enabled;
+      enabled.input.onchange = () =>
+        this.run(() =>
+          this.model.setBehaviourProperty(id, 'enabled', enabled.input.checked),
+        );
+      select.setAttribute('aria-label', 'Behaviour script');
+      select.append(new Option('Select script', ''));
+      for (const script of scripts)
+        select.append(new Option(script.path, script.id));
+      select.value = item.script;
+      select.onchange = () =>
+        this.run(() => this.model.replaceBehaviourScript(id, select.value));
+      cardHeader.append(
+        node(
+          'strong',
+          '',
+          scripts
+            .find((script) => script.id === item.script)
+            ?.path.split('/')
+            .at(-1) ?? 'Script Behaviour',
+        ),
+        button('Remove', () => this.run(() => this.model.removeBehaviour(id))),
+      );
+      card.append(cardHeader, enabled.row, select);
+      const script = scripts.find((candidate) => candidate.id === item.script);
+      if (script) {
+        if (this.openScript)
+          card.append(
+            button(`Open script · ${script.path.split('/').at(-1)}`, () =>
+              this.openScript?.(script.id),
+            ),
+          );
+        try {
+          for (const [name, field] of Object.entries(
+            scriptFields(script.data, script.path),
+          )) {
+            const value = item.values[name] ?? field.default;
+            if (field.type === 'boolean') {
+              const control = input(field.label || name, '', 'checkbox');
+              control.input.checked = Boolean(value);
+              control.input.onchange = () =>
+                this.run(() =>
+                  this.model.setBehaviourProperty(
+                    id,
+                    `values.${name}`,
+                    control.input.checked,
+                  ),
+                );
+              card.append(control.row);
+            } else if (
+              field.type === 'entity' ||
+              field.type === 'asset' ||
+              field.options?.length
+            ) {
+              const row = node('label', 'field'),
+                fieldSelect = node('select');
+              fieldSelect.append(new Option('None', ''));
+              if (field.type === 'entity')
+                for (const entity of this.model.world.all())
+                  fieldSelect.append(new Option(entity.name, entity.guid));
+              else if (field.type === 'asset')
+                for (const asset of this.model.project.assets)
+                  fieldSelect.append(new Option(asset.path, asset.id));
+              else
+                for (const option of field.options ?? [])
+                  fieldSelect.append(new Option(option, option));
+              fieldSelect.value = String(value);
+              fieldSelect.onchange = () =>
+                this.run(() =>
+                  this.model.setBehaviourProperty(
+                    id,
+                    `values.${name}`,
+                    fieldSelect.value,
+                  ),
+                );
+              row.append(node('span', '', field.label || name), fieldSelect);
+              card.append(row);
+            } else {
+              const control = input(
+                field.label || name,
+                String(value),
+                field.type === 'number'
+                  ? 'number'
+                  : field.type === 'color'
+                    ? 'color'
+                    : 'text',
+              );
+              if (field.type === 'number') {
+                control.input.step = String(field.step ?? 'any');
+                if (field.min !== undefined)
+                  control.input.min = String(field.min);
+                if (field.max !== undefined)
+                  control.input.max = String(field.max);
+              }
+              control.input.onchange = () =>
+                this.run(() =>
+                  this.model.setBehaviourProperty(
+                    id,
+                    `values.${name}`,
+                    field.type === 'number'
+                      ? control.input.valueAsNumber
+                      : control.input.value,
+                  ),
+                );
+              card.append(control.row);
+            }
+          }
+        } catch (error) {
+          card.append(node('p', 'error', String(error)));
+        }
+      }
+      section.append(card);
+    }
+    if (!behaviours.order.length)
+      section.append(
+        node('p', 'empty', 'Attach scripts from the Scripts workspace.'),
+      );
+    this.host.append(section);
   }
 }

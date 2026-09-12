@@ -5,6 +5,32 @@ import {
 } from './components';
 import { assertGuid, guid, type EntityId, type Guid } from './identity';
 import { IDENTITY, inverse, matrix, multiply, type Matrix2D } from './math';
+const tagPattern = /^[A-Za-z][A-Za-z0-9_.:-]*$/;
+export interface TagsData {
+  readonly values: readonly string[];
+}
+export const Tags: ComponentDefinition<TagsData> = {
+  type: 'protomake.tags',
+  displayName: 'Tags',
+  defaults: () => ({ values: [] }),
+  schema: {
+    parse(value: unknown): TagsData {
+      if (
+        !value ||
+        typeof value !== 'object' ||
+        !('values' in value) ||
+        !Array.isArray(value.values) ||
+        !value.values.every(
+          (tag) => typeof tag === 'string' && tagPattern.test(tag),
+        ) ||
+        new Set(value.values).size !== value.values.length
+      )
+        throw new Error('Tags: expected unique identifier-like names');
+      return { values: [...value.values] };
+    },
+  },
+  inspector: [],
+};
 export interface Transform {
   readonly local: Matrix2D;
 }
@@ -33,6 +59,7 @@ export const TransformComponent: ComponentDefinition<Transform> = {
 export function createRegistry(): ComponentRegistry {
   const registry = new ComponentRegistry();
   registry.register(TransformComponent);
+  registry.register(Tags);
   return registry;
 }
 export interface Entity {
@@ -49,6 +76,7 @@ export class World {
   private readonly identities = new Map<Guid, EntityId>();
   private readonly stores = new Map<string, ComponentStore<unknown>>();
   private readonly childIndex = new Map<EntityId, Set<EntityId>>();
+  private readonly tagIndex = new Map<string, Set<EntityId>>();
   constructor(readonly registry: ComponentRegistry) {
     registry.get(TransformComponent.type);
   }
@@ -123,12 +151,15 @@ export class World {
       id,
       value === undefined ? this.registry.get(type).defaults() : value,
     );
+    if (type === Tags.type) this.indexTags(id, undefined, store.get(id));
   }
   set(id: EntityId, type: string, value: unknown): void {
     this.get(id);
     const store = this.store(type);
     if (!store.has(id)) throw new Error(`Entity ${id} has no ${type}`);
+    const previous = store.get(id);
     store.set(id, value);
+    if (type === Tags.type) this.indexTags(id, previous, store.get(id));
   }
   read<T>(id: EntityId, definition: ComponentDefinition<T>): T | undefined {
     this.get(id);
@@ -147,11 +178,66 @@ export class World {
   query(type: string): IterableIterator<[EntityId, unknown]> {
     return this.store(type).entries();
   }
+  withTag(tag: string): readonly EntityId[] {
+    return [...(this.tagIndex.get(tag) ?? [])].filter((id) => this.has(id));
+  }
+  withComponent(type: string): readonly EntityId[] {
+    this.registry.get(type);
+    return [...this.store(type).entries()].map(([id]) => id);
+  }
+  withComponents(...types: readonly string[]): readonly EntityId[] {
+    if (!types.length) return [...this.entities.keys()];
+    const stores = types.map((type) => {
+      this.registry.get(type);
+      return this.store(type);
+    });
+    return [...stores[0]!.entries()]
+      .map(([id]) => id)
+      .filter((id) => stores.slice(1).every((store) => store.has(id)));
+  }
+  closestWithTag(
+    tag: string,
+    position: readonly [number, number],
+  ): EntityId | undefined {
+    if (!position.every(Number.isFinite))
+      throw new Error('Position must be finite');
+    let closest: EntityId | undefined,
+      best = Infinity;
+    for (const id of this.withTag(tag)) {
+      const [x, y] = this.worldPosition(id),
+        distance = (x - position[0]) ** 2 + (y - position[1]) ** 2;
+      if (distance < best) {
+        best = distance;
+        closest = id;
+      }
+    }
+    return closest;
+  }
+  inRadius(
+    position: readonly [number, number],
+    radius: number,
+  ): readonly EntityId[] {
+    if (
+      !position.every(Number.isFinite) ||
+      !Number.isFinite(radius) ||
+      radius < 0
+    )
+      throw new Error(
+        'Radius query expects a finite position and non-negative radius',
+      );
+    const squared = radius * radius;
+    return [...this.entities.keys()].filter((id) => {
+      const [x, y] = this.worldPosition(id);
+      return (x - position[0]) ** 2 + (y - position[1]) ** 2 <= squared;
+    });
+  }
   remove(id: EntityId, type: string): void {
     this.get(id);
     if (type === TransformComponent.type)
       throw new Error('Transform is required');
     this.registry.get(type);
+    if (type === Tags.type)
+      this.indexTags(id, this.stores.get(type)?.get(id), undefined);
     this.stores.get(type)?.delete(id);
   }
   localMatrix(id: EntityId): Matrix2D {
@@ -215,9 +301,33 @@ export class World {
     if (root.parent !== null) this.childIndex.get(root.parent)?.delete(id);
     for (const target of ordered.reverse()) {
       this.identities.delete(this.get(target).guid);
+      this.indexTags(
+        target,
+        this.stores.get(Tags.type)?.get(target),
+        undefined,
+      );
       for (const store of this.stores.values()) store.delete(target);
       this.childIndex.delete(target);
       this.entities.delete(target);
     }
+  }
+  private indexTags(id: EntityId, before: unknown, after: unknown): void {
+    const previous = (before as TagsData | undefined)?.values ?? [],
+      next = (after as TagsData | undefined)?.values ?? [];
+    for (const tag of previous)
+      if (!next.includes(tag)) {
+        const group = this.tagIndex.get(tag);
+        group?.delete(id);
+        if (group?.size === 0) this.tagIndex.delete(tag);
+      }
+    for (const tag of next)
+      if (!previous.includes(tag)) {
+        let group = this.tagIndex.get(tag);
+        if (!group) {
+          group = new Set();
+          this.tagIndex.set(tag, group);
+        }
+        group.add(id);
+      }
   }
 }

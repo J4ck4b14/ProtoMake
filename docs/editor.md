@@ -22,7 +22,6 @@ Panel dividers support pointer dragging, keyboard arrows and double-click reset.
 
 Prefab actions and override visualization are documented in [prefabs](prefabs.md). Frame/controller forms and Mixer are in [animation/audio](animation-audio.md). Build ZIP and production Preview build are in [web build](web-build.md).
 
-
 ## Mobile workspace
 
 Desktop remains the primary layout. At 800 CSS pixels and below, the editor switches to a single-panel tab workspace instead of forcing the desktop split view. Hierarchy, Scene, Inspector, Project, Console and Assets are available as touch-sized tabs. The Scene tab adds explicit Pan, zoom-out, zoom-in and Frame controls so navigation does not depend on a mouse wheel or middle button. Dialogs and script editing expand to the small viewport. The desktop splitter layout is unchanged above the breakpoint.

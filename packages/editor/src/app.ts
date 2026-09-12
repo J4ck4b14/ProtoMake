@@ -61,16 +61,26 @@ inspectorHost.append(inspectorBody);
 workspace.append(hierarchy, sceneArea, inspectorHost);
 consolePanel.append(node('h2', '', 'Console'), consoleBody);
 bottom.append(projectBrowser, consolePanel);
-app.append(header, toolbar, mobileNav, mobileViewTools, workspace, bottom, status);
+app.append(
+  header,
+  toolbar,
+  mobileNav,
+  mobileViewTools,
+  workspace,
+  bottom,
+  status,
+);
 function log(message: string, error = false): void {
   const line = node(
-    'p',
-    error ? 'error' : '',
-    `${new Date().toLocaleTimeString()}  ${message}`,
-  ),
+      'p',
+      error ? 'error' : '',
+      `${new Date().toLocaleTimeString()}  ${message}`,
+    ),
     scriptLocation = /(?:^|\s)(Assets\/[^:\n]+\.ts):(\d+):(\d+)/.exec(message);
   if (scriptLocation) {
-    const asset = model.project.assets.find((candidate) => candidate.path === scriptLocation[1]);
+    const asset = model.project.assets.find(
+      (candidate) => candidate.path === scriptLocation[1],
+    );
     if (asset) {
       const jump = button('Open error', () =>
         showScripts(model, log, asset.id, {
@@ -100,7 +110,9 @@ const recovery = new RecoveryManager(model, storage, log);
 const viewport = new SceneViewport(canvas, model, (error) =>
     log(String(error), true),
   ),
-  inspector = new Inspector(inspectorBody, model, run, (assetId) => showScripts(model, log, assetId)),
+  inspector = new Inspector(inspectorBody, model, run, (assetId) =>
+    showScripts(model, log, assetId),
+  ),
   play = new PlayMode(playHost, model, log, refresh);
 
 const mobilePanels = [
@@ -172,10 +184,26 @@ menu.append(
       if (name) model.newProject(name);
     }),
   ),
-  button('Open local', () => asyncRun(openProjects), 'Open a project saved in this browser'),
-  button('Save locally', () => asyncRun(save), 'Save this project in this browser · Ctrl/Cmd+S'),
-  button('Export backup', () => run(exportBackup), 'Download a portable .protomake.json backup'),
-  button('Import project', () => fileInput.click(), 'Open a portable .protomake.json project'),
+  button(
+    'Open local',
+    () => asyncRun(openProjects),
+    'Open a project saved in this browser',
+  ),
+  button(
+    'Save locally',
+    () => asyncRun(save),
+    'Save this project in this browser · Ctrl/Cmd+S',
+  ),
+  button(
+    'Export backup',
+    () => run(exportBackup),
+    'Download a portable .protomake.json backup',
+  ),
+  button(
+    'Import project',
+    () => fileInput.click(),
+    'Open a portable .protomake.json project',
+  ),
 );
 const fileInput = node('input');
 fileInput.type = 'file';
@@ -211,24 +239,30 @@ async function openProjects(): Promise<void> {
   dialog.append(heading);
   if (!projects.length)
     dialog.append(
-      node('p', '', 'No local projects yet. Create a project and choose Save locally.'),
+      node(
+        'p',
+        '',
+        'No local projects yet. Create a project and choose Save locally.',
+      ),
     );
   for (const project of projects) {
     const row = node('div', 'saved-project');
     row.append(
-      button(`${project.name} · ${new Date(project.updated).toLocaleString()}`, () =>
-        asyncRun(async () => {
-          if (!canLeave()) return;
-          const saved = await storage.loadSession(project.id);
-          model.load(saved.project);
-          if (
-            saved.activeScene &&
-            model.project.scenes.some((s) => s.id === saved.activeScene)
-          )
-            model.switchScene(saved.activeScene);
-          dialog.close();
-          log(`Opened ${project.name}`);
-        }),
+      button(
+        `${project.name} · ${new Date(project.updated).toLocaleString()}`,
+        () =>
+          asyncRun(async () => {
+            if (!canLeave()) return;
+            const saved = await storage.loadSession(project.id);
+            model.load(saved.project);
+            if (
+              saved.activeScene &&
+              model.project.scenes.some((s) => s.id === saved.activeScene)
+            )
+              model.switchScene(saved.activeScene);
+            dialog.close();
+            log(`Opened ${project.name}`);
+          }),
       ),
       button('Delete local copy', () =>
         asyncRun(async () => {
@@ -247,7 +281,10 @@ async function openProjects(): Promise<void> {
 }
 function recoverySummary(snapshot: RecoverySnapshot): string {
   const scenes = snapshot.project.scenes.length,
-    entities = snapshot.project.scenes.reduce((total, scene) => total + scene.entities.length, 0),
+    entities = snapshot.project.scenes.reduce(
+      (total, scene) => total + scene.entities.length,
+      0,
+    ),
     assets = snapshot.project.assets.length;
   return `${scenes} scene${scenes === 1 ? '' : 's'} · ${entities} entities · ${assets} assets`;
 }
@@ -255,58 +292,110 @@ function recoverySummary(snapshot: RecoverySnapshot): string {
 function restoreRecovery(snapshot: RecoverySnapshot): void {
   if (!canLeave()) return;
   model.load(snapshot.project, false);
-  if (snapshot.activeScene && model.project.scenes.some((scene) => scene.id === snapshot.activeScene))
+  if (
+    snapshot.activeScene &&
+    model.project.scenes.some((scene) => scene.id === snapshot.activeScene)
+  )
     model.switchScene(snapshot.activeScene);
-  log(`Restored recovery snapshot for ${snapshot.projectName}; save when satisfied`);
+  log(
+    `Restored recovery snapshot for ${snapshot.projectName}; save when satisfied`,
+  );
 }
 
 function compareRecovery(snapshot: RecoverySnapshot): void {
-  const dialog = node('dialog'), heading = node('h2', '', 'Recovery comparison'),
+  const dialog = node('dialog'),
+    heading = node('h2', '', 'Recovery comparison'),
     current = structuredClone(model.project);
   const currentScenes = current.scenes.length,
-    currentEntities = current.scenes.reduce((total, scene) => total + scene.entities.length, 0),
-    snapshotEntities = snapshot.project.scenes.reduce((total, scene) => total + scene.entities.length, 0);
+    currentEntities = current.scenes.reduce(
+      (total, scene) => total + scene.entities.length,
+      0,
+    ),
+    snapshotEntities = snapshot.project.scenes.reduce(
+      (total, scene) => total + scene.entities.length,
+      0,
+    );
   dialog.append(
     heading,
-    node('p', '', `Recovery · ${new Date(snapshot.updated).toLocaleString()} · ${recoverySummary(snapshot)}`),
-    node('p', '', `Current · ${currentScenes} scenes · ${currentEntities} entities · ${current.assets.length} assets`),
-    node('p', 'settings-note', '',),
+    node(
+      'p',
+      '',
+      `Recovery · ${new Date(snapshot.updated).toLocaleString()} · ${recoverySummary(snapshot)}`,
+    ),
+    node(
+      'p',
+      '',
+      `Current · ${currentScenes} scenes · ${currentEntities} entities · ${current.assets.length} assets`,
+    ),
+    node('p', 'settings-note', ''),
     button('Close', () => dialog.close()),
   );
   const note = dialog.querySelector('.settings-note');
-  if (note) note.textContent = `${snapshotEntities - currentEntities >= 0 ? '+' : ''}${snapshotEntities - currentEntities} entities · ${snapshot.project.assets.length - current.assets.length >= 0 ? '+' : ''}${snapshot.project.assets.length - current.assets.length} assets compared with the current project.`;
+  if (note)
+    note.textContent = `${snapshotEntities - currentEntities >= 0 ? '+' : ''}${snapshotEntities - currentEntities} entities · ${snapshot.project.assets.length - current.assets.length >= 0 ? '+' : ''}${snapshot.project.assets.length - current.assets.length} assets compared with the current project.`;
   dialog.onclose = () => dialog.remove();
   document.body.append(dialog);
   dialog.showModal();
 }
 
 async function showRecovery(preferred?: RecoverySnapshot): Promise<void> {
-  const snapshots = preferred ? [preferred, ...(await recovery.list()).filter((item) => item.key !== preferred.key)] : await recovery.list(),
-    dialog = node('dialog', 'recovery-dialog'), heading = node('h2', '', 'Recovery journal');
-  dialog.append(heading, node('p', 'settings-note', 'Autosaves are separate from Save and rotate automatically. Restore keeps the recovered project dirty so you can inspect it before committing.'));
-  if (!snapshots.length) dialog.append(node('p', 'empty', 'No recovery snapshots yet.'));
+  const snapshots = preferred
+      ? [
+          preferred,
+          ...(await recovery.list()).filter(
+            (item) => item.key !== preferred.key,
+          ),
+        ]
+      : await recovery.list(),
+    dialog = node('dialog', 'recovery-dialog'),
+    heading = node('h2', '', 'Recovery journal');
+  dialog.append(
+    heading,
+    node(
+      'p',
+      'settings-note',
+      'Autosaves are separate from Save and rotate automatically. Restore keeps the recovered project dirty so you can inspect it before committing.',
+    ),
+  );
+  if (!snapshots.length)
+    dialog.append(node('p', 'empty', 'No recovery snapshots yet.'));
   for (const snapshot of snapshots) {
-    const row = node('div', 'recovery-row'), info = node('div');
+    const row = node('div', 'recovery-row'),
+      info = node('div');
     info.append(
       node('strong', '', snapshot.projectName),
-      node('div', 'settings-note', `${snapshot.reason === 'checkpoint' ? 'Checkpoint' : snapshot.key.startsWith('emergency:') ? 'Emergency' : 'Autosave'} · ${new Date(snapshot.updated).toLocaleString()}`),
+      node(
+        'div',
+        'settings-note',
+        `${snapshot.reason === 'checkpoint' ? 'Checkpoint' : snapshot.key.startsWith('emergency:') ? 'Emergency' : 'Autosave'} · ${new Date(snapshot.updated).toLocaleString()}`,
+      ),
       node('div', 'settings-note', recoverySummary(snapshot)),
     );
     const actions = node('div', 'actions');
     actions.append(
-      button('Restore', () => { restoreRecovery(snapshot); dialog.close(); }),
+      button('Restore', () => {
+        restoreRecovery(snapshot);
+        dialog.close();
+      }),
       button('Compare', () => compareRecovery(snapshot)),
-      button('Discard', () => asyncRun(async () => {
-        await recovery.discard(snapshot);
-        row.remove();
-      })),
+      button('Discard', () =>
+        asyncRun(async () => {
+          await recovery.discard(snapshot);
+          row.remove();
+        }),
+      ),
     );
     row.append(info, actions);
     dialog.append(row);
   }
   const actions = node('div', 'actions');
   actions.append(
-    button('Create checkpoint', () => asyncRun(async () => { await recovery.capture('checkpoint'); dialog.close(); })),
+    button('Create checkpoint', () =>
+      asyncRun(async () => {
+        await recovery.capture('checkpoint');
+        dialog.close();
+      }),
+    ),
     button('Close', () => dialog.close()),
   );
   dialog.append(actions);
@@ -359,19 +448,39 @@ spacing.input.onchange = () => {
 };
 const gizmos = input('Gizmos', '', 'checkbox');
 gizmos.input.checked = true;
-gizmos.input.onchange = () => { viewport.showGizmos = gizmos.input.checked; viewport.draw(); };
+gizmos.input.onchange = () => {
+  viewport.showGizmos = gizmos.input.checked;
+  viewport.draw();
+};
 const colliders = input('Colliders', '', 'checkbox');
 colliders.input.checked = true;
-colliders.input.onchange = () => { viewport.showColliders = colliders.input.checked; viewport.draw(); };
+colliders.input.onchange = () => {
+  viewport.showColliders = colliders.input.checked;
+  viewport.draw();
+};
 const lightingDebug = input('Light debug', '', 'checkbox');
-lightingDebug.input.onchange = () => { viewport.lightingDebug = lightingDebug.input.checked; viewport.draw(); };
+lightingDebug.input.onchange = () => {
+  viewport.lightingDebug = lightingDebug.input.checked;
+  viewport.draw();
+};
 const lightingChannel = node('select');
 lightingChannel.setAttribute('aria-label', 'Lighting debug channel');
-for (const channel of LIGHTING_CHANNELS) lightingChannel.append(new Option(channel, channel));
+for (const channel of LIGHTING_CHANNELS)
+  lightingChannel.append(new Option(channel, channel));
 lightingChannel.value = viewport.lightingChannel;
-lightingChannel.onchange = () => { viewport.lightingChannel = lightingChannel.value as LightingChannel; viewport.draw(); };
+lightingChannel.onchange = () => {
+  viewport.lightingChannel = lightingChannel.value as LightingChannel;
+  viewport.draw();
+};
 toolbar.append(
-  grid.row, snapping.row, spacing.row, gizmos.row, colliders.row, lightingDebug.row, lightingChannel, node('span', 'spacer'),
+  grid.row,
+  snapping.row,
+  spacing.row,
+  gizmos.row,
+  colliders.row,
+  lightingDebug.row,
+  lightingChannel,
+  node('span', 'spacer'),
 );
 const playButton = button('▶ Play', () => run(() => play.start())),
   pause = button('Pause', () => run(() => play.pause())),
@@ -653,7 +762,6 @@ void attachRenderer(sceneArea, viewport, model, log).catch((error) =>
   log(`Renderer unavailable: ${String(error)}`, true),
 );
 
-
 const STORAGE_NOTICE_KEY = 'protomake.storage-notice.v1';
 function showStorageNotice(): void {
   try {
@@ -708,7 +816,11 @@ asyncRun(async () => {
 
 menu.append(
   button('Recovery', () => asyncRun(() => showRecovery())),
-  button('Cloud sync', () => showAccount(model, accountSync, log, canLeave), 'Optional account-backed project continuity'),
+  button(
+    'Cloud sync',
+    () => showAccount(model, accountSync, log, canLeave),
+    'Optional account-backed project continuity',
+  ),
   button('Settings', () => showSettings(model, log)),
 );
 

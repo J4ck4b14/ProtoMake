@@ -1,8 +1,8 @@
-# ProtoMake 0.9.3
+# ProtoMake 0.10.0
 
 A reusable, browser-native 2D engine and visual editor for human-authored projects.
 
-**Milestones 0–7 plus the Editor Quality pass are implemented.** ProtoMake 0.9.3 is the public-alpha launch pass: it keeps the 0.9.2 reliability/authoring work and makes browser-local persistence, portable backups and zero-cost GitHub Pages deployment explicit. The editor includes recovery/undo discipline, visual gizmos, channel-aware lighting with quality/performance diagnostics, a stronger in-editor TypeScript workflow, reusable perception primitives, mobile/tablet usability and safer optional account continuity. It remains a development release with the documented scope below.
+**Milestones 0–7, the Editor Quality pass and Developer Velocity are implemented.** ProtoMake 0.10.0 adds composable behaviour slots, TRS-first transform authoring, indexed tags and queries, runtime prefab creation, signals, timers, tweens, pointer/camera coordinates and a visual Input Action editor. Existing 0.9 projects migrate on load. It remains a development release with the documented scope below.
 
 ## Three prototype workshop
 
@@ -51,8 +51,7 @@ Start testing with [TESTING-CHECKLIST.md](TESTING-CHECKLIST.md). Save your test 
 | 5         | Linked hierarchy prefabs, inherited base properties, tokenized overrides, per-property apply/revert, propagation across scenes, Inspector indicators                                                                                                     |
 | 6         | Ordered sprite frames, clip/state playback, bool/float/int/trigger parameters, transitions, frame/state editor forms, AudioSource, WAV/MP3/OGG import, Web Audio mixer and buses                                                                         |
 | 7         | Separate production player, compiled project JS modules, dependency report, Build ZIP, standalone production preview and static-hosting instructions                                                                                                     |
-
-
+| 0.10      | Multiple independently enabled script behaviours, friendly transforms, tags/queries, runtime prefab lifecycle, signals, timers, tweens, pointer/camera conversion and visual input authoring                                                             |
 
 ## Editor Quality polish
 
@@ -86,7 +85,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 106 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, audio behavior and input feel remain part of the browser acceptance checklist.
+The suite includes 110 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, audio behavior and input feel remain part of the browser acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 
@@ -95,7 +94,7 @@ The suite includes 106 automated tests, with actual Rapier simulation and execut
 - **Build ZIP** exports the current project. **Preview build** runs those production files in a separate tab. `npm run build` builds the editor, Play host and reusable standalone player bundle. The included `examples/milestones-5-7/web-build/` is a generated game; `npm run preview:game` serves it independently. See [web build](docs/web-build.md).
 - The included account server is a self-hostable reference backend, not a hosted production identity service. Cross-device use requires a reachable HTTPS deployment/reverse proxy. The reference server now includes basic auth rate limiting and quotas, but public deployment still needs durable sessions/database operations, backups, migrations, password recovery/email verification and operational monitoring as appropriate.
 - Script compilation reports syntax, static metadata and import/link errors. Full semantic project-script TypeScript checking belongs to an external TS editor/`tsc` for now. The engine, editor and checked-in example scripts are strictly typechecked.
-- One ScriptBehaviour component is supported per entity. Compose behavior through local project modules when needed. Runtime imports must be relative project TS modules; acyclic imports are supported. External runtime packages, dynamic imports and Node APIs are unsupported in project scripts.
+- Each entity can own multiple independently enabled script behaviours with stable slot identities and exposed values. Runtime imports must be relative project TS modules; acyclic imports are supported. External runtime packages, dynamic imports and Node APIs are unsupported in project scripts.
 - Rebuild uses **Stop → edit/save script → Play**. Stateful hot replacement while running is not implemented.
 - The same-origin iframe isolates ordinary runtime state and lifetime, **not malicious code**. Only press Play on trusted projects. Arbitrary creator code can access browser APIs and an infinite loop can block the tab.
 - Physics supports non-sheared, nonzero transforms; circles/capsules require uniform scale. Dynamic bodies own their position/rotation. Use physics methods for velocity/impulse/teleport; transform-driven movement is for static/kinematic bodies.
@@ -104,4 +103,4 @@ The suite includes 106 automated tests, with actual Rapier simulation and execut
 
 Prefabs do not yet support nested relationships or structural overrides. Animation transitions are immediate cuts; audio is non-spatial with one voice per source. Export conservatively includes every project scene/asset. Detailed contracts are in [prefabs](docs/prefabs.md) and [animation/audio](docs/animation-audio.md).
 
-See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [lighting](docs/lighting.md), [scripting guide](docs/scripting.md), [account continuity](docs/account-sync.md), [polish-pass notes](docs/polish-pass.md), [0.9 editor quality](docs/editor-quality-0.9.md), [0.9.1 hotfix](docs/hotfix-0.9.1.md), [0.9.2 certification hotfix](docs/hotfix-0.9.2.md), [0.9.3 launch pass](docs/launch-0.9.3.md), [GitHub Pages deployment](docs/github-pages.md), [Git history/reflogs](docs/git-history.md), [project history](HISTORY.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).
+See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [scripting guide](docs/scripting.md), [Developer Velocity 0.10](docs/developer-velocity-0.10.md), [lighting](docs/lighting.md), [account continuity](docs/account-sync.md), [0.9.3 launch pass](docs/launch-0.9.3.md), [GitHub Pages deployment](docs/github-pages.md), [project history](HISTORY.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).

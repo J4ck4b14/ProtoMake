@@ -2,7 +2,11 @@ import { runtimeRegistry } from '@protomake/player';
 import { PrefabLink } from '@protomake/prefabs';
 import { captureOverrides } from './prefab-actions';
 import { scriptFields } from '@protomake/scripting/compiler';
-import { ScriptBehaviour } from '@protomake/scripting';
+import {
+  Behaviours,
+  scriptBehaviour,
+  type ScriptBehaviourData,
+} from '@protomake/scripting';
 import {
   World,
   guid,
@@ -10,6 +14,9 @@ import {
   multiply,
   inverse,
   IDENTITY,
+  Tags,
+  composeAffine,
+  decompose,
   type Guid,
   type Matrix2D,
 } from '@protomake/core';
@@ -346,15 +353,18 @@ export class EditorModel {
             .get(type)
             .inspector.filter((f) => f.kind === 'entity')
             .map((f) => f.path);
-          if (type === ScriptBehaviour.type) {
-            const script = this.project.assets.find(
-              (a) => a.id === getPath(data, 'script'),
-            );
-            if (script)
-              for (const [name, field] of Object.entries(
-                scriptFields(script.data, script.path),
-              ))
-                if (field.type === 'entity') paths.push(`values.${name}`);
+          if (type === Behaviours.type) {
+            const behaviours = Behaviours.schema.parse(data);
+            for (const behaviourId of behaviours.order) {
+              const item = behaviours.items[behaviourId]!,
+                script = this.project.assets.find((a) => a.id === item.script);
+              if (script)
+                for (const [name, field] of Object.entries(
+                  scriptFields(script.data, script.path),
+                ))
+                  if (field.type === 'entity')
+                    paths.push(`items.${behaviourId}.values.${name}`);
+            }
           }
           for (const path of paths) {
             const previous = getPath(data, path);
@@ -404,6 +414,92 @@ export class EditorModel {
       for (const id of this.selection)
         if (!this.world.components(this.entity(id)).has(type))
           this.world.add(this.entity(id), type);
+    });
+  }
+  addScriptBehaviour(
+    script: string,
+    values: ScriptBehaviourData['values'] = {},
+  ): void {
+    this.change('Add script behaviour', () => {
+      for (const stable of this.selection) {
+        const entity = this.entity(stable),
+          id = guid(),
+          current =
+            this.world.read(entity, Behaviours) ?? Behaviours.defaults(),
+          next = structuredClone(current);
+        next.order.push(id);
+        next.items[id] = scriptBehaviour(id, script, values);
+        if (this.world.components(entity).has(Behaviours.type))
+          this.world.set(entity, Behaviours.type, next);
+        else this.world.add(entity, Behaviours.type, next);
+      }
+    });
+  }
+  removeBehaviour(id: string): void {
+    this.change('Remove behaviour', () => {
+      for (const stable of this.selection) {
+        const entity = this.entity(stable),
+          current = this.world.read(entity, Behaviours);
+        if (!current?.items[id]) continue;
+        const next = structuredClone(current);
+        next.order = next.order.filter((candidate) => candidate !== id);
+        delete next.items[id];
+        this.world.set(entity, Behaviours.type, next);
+      }
+    });
+  }
+  setBehaviourProperty(id: string, path: string, value: unknown): void {
+    this.change('Edit behaviour', () => {
+      for (const stable of this.selection) {
+        const entity = this.entity(stable),
+          current = this.world.read(entity, Behaviours);
+        if (!current?.items[id]) continue;
+        const next = structuredClone(current);
+        setPath(next, `items.${id}.${path}`, value);
+        this.world.set(entity, Behaviours.type, next);
+      }
+    });
+  }
+  replaceBehaviourScript(id: string, script: string): void {
+    this.change('Replace behaviour script', () => {
+      for (const stable of this.selection) {
+        const entity = this.entity(stable),
+          current = this.world.read(entity, Behaviours);
+        if (!current?.items[id]) continue;
+        const next = structuredClone(current),
+          item = next.items[id]!;
+        item.script = script;
+        item.values = {};
+        this.world.set(entity, Behaviours.type, next);
+      }
+    });
+  }
+  setTransformProperty(
+    property: 'x' | 'y' | 'rotation' | 'scaleX' | 'scaleY',
+    value: number,
+  ): void {
+    if (!Number.isFinite(value))
+      throw new Error('Transform value must be finite');
+    this.change('Edit transform', () => {
+      for (const stable of this.selection) {
+        const entity = this.entity(stable),
+          parts = decompose(this.world.localMatrix(entity));
+        this.world.setLocalMatrix(
+          entity,
+          composeAffine({ ...parts, [property]: value }),
+        );
+      }
+    });
+  }
+  setTags(values: readonly string[]): void {
+    this.change('Edit tags', () => {
+      for (const stable of this.selection) {
+        const entity = this.entity(stable),
+          data = { values: [...new Set(values)] };
+        if (this.world.components(entity).has(Tags.type))
+          this.world.set(entity, Tags.type, data);
+        else this.world.add(entity, Tags.type, data);
+      }
     });
   }
   removeComponent(type: string): void {

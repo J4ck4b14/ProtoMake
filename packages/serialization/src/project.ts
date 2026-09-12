@@ -18,7 +18,7 @@ import {
   validateScene,
 } from './scene';
 import { MigrationChain } from './migrations';
-export const PROJECT_SCHEMA_VERSION = 4;
+export const PROJECT_SCHEMA_VERSION = 5;
 export const ProjectSchema = z.strictObject({
   schemaVersion: z.literal(PROJECT_SCHEMA_VERSION),
   id: GuidSchema,
@@ -53,12 +53,99 @@ projectMigrations.register(3, (input) => ({
   folders: ['Assets', 'Scenes'],
   sceneFolders: {},
 }));
+projectMigrations.register(4, (input) => {
+  const project = input as {
+    engineVersion?: string;
+    schemaVersion: number;
+    scenes?: unknown[];
+    assets?: { mime?: string; data?: string }[];
+  };
+  const migrateScene = (candidate: unknown): void => {
+    if (
+      !candidate ||
+      typeof candidate !== 'object' ||
+      !('entities' in candidate)
+    )
+      return;
+    const entities = (candidate as { entities?: unknown }).entities;
+    if (!Array.isArray(entities)) return;
+    for (const entity of entities) {
+      if (!entity || typeof entity !== 'object' || !('components' in entity))
+        continue;
+      const components = (entity as { components?: unknown }).components;
+      if (
+        !components ||
+        typeof components !== 'object' ||
+        Array.isArray(components)
+      )
+        continue;
+      const record = components as Record<string, unknown>,
+        legacy = record['protomake.script'];
+      if (legacy && typeof legacy === 'object' && !Array.isArray(legacy)) {
+        const item = legacy as { script?: unknown; values?: unknown };
+        record['protomake.behaviours'] = {
+          order: ['script'],
+          items: {
+            script: {
+              id: 'script',
+              kind: 'script',
+              enabled: true,
+              script: typeof item.script === 'string' ? item.script : '',
+              values:
+                item.values &&
+                typeof item.values === 'object' &&
+                !Array.isArray(item.values)
+                  ? item.values
+                  : {},
+            },
+          },
+        };
+        delete record['protomake.script'];
+      }
+      const link = record['protomake.prefab'];
+      if (
+        link &&
+        typeof link === 'object' &&
+        !Array.isArray(link) &&
+        'overrides' in link &&
+        Array.isArray(link.overrides)
+      )
+        for (const override of link.overrides)
+          if (
+            override &&
+            typeof override === 'object' &&
+            'path' in override &&
+            Array.isArray(override.path)
+          ) {
+            const index = override.path.indexOf('protomake.script');
+            if (index >= 0)
+              override.path.splice(
+                index,
+                1,
+                'protomake.behaviours',
+                'items',
+                'script',
+              );
+          }
+    }
+  };
+  for (const scene of project.scenes ?? []) migrateScene(scene);
+  for (const asset of project.assets ?? [])
+    if (asset.mime === PREFAB_MIME && typeof asset.data === 'string') {
+      const document = JSON.parse(asset.data) as unknown;
+      migrateScene(document);
+      asset.data = JSON.stringify(document);
+    }
+  project.schemaVersion = 5;
+  project.engineVersion = '0.10.0';
+  return project;
+});
 export function createProject(name: string): ProjectData {
   return ProjectSchema.parse({
     schemaVersion: PROJECT_SCHEMA_VERSION,
     id: guid(),
     name,
-    engineVersion: '0.9.3',
+    engineVersion: '0.10.0',
     startupScene: null,
     scenes: [],
     assets: [],
@@ -138,27 +225,33 @@ export function validateProject(
             `${scene.name}/${entity.name}: physics layer ${data.layer} is not defined`,
           );
         if (
-          (type === 'protomake.sprite' || type === 'protomake.script') &&
+          (type === 'protomake.sprite' || type === 'protomake.behaviours') &&
           data &&
           typeof data === 'object'
         ) {
-          const reference =
+          const references =
             'texture' in data
-              ? data.texture
-              : 'script' in data
-                ? data.script
-                : '';
-          if (reference) {
-            const asset = project.assets.find((a) => a.id === reference);
-            if (
-              asset &&
-              ((type === 'protomake.sprite' && asset.kind !== 'image') ||
-                (type === 'protomake.script' && asset.mime !== 'text/typescript'))
-            )
-              throw new Error(
-                `${scene.name}/${entity.name}: incompatible asset type on ${type}`,
-              );
-          }
+              ? [data.texture]
+              : 'items' in data && data.items && typeof data.items === 'object'
+                ? Object.values(data.items).map((item) =>
+                    item && typeof item === 'object' && 'script' in item
+                      ? item.script
+                      : '',
+                  )
+                : [];
+          for (const reference of references)
+            if (reference) {
+              const asset = project.assets.find((a) => a.id === reference);
+              if (
+                asset &&
+                ((type === 'protomake.sprite' && asset.kind !== 'image') ||
+                  (type === 'protomake.behaviours' &&
+                    asset.mime !== 'text/typescript'))
+              )
+                throw new Error(
+                  `${scene.name}/${entity.name}: incompatible asset type on ${type}`,
+                );
+            }
         }
       }
     if (ids.has(scene.id))
@@ -170,9 +263,41 @@ export function validateProject(
       `Project ${project.name}: missing startup scene ${project.startupScene}`,
     );
   const database = new AssetDatabase(project.assets);
-  const missing = database.missing(
-    assetReferences([...project.scenes, ...bases.values()], registry),
-  );
+  const documents = [...project.scenes, ...bases.values()],
+    behaviourReferences = documents.flatMap((scene) =>
+      scene.entities.flatMap((entity) => {
+        const data = entity.components['protomake.behaviours'];
+        if (
+          !data ||
+          typeof data !== 'object' ||
+          !('items' in data) ||
+          !data.items ||
+          typeof data.items !== 'object'
+        )
+          return [];
+        return Object.values(data.items).flatMap((item) =>
+          item &&
+          typeof item === 'object' &&
+          'script' in item &&
+          typeof item.script === 'string' &&
+          item.script
+            ? [
+                {
+                  scene: scene.name,
+                  entity: entity.name,
+                  component: 'protomake.behaviours',
+                  path: `items.${'id' in item ? String(item.id) : 'unknown'}.script`,
+                  asset: item.script,
+                },
+              ]
+            : [],
+        );
+      }),
+    ),
+    missing = database.missing([
+      ...assetReferences(documents, registry),
+      ...behaviourReferences,
+    ]);
   if (missing.length)
     throw new Error(
       `Missing asset ${missing[0]!.asset} on ${missing[0]!.scene}/${missing[0]!.entity}`,

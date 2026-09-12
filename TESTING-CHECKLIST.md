@@ -72,7 +72,6 @@ Import each project's JSON to inspect and edit it. Scrub a clip, change a durati
 
 See the workshop chapters for per-game success/failure checks. `tests/prototypes.test.ts` additionally completes the platformer with keyboard input only, so a reachable route is covered beyond isolated jump tests.
 
-
 ## Additional polish acceptance
 
 ### Lighting and stealth queries
@@ -95,7 +94,6 @@ See the workshop chapters for per-game success/failure checks. `tests/prototypes
 - On a second browser/device connected to the same reachable server, open the project, save a newer revision, then attempt to save the stale first copy. The stale save must report a revision conflict instead of silently overwriting the newer cloud project.
 
 For true phone/desktop testing the account server must be reachable from both devices; localhost on one machine is not cross-device networking. See `docs/account-sync.md`.
-
 
 ## ProtoMake 0.9 Editor Quality acceptance
 
@@ -133,4 +131,3 @@ For true phone/desktop testing the account server must be reachable from both de
 - [ ] Unsaved changes still trigger the existing before-unload/recovery behavior.
 - [ ] `npm run build` produces `dist/` whose HTML/assets work from a non-root static path.
 - [ ] The GitHub Pages workflow publishes only the production `dist/` artifact, not `.git`, source-only account data, or `node_modules`.
-

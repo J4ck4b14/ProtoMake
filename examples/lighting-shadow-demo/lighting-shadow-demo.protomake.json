@@ -17,14 +17,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                0,
-                -225
-              ]
+              "local": [1, 0, 0, 1, 0, -225]
             },
             "protomake.sprite": {
               "texture": "3b4ca704-aeba-4048-a8ba-b64bbf43c02b",
@@ -50,14 +43,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                60,
-                180
-              ]
+              "local": [1, 0, 0, 1, 60, 180]
             },
             "protomake.sprite": {
               "texture": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
@@ -106,14 +92,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                -80,
-                50
-              ]
+              "local": [1, 0, 0, 1, -80, 50]
             },
             "protomake.sprite": {
               "texture": "b3795dc4-2ac2-4cee-8f44-836eab6977ed",
@@ -139,14 +118,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                0,
-                0
-              ]
+              "local": [1, 0, 0, 1, 0, 0]
             },
             "protomake.sprite": {
               "texture": "9f2e452d-88ac-478c-8eb9-fda848969104",
@@ -173,12 +145,8 @@
           "components": {
             "protomake.transform": {
               "local": [
-                0.9210609940028851,
-                0.3894183423086505,
-                -0.3894183423086505,
-                0.9210609940028851,
-                -350,
-                -160
+                0.9210609940028851, 0.3894183423086505, -0.3894183423086505,
+                0.9210609940028851, -350, -160
               ]
             },
             "protomake.light": {
@@ -202,14 +170,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                0,
-                0
-              ]
+              "local": [1, 0, 0, 1, 0, 0]
             },
             "protomake.light": {
               "kind": "ambient",
@@ -232,14 +193,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                -350,
-                -192
-              ]
+              "local": [1, 0, 0, 1, -350, -192]
             },
             "protomake.sprite": {
               "texture": "",
@@ -265,14 +219,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                -250,
-                130
-              ]
+              "local": [1, 0, 0, 1, -250, 130]
             },
             "protomake.sprite": {
               "texture": "343b7c30-b3b5-49a2-b025-bfd5a1127e66",
@@ -304,14 +251,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                -350,
-                -192
-              ]
+              "local": [1, 0, 0, 1, -350, -192]
             },
             "protomake.sprite": {
               "texture": "",
@@ -337,14 +277,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                330,
-                135
-              ]
+              "local": [1, 0, 0, 1, 330, 135]
             },
             "protomake.sprite": {
               "texture": "628ba8c4-7a58-4c78-a586-b8e1bcd42b4e",
@@ -370,14 +303,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                200,
-                60
-              ]
+              "local": [1, 0, 0, 1, 200, 60]
             },
             "protomake.light": {
               "kind": "area",
@@ -400,14 +326,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                -240,
-                180
-              ]
+              "local": [1, 0, 0, 1, -240, 180]
             },
             "protomake.sprite": {
               "texture": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
@@ -456,14 +375,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                -80,
-                90
-              ]
+              "local": [1, 0, 0, 1, -80, 90]
             },
             "protomake.sprite": {
               "texture": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
@@ -512,14 +424,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                300,
-                180
-              ]
+              "local": [1, 0, 0, 1, 300, 180]
             },
             "protomake.sprite": {
               "texture": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
@@ -568,14 +473,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                0,
-                0
-              ]
+              "local": [1, 0, 0, 1, 0, 0]
             },
             "protomake.camera": {
               "zoom": 1,
@@ -595,14 +493,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                -190,
-                0
-              ]
+              "local": [1, 0, 0, 1, -190, 0]
             },
             "protomake.light": {
               "kind": "point",
@@ -625,14 +516,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                300,
-                105
-              ]
+              "local": [1, 0, 0, 1, 300, 105]
             },
             "protomake.sprite": {
               "texture": "343b7c30-b3b5-49a2-b025-bfd5a1127e66",
@@ -655,27 +539,14 @@
               "root": "739312ef-0ce0-4012-9be4-dfe2c1dd085e",
               "overrides": [
                 {
-                  "path": [
-                    "name"
-                  ],
+                  "path": ["name"],
                   "removed": false,
                   "value": "Coin 4"
                 },
                 {
-                  "path": [
-                    "components",
-                    "protomake.transform",
-                    "local"
-                  ],
+                  "path": ["components", "protomake.transform", "local"],
                   "removed": false,
-                  "value": [
-                    1,
-                    0,
-                    0,
-                    1,
-                    300,
-                    105
-                  ]
+                  "value": [1, 0, 0, 1, 300, 105]
                 }
               ]
             }
@@ -688,14 +559,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                190,
-                -192
-              ]
+              "local": [1, 0, 0, 1, 190, -192]
             },
             "protomake.sprite": {
               "texture": "",
@@ -721,14 +585,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                120,
-                0
-              ]
+              "local": [1, 0, 0, 1, 120, 0]
             },
             "protomake.sprite": {
               "texture": "06a76d2a-8b91-4443-9e52-ae25b27e996d",
@@ -777,14 +634,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                0,
-                0
-              ]
+              "local": [1, 0, 0, 1, 0, 0]
             },
             "protomake.sprite": {
               "texture": "db68dcb1-8402-4c1d-8cce-10219a009483",
@@ -810,14 +660,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                190,
-                -192
-              ]
+              "local": [1, 0, 0, 1, 190, -192]
             },
             "protomake.sprite": {
               "texture": "",
@@ -843,14 +686,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                120,
-                -45
-              ]
+              "local": [1, 0, 0, 1, 120, -45]
             },
             "protomake.sprite": {
               "texture": "343b7c30-b3b5-49a2-b025-bfd5a1127e66",
@@ -873,27 +709,14 @@
               "root": "a65fcaec-d24d-4110-8a33-c14b5053a617",
               "overrides": [
                 {
-                  "path": [
-                    "name"
-                  ],
+                  "path": ["name"],
                   "removed": false,
                   "value": "Coin 3"
                 },
                 {
-                  "path": [
-                    "components",
-                    "protomake.transform",
-                    "local"
-                  ],
+                  "path": ["components", "protomake.transform", "local"],
                   "removed": false,
-                  "value": [
-                    1,
-                    0,
-                    0,
-                    1,
-                    120,
-                    -45
-                  ]
+                  "value": [1, 0, 0, 1, 120, -45]
                 }
               ]
             }
@@ -906,14 +729,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                -80,
-                45
-              ]
+              "local": [1, 0, 0, 1, -80, 45]
             },
             "protomake.sprite": {
               "texture": "343b7c30-b3b5-49a2-b025-bfd5a1127e66",
@@ -936,27 +752,14 @@
               "root": "b198981b-f0e1-405c-b43a-81dc8ddb45de",
               "overrides": [
                 {
-                  "path": [
-                    "name"
-                  ],
+                  "path": ["name"],
                   "removed": false,
                   "value": "Coin 2"
                 },
                 {
-                  "path": [
-                    "components",
-                    "protomake.transform",
-                    "local"
-                  ],
+                  "path": ["components", "protomake.transform", "local"],
                   "removed": false,
-                  "value": [
-                    1,
-                    0,
-                    0,
-                    1,
-                    -80,
-                    45
-                  ]
+                  "value": [1, 0, 0, 1, -80, 45]
                 }
               ]
             }
@@ -969,14 +772,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                0,
-                0
-              ]
+              "local": [1, 0, 0, 1, 0, 0]
             },
             "protomake.sprite": {
               "texture": "f7ba8245-49c9-4847-8905-2380f91f5a03",
@@ -1002,14 +798,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                -310,
-                130
-              ]
+              "local": [1, 0, 0, 1, -310, 130]
             },
             "protomake.sprite": {
               "texture": "ec20c2d6-684b-421a-b541-800c25e31a04",
@@ -1073,14 +862,7 @@
           "parent": "d81ac2da-c34c-4e34-a0ed-f4596f38fa7f",
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                18,
-                -4
-              ]
+              "local": [1, 0, 0, 1, 18, -4]
             },
             "protomake.light": {
               "kind": "point",
@@ -1103,14 +885,7 @@
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                1,
-                0,
-                0,
-                1,
-                -440,
-                130
-              ]
+              "local": [1, 0, 0, 1, -440, 130]
             },
             "protomake.sprite": {
               "texture": "4325f91a-78bb-4493-a299-cce5cddc8ded",
@@ -1345,71 +1120,27 @@
   "physics": {
     "gravityX": 0,
     "gravityY": 980,
-    "layers": [
-      "Default",
-      "World",
-      "Actors",
-      "Triggers"
-    ],
+    "layers": ["Default", "World", "Actors", "Triggers"],
     "matrix": [
-      [
-        true,
-        true,
-        true,
-        true
-      ],
-      [
-        true,
-        true,
-        true,
-        true
-      ],
-      [
-        true,
-        true,
-        true,
-        true
-      ],
-      [
-        true,
-        true,
-        true,
-        true
-      ]
+      [true, true, true, true],
+      [true, true, true, true],
+      [true, true, true, true],
+      [true, true, true, true]
     ]
   },
   "input": [
     {
       "name": "Move",
       "kind": "vector2",
-      "positiveX": [
-        "KeyD",
-        "ArrowRight",
-        "GamepadAxis0+"
-      ],
-      "negativeX": [
-        "KeyA",
-        "ArrowLeft",
-        "GamepadAxis0-"
-      ],
-      "positiveY": [
-        "KeyS",
-        "ArrowDown",
-        "GamepadAxis1+"
-      ],
-      "negativeY": [
-        "KeyW",
-        "ArrowUp",
-        "GamepadAxis1-"
-      ]
+      "positiveX": ["KeyD", "ArrowRight", "GamepadAxis0+"],
+      "negativeX": ["KeyA", "ArrowLeft", "GamepadAxis0-"],
+      "positiveY": ["KeyS", "ArrowDown", "GamepadAxis1+"],
+      "negativeY": ["KeyW", "ArrowUp", "GamepadAxis1-"]
     },
     {
       "name": "Jump",
       "kind": "button",
-      "positiveX": [
-        "Space",
-        "GamepadButton0"
-      ],
+      "positiveX": ["Space", "GamepadButton0"],
       "negativeX": [],
       "positiveY": [],
       "negativeY": []
@@ -1417,11 +1148,7 @@
     {
       "name": "Interact",
       "kind": "button",
-      "positiveX": [
-        "KeyE",
-        "Mouse0",
-        "GamepadButton2"
-      ],
+      "positiveX": ["KeyE", "Mouse0", "GamepadButton2"],
       "negativeX": [],
       "positiveY": [],
       "negativeY": []
@@ -1429,9 +1156,7 @@
     {
       "name": "Restart",
       "kind": "button",
-      "positiveX": [
-        "KeyR"
-      ],
+      "positiveX": ["KeyR"],
       "negativeX": [],
       "positiveY": [],
       "negativeY": []

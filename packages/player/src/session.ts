@@ -1,5 +1,10 @@
 import { loadStage } from './loading';
-import { Engine } from '@protomake/runtime';
+import {
+  Engine,
+  SignalService,
+  TimerService,
+  TweenService,
+} from '@protomake/runtime';
 import { Physics2D } from '@protomake/physics2d/rapier';
 import { InputService } from '@protomake/input';
 import { AnimationSystem } from '@protomake/animation';
@@ -16,6 +21,7 @@ import {
   type ScriptFields,
 } from '@protomake/scripting';
 import { runtimeRegistry } from './registry';
+import { RuntimePrefabs } from './prefabs';
 /** Shared runtime composition for editor Play and exported games. Hosts own scheduling and UI. */
 export class GameSession {
   private constructor(
@@ -35,7 +41,8 @@ export class GameSession {
     loadScene: (id: string) => void,
     progress: (stage: string) => void = () => {},
   ): Promise<GameSession> {
-    const { world } = instantiateScene(scene, runtimeRegistry());
+    const registry = runtimeRegistry(),
+      { world } = instantiateScene(scene, registry);
     let renderer: PixiRenderer | undefined,
       physics: Physics2D | undefined,
       audio: AudioSystem | undefined,
@@ -62,7 +69,22 @@ export class GameSession {
       );
       input = new InputService(project.input);
       input.attach(window);
-      const animation = new AnimationSystem(world, project.assets);
+      const animation = new AnimationSystem(world, project.assets),
+        signals = new SignalService(),
+        timers = new TimerService(),
+        tweens = new TweenService(world),
+        prefabs = new RuntimePrefabs(world, registry, project.assets),
+        coordinates = {
+          screenPosition: () => input!.pointerScreenPosition,
+          worldPosition: () =>
+            renderer!.screenToWorld(world, input!.pointerScreenPosition),
+          delta: () => input!.pointerDelta,
+          wheel: () => input!.pointerWheel,
+          screenToWorld: (position: readonly [number, number]) =>
+            renderer!.screenToWorld(world, position),
+          worldToScreen: (position: readonly [number, number]) =>
+            renderer!.worldToScreen(world, position),
+        };
       audio = await loadStage(
         'Decoding audio',
         () => AudioSystem.create(world, project.assets, project.mixer),
@@ -76,6 +98,9 @@ export class GameSession {
         stop: () => physicsService.destroy(),
       });
       engine.addSystem(audio);
+      engine.addSystem({ id: 'signal-lifetime', stop: () => signals.clear() });
+      engine.addSystem(timers);
+      engine.addSystem(tweens);
       engine.addSystem(
         new ScriptSystem(
           world,
@@ -86,6 +111,7 @@ export class GameSession {
           log,
           loadScene,
           { animation, audio },
+          { signals, timers, tweens, prefabs, coordinates },
         ),
       );
       engine.addSystem(animation);

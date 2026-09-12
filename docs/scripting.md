@@ -1,14 +1,22 @@
-# Project scripting — ProtoMake 0.9
+# Project scripting — ProtoMake 0.10
 
-Create a TypeScript asset from **Assets → + Script**, or double-click an existing `.ts` asset to open it directly. The Scripts menu remains available as a shortcut. Compile, Save, then Attach to selection. ScriptBehaviour's script field stores the durable asset UUID. Each entity currently supports one script component; multiple local modules can compose a behavior. Replacing the attached script resets its exposed overrides through the Attach action.
+Create a TypeScript asset from **Assets → + Script**, or double-click an existing `.ts` asset to open it directly. Compile, Save, then Attach to selection. Each attachment creates a stable behaviour slot with its own enabled state, script asset reference and exposed values. An entity can own any number of script behaviours. Replacing one slot's script resets only that slot's exposed overrides.
 
-The in-editor source workspace supports line numbers, syntax colour, Tab indentation, live syntax diagnostics with click-to-jump, `ctx.*` completion, a searchable ProtoMake API reference and Ctrl/Cmd+S. Unsaved source is protected as a browser-local draft and offered again when that script is reopened. ScriptBehaviour also exposes **Open script** directly from the Inspector. A script exports a default class with optional lifecycle methods. It can import ProtoMake **types**, which are erased by TypeScript compilation. Runtime services arrive through ScriptContext:
+The in-editor source workspace supports line numbers, syntax colour, live diagnostics, `ctx.*` completion, a searchable ProtoMake API reference and protected drafts. Every behaviour card exposes **Open script** directly from the Inspector. A script exports a default class with optional lifecycle methods. Runtime services arrive through `ScriptContext`:
 
 ```ts
 import type { ScriptContext } from '@protomake/scripting';
 
 export const fields = {
-  speed: { type: 'number', default: 80, label: 'Move speed', min: 0, max: 500, step: 5, help: 'World units per second' },
+  speed: {
+    type: 'number',
+    default: 80,
+    label: 'Move speed',
+    min: 0,
+    max: 500,
+    step: 5,
+    help: 'World units per second',
+  },
 } as const;
 
 export default class Drift {
@@ -20,7 +28,7 @@ export default class Drift {
 }
 ```
 
-Use update for variable-step work and fixedUpdate for physics control. Exposed fields are static literal metadata; supported kinds are number, boolean, string, color, entity and asset. Defaults are validated without executing source. Numeric/string/boolean overrides are persisted under ScriptBehaviour.values, applied before awake, and shown in the Inspector. Metadata can additionally provide `label`, `help`, numeric `min`/`max`/`step`, and `options` for string-like fields; metadata remains static literal data and is never executed to build the Inspector. Entity references use stable scene UUIDs; duplicates remap references internal to the copied group.
+Use `update` for variable-step work and `fixedUpdate` for physics control. Exposed field overrides live inside their behaviour slot, are applied before `awake`, and remain independent when the same script is attached more than once. Entity references use stable scene UUIDs; duplication remaps references internal to the copied group.
 
 ## Lifecycle
 
@@ -35,12 +43,20 @@ Physics events call onCollisionEnter/onCollisionExit or onTriggerEnter/onTrigger
 | `ctx.entity`                                                   | This instance's stable entity GUID                                                        |
 | `ctx.position(id?)`                                            | World position, defaulting to self                                                        |
 | `ctx.illumination(id?)`                                        | Occlusion-aware perceptual light at an entity centre (0..1); ignores that entity's caster |
-| `ctx.lightAt(x, y, channel?)`                                 | Occlusion-aware perceptual light at an arbitrary world point/channel (0..1)               |
+| `ctx.lightAt(x, y, channel?)`                                  | Occlusion-aware perceptual light at an arbitrary world point/channel (0..1)               |
 | `ctx.canSee(target, range?, fov?, observer?)`                  | Distance + local-facing FOV + shadow-caster line-of-sight primitive                       |
 | `ctx.setPosition(x, y, id?)`                                   | Position update; kinematic bodies receive a next-step target, dynamic bodies teleport     |
 | `ctx.get<T>(type, id?)` / `ctx.set(type, data, id?)`           | Read an immutable component snapshot / validate and replace it                            |
 | `ctx.world`                                                    | Entity creation/destruction, component registration consumers and explicit transform APIs |
 | `ctx.find(name)`                                               | First matching entity GUID; use exposed GUID references when names are ambiguous          |
+| `ctx.entities.withTag/withComponent/withComponents`            | Indexed runtime queries returning stable entity GUIDs                                     |
+| `ctx.entities.closestWithTag/inRadius`                         | Spatial entity queries                                                                    |
+| `ctx.events.emit/on`                                           | Named project signals with automatic behaviour-lifetime cleanup                           |
+| `ctx.time.after/every/cancel`                                  | Pause-aware runtime timers owned by the behaviour                                         |
+| `ctx.tween.to/cancel`                                          | Shared position, rotation, scale and opacity tween service                                |
+| `ctx.prefabs.instantiate/destroy`                              | Runtime prefab creation and safe hierarchy destruction                                    |
+| `ctx.pointer.screenPosition/worldPosition/delta/wheel`         | Pointer state in screen and active-camera world coordinates                               |
+| `ctx.camera.screenToWorld/worldToScreen`                       | Explicit active-camera coordinate conversion                                              |
 | `ctx.input.getVector/getAxis/isPressed/wasPressed/wasReleased` | Named input actions                                                                       |
 | `ctx.physics.velocity/setVelocity/impulse/teleport/raycast`    | ProtoMake physics API; no Rapier handles                                                      |
 | `ctx.loadScene(idOrName)`                                      | Queue a validated scene transition after the current frame                                |
@@ -55,7 +71,7 @@ The browser compiler reports syntax, metadata and module-link errors; it does **
 
 Project code runs only when Play loads modules. The same-origin iframe gives a separate runtime world, globals and teardown context. It is not a security sandbox: trusted project code has browser capabilities, can access the parent origin, and may block the tab if it loops indefinitely. Only run trusted projects. Importing JSON and inspecting metadata does not execute project source.
 
-Rebuild workflow is Stop → edit/save → Play. Lighting queries are available during ordinary lifecycle callbacks and are intended for gameplay rules such as stealth exposure; see [lighting](lighting.md). Each Play starts a fresh module graph and runtime. Stateful hot reload, multiple script slots per entity and external-package bundling are deferred.
+Rebuild workflow is Stop → edit/save → Play. Each Play starts a fresh module graph and runtime. Stateful hot reload and external-package bundling are deferred.
 
 ## Animation and audio services (Milestone 6)
 

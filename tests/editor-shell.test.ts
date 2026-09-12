@@ -64,8 +64,8 @@ it('boots the complete editor and executes create/edit/save/open through its con
       'Untitled project',
     ),
   );
-  const saved = [...document.querySelectorAll('dialog button')].find(
-    (b) => b.textContent?.startsWith('Untitled project · '),
+  const saved = [...document.querySelectorAll('dialog button')].find((b) =>
+    b.textContent?.startsWith('Untitled project · '),
   )! as HTMLButtonElement;
   saved.click();
   await vi.waitFor(() =>

@@ -1,27 +1,29 @@
 {
-  "schemaVersion": 4,
-  "id": "715d08af-c84a-45b8-8b59-473992cfdade",
+  "schemaVersion": 5,
+  "id": "f22564ad-7072-4483-a034-5585a4c4c5c4",
   "name": "Signal Patrol",
-  "engineVersion": "0.8.0",
-  "startupScene": "fc6a13ab-d752-4f6f-8a1a-0039872bc20b",
+  "engineVersion": "0.10.0",
+  "startupScene": "cc0a654a-97ff-4503-90ec-10465e5df82c",
   "scenes": [
     {
       "schemaVersion": 1,
-      "id": "fc6a13ab-d752-4f6f-8a1a-0039872bc20b",
+      "id": "cc0a654a-97ff-4503-90ec-10465e5df82c",
       "name": "Scene 1",
       "entities": [
         {
-          "id": "0670744b-f662-43d8-87be-a795e190e1dc",
-          "name": "Drone 3",
+          "id": "0354072c-c759-4b68-9cda-0f96c78557ca",
+          "name": "Drone 2",
           "enabled": true,
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [1, 0, 0, 1, 180, 0]
+              "local": [1, 0, 0, 1, 290, -140]
             },
             "protomake.sprite": {
-              "texture": "c863c7e6-39ea-42f6-8319-397fc4c3b5ea",
+              "texture": "57de820b-c6cb-44c4-9fc6-6bc7e52e1515",
               "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 36,
               "height": 36,
               "tint": "#ffffff",
@@ -35,26 +37,26 @@
               "order": 0
             },
             "protomake.prefab": {
-              "prefab": "a2443869-18dd-4c11-8d12-f35de8ca6a2a",
-              "source": "d6fa9abe-4229-48c0-a26c-0ec5eb3f8dc7",
-              "root": "0670744b-f662-43d8-87be-a795e190e1dc",
+              "prefab": "08263744-3ba5-426e-aa54-ed9cc6f5d3db",
+              "source": "3cf86277-059e-4d6a-a475-635a4eeaaa20",
+              "root": "0354072c-c759-4b68-9cda-0f96c78557ca",
               "overrides": [
                 {
                   "path": ["name"],
                   "removed": false,
-                  "value": "Drone 3"
+                  "value": "Drone 2"
                 },
                 {
                   "path": ["components", "protomake.transform", "local"],
                   "removed": false,
-                  "value": [1, 0, 0, 1, 180, 0]
+                  "value": [1, 0, 0, 1, 290, -140]
                 }
               ]
             }
           }
         },
         {
-          "id": "079623c3-fd6a-48e3-a2cf-2835d0270e90",
+          "id": "0e558837-30f9-405f-a966-591a08ae0ab3",
           "name": "Bullet 10",
           "enabled": true,
           "parent": null,
@@ -65,6 +67,8 @@
             "protomake.sprite": {
               "texture": "",
               "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 16,
               "height": 5,
               "tint": "#ffdf8e",
@@ -80,7 +84,369 @@
           }
         },
         {
-          "id": "23a3b331-aa08-4177-ad88-447b21bfc407",
+          "id": "0edc5134-f582-4cbb-b25c-6d9f3ace5c6e",
+          "name": "Bullet 3",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 16,
+              "height": 5,
+              "tint": "#ffdf8e",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "0f7cdc1a-5094-4461-ab86-71f2b20df241",
+          "name": "Backdrop",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "683bc437-0acd-4c87-9cbd-3d1271a1474a",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 800,
+              "height": 500,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": -10,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "11306d6b-203a-4818-86d2-a0cb333a0010",
+          "name": "Ambient",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.light": {
+              "kind": "ambient",
+              "mobility": "dynamic",
+              "color": "#d4e5ff",
+              "intensity": 0.65,
+              "range": 300,
+              "falloff": 1,
+              "innerAngle": 40,
+              "outerAngle": 70,
+              "width": 160,
+              "height": 80,
+              "channelMask": 15,
+              "castShadows": true,
+              "shadowOpacity": 1,
+              "shadowBias": 1,
+              "shadowSoftness": 0
+            }
+          }
+        },
+        {
+          "id": "1146f050-e897-4f22-86cf-a97a86f04093",
+          "name": "Bullet 5",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 16,
+              "height": 5,
+              "tint": "#ffdf8e",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "15501a11-1efc-4184-8573-6a11d3983121",
+          "name": "Bullet 4",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 16,
+              "height": 5,
+              "tint": "#ffdf8e",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "15ef1a73-c1a6-4e80-bba6-9c37a999781d",
+          "name": "Defeat",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "2cf8de21-8346-4079-89e1-fb4395462f6a",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 520,
+              "height": 120,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 30,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "1b2ac989-4eba-4127-a5c3-6319324d3e4b",
+          "name": "Warm pool",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -190, 0]
+            },
+            "protomake.light": {
+              "kind": "point",
+              "mobility": "dynamic",
+              "color": "#ffb76b",
+              "intensity": 0.8,
+              "range": 350,
+              "falloff": 1.4,
+              "innerAngle": 40,
+              "outerAngle": 70,
+              "width": 160,
+              "height": 80,
+              "channelMask": 15,
+              "castShadows": true,
+              "shadowOpacity": 1,
+              "shadowBias": 1,
+              "shadowSoftness": 0
+            }
+          }
+        },
+        {
+          "id": "21b34040-e9a4-40a9-8340-47a8ca538ad1",
+          "name": "Victory",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "aa2a6b9f-22d7-4397-bb5e-6ac7a983eb8d",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 520,
+              "height": 120,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 30,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "22fbc080-7477-449a-b438-8e01ee82c618",
+          "name": "Spotlight",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [
+                0.9210609940028851, 0.3894183423086505, -0.3894183423086505,
+                0.9210609940028851, -350, -160
+              ]
+            },
+            "protomake.light": {
+              "kind": "spot",
+              "mobility": "dynamic",
+              "color": "#fff0ce",
+              "intensity": 0.8,
+              "range": 700,
+              "falloff": 1,
+              "innerAngle": 30,
+              "outerAngle": 75,
+              "width": 160,
+              "height": 80,
+              "channelMask": 15,
+              "castShadows": true,
+              "shadowOpacity": 1,
+              "shadowBias": 1,
+              "shadowSoftness": 0
+            }
+          }
+        },
+        {
+          "id": "2e356a2e-67cc-4615-a05c-af624cade8dc",
+          "name": "Bullet 8",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 16,
+              "height": 5,
+              "tint": "#ffdf8e",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "398ebe21-3bba-4d5b-8a5b-9afe263c19d1",
+          "name": "Drone 4",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 290, 0]
+            },
+            "protomake.sprite": {
+              "texture": "57de820b-c6cb-44c4-9fc6-6bc7e52e1515",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 36,
+              "height": 36,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.prefab": {
+              "prefab": "08263744-3ba5-426e-aa54-ed9cc6f5d3db",
+              "source": "3cf86277-059e-4d6a-a475-635a4eeaaa20",
+              "root": "398ebe21-3bba-4d5b-8a5b-9afe263c19d1",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Drone 4"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 290, 0]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "3cf86277-059e-4d6a-a475-635a4eeaaa20",
+          "name": "Drone 1",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 180, -140]
+            },
+            "protomake.sprite": {
+              "texture": "57de820b-c6cb-44c4-9fc6-6bc7e52e1515",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 36,
+              "height": 36,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.prefab": {
+              "prefab": "08263744-3ba5-426e-aa54-ed9cc6f5d3db",
+              "source": "3cf86277-059e-4d6a-a475-635a4eeaaa20",
+              "root": "3cf86277-059e-4d6a-a475-635a4eeaaa20",
+              "overrides": []
+            }
+          }
+        },
+        {
+          "id": "4a85066b-ad1c-434d-bb86-a472772c43a3",
           "name": "Camera",
           "enabled": true,
           "parent": null,
@@ -100,617 +466,7 @@
           }
         },
         {
-          "id": "306d0a9f-6cde-4032-8545-b6e2e7713795",
-          "name": "Warm pool",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, -190, 0]
-            },
-            "protomake.light": {
-              "kind": "point",
-              "color": "#ffb76b",
-              "intensity": 0.8,
-              "range": 350,
-              "falloff": 1.4,
-              "innerAngle": 40,
-              "outerAngle": 70,
-              "width": 160,
-              "height": 80
-            }
-          }
-        },
-        {
-          "id": "35cd280a-f323-4dee-837d-bc387bf6de95",
-          "name": "Instructions",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, -225]
-            },
-            "protomake.sprite": {
-              "texture": "6bec45dd-62ee-4151-8258-c036d07dab21",
-              "lit": false,
-              "width": 760,
-              "height": 44,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 20,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "482bc9a0-1499-4794-a718-16d33dd83938",
-          "name": "Ambient",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.light": {
-              "kind": "ambient",
-              "color": "#d4e5ff",
-              "intensity": 0.65,
-              "range": 300,
-              "falloff": 1,
-              "innerAngle": 40,
-              "outerAngle": 70,
-              "width": 160,
-              "height": 80
-            }
-          }
-        },
-        {
-          "id": "4d5263c9-c520-4e21-9212-996194639beb",
-          "name": "Cool area",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 200, 60]
-            },
-            "protomake.light": {
-              "kind": "area",
-              "color": "#75caff",
-              "intensity": 0.65,
-              "range": 220,
-              "falloff": 1,
-              "innerAngle": 40,
-              "outerAngle": 70,
-              "width": 220,
-              "height": 100
-            }
-          }
-        },
-        {
-          "id": "57c838a0-525b-4943-a110-8231e9483e64",
-          "name": "Bullet 11",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 16,
-              "height": 5,
-              "tint": "#ffdf8e",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "5b870866-137a-4898-87ab-6d26ab378b90",
-          "name": "Victory",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "98ef988b-68e6-4ee7-9690-969fa30e989a",
-              "lit": false,
-              "width": 520,
-              "height": 120,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 30,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "63e7a7a4-9807-4c53-94b4-70cffb8325e0",
-          "name": "Bullet 1",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 16,
-              "height": 5,
-              "tint": "#ffdf8e",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "665959c2-6a53-42c4-bb32-6b77a52c6b6b",
-          "name": "Bullet 5",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 16,
-              "height": 5,
-              "tint": "#ffdf8e",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "676599bf-3c5f-45c3-8169-3aa7f989784d",
-          "name": "Backdrop",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "6a664aa2-0f35-4d97-9c45-2c42a46d5307",
-              "lit": false,
-              "width": 800,
-              "height": 500,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": -10,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "6e2de4c0-88ee-4c3b-83fa-5ba2ec7d551d",
-          "name": "Bullet 12",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 16,
-              "height": 5,
-              "tint": "#ffdf8e",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "71bd1f49-2ced-4a53-8d6a-438e42d70453",
-          "name": "Bullet 3",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 16,
-              "height": 5,
-              "tint": "#ffdf8e",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "7d7d89e9-765f-4e18-8cfd-6a4f0d2bfe1c",
-          "name": "Bullet 4",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 16,
-              "height": 5,
-              "tint": "#ffdf8e",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "85d59d08-cd2b-4176-ac89-c4400b639012",
-          "name": "Bullet 6",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 16,
-              "height": 5,
-              "tint": "#ffdf8e",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "89b80e76-b4af-42c6-a278-b7f87602cd1b",
-          "name": "Spotlight",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [
-                0.9210609940028851, 0.3894183423086505, -0.3894183423086505,
-                0.9210609940028851, -350, -160
-              ]
-            },
-            "protomake.light": {
-              "kind": "spot",
-              "color": "#fff0ce",
-              "intensity": 0.8,
-              "range": 700,
-              "falloff": 1,
-              "innerAngle": 30,
-              "outerAngle": 75,
-              "width": 160,
-              "height": 80
-            }
-          }
-        },
-        {
-          "id": "a1294d6b-bc34-497e-bd04-f4680407f52b",
-          "name": "Drone 2",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 290, -140]
-            },
-            "protomake.sprite": {
-              "texture": "c863c7e6-39ea-42f6-8319-397fc4c3b5ea",
-              "lit": true,
-              "width": 36,
-              "height": 36,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            },
-            "protomake.prefab": {
-              "prefab": "a2443869-18dd-4c11-8d12-f35de8ca6a2a",
-              "source": "d6fa9abe-4229-48c0-a26c-0ec5eb3f8dc7",
-              "root": "a1294d6b-bc34-497e-bd04-f4680407f52b",
-              "overrides": [
-                {
-                  "path": ["name"],
-                  "removed": false,
-                  "value": "Drone 2"
-                },
-                {
-                  "path": ["components", "protomake.transform", "local"],
-                  "removed": false,
-                  "value": [1, 0, 0, 1, 290, -140]
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": "a37ce340-2314-46cd-a96e-0db6e48be6a1",
-          "name": "Score background",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 190, -192]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 160,
-              "height": 12,
-              "tint": "#26313d",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0,
-              "anchorY": 0.5,
-              "layer": 20,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "a5bc4ff9-8da1-4706-bf05-c6db37add91b",
-          "name": "Score",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 190, -192]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 1,
-              "height": 12,
-              "tint": "#f3ac66",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0,
-              "anchorY": 0.5,
-              "layer": 20,
-              "order": 1
-            }
-          }
-        },
-        {
-          "id": "a7c33749-1b4a-4771-8ebd-ef67628be1f5",
-          "name": "Health",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, -350, -192]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 160,
-              "height": 12,
-              "tint": "#74e8b8",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0,
-              "anchorY": 0.5,
-              "layer": 20,
-              "order": 1
-            }
-          }
-        },
-        {
-          "id": "a8d0bcbe-df04-42c0-828e-3fbd632bf2ff",
-          "name": "Drone 6",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 290, 140]
-            },
-            "protomake.sprite": {
-              "texture": "c863c7e6-39ea-42f6-8319-397fc4c3b5ea",
-              "lit": true,
-              "width": 36,
-              "height": 36,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            },
-            "protomake.prefab": {
-              "prefab": "a2443869-18dd-4c11-8d12-f35de8ca6a2a",
-              "source": "d6fa9abe-4229-48c0-a26c-0ec5eb3f8dc7",
-              "root": "a8d0bcbe-df04-42c0-828e-3fbd632bf2ff",
-              "overrides": [
-                {
-                  "path": ["name"],
-                  "removed": false,
-                  "value": "Drone 6"
-                },
-                {
-                  "path": ["components", "protomake.transform", "local"],
-                  "removed": false,
-                  "value": [1, 0, 0, 1, 290, 140]
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": "b4f70ca4-051d-4378-821a-3acd241ffadf",
-          "name": "Drone 4",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 290, 0]
-            },
-            "protomake.sprite": {
-              "texture": "c863c7e6-39ea-42f6-8319-397fc4c3b5ea",
-              "lit": true,
-              "width": 36,
-              "height": 36,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            },
-            "protomake.prefab": {
-              "prefab": "a2443869-18dd-4c11-8d12-f35de8ca6a2a",
-              "source": "d6fa9abe-4229-48c0-a26c-0ec5eb3f8dc7",
-              "root": "b4f70ca4-051d-4378-821a-3acd241ffadf",
-              "overrides": [
-                {
-                  "path": ["name"],
-                  "removed": false,
-                  "value": "Drone 4"
-                },
-                {
-                  "path": ["components", "protomake.transform", "local"],
-                  "removed": false,
-                  "value": [1, 0, 0, 1, 290, 0]
-                }
-              ]
-            }
-          }
-        },
-        {
-          "id": "c6e0f62e-6fd4-45c1-9348-ebaedeac577f",
-          "name": "Bullet 9",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 16,
-              "height": 5,
-              "tint": "#ffdf8e",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "c9141f98-768e-4f76-a56e-0a0094a49429",
-          "name": "Health background",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, -350, -192]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 160,
-              "height": 12,
-              "tint": "#26313d",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0,
-              "anchorY": 0.5,
-              "layer": 20,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "cea8b635-538b-44ee-80c3-b2ce354461f0",
+          "id": "52d64e30-e26b-438d-82e9-55a1c70f0899",
           "name": "Drone 5",
           "enabled": true,
           "parent": null,
@@ -719,8 +475,10 @@
               "local": [1, 0, 0, 1, 180, 140]
             },
             "protomake.sprite": {
-              "texture": "c863c7e6-39ea-42f6-8319-397fc4c3b5ea",
+              "texture": "57de820b-c6cb-44c4-9fc6-6bc7e52e1515",
               "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 36,
               "height": 36,
               "tint": "#ffffff",
@@ -734,9 +492,9 @@
               "order": 0
             },
             "protomake.prefab": {
-              "prefab": "a2443869-18dd-4c11-8d12-f35de8ca6a2a",
-              "source": "d6fa9abe-4229-48c0-a26c-0ec5eb3f8dc7",
-              "root": "cea8b635-538b-44ee-80c3-b2ce354461f0",
+              "prefab": "08263744-3ba5-426e-aa54-ed9cc6f5d3db",
+              "source": "3cf86277-059e-4d6a-a475-635a4eeaaa20",
+              "root": "52d64e30-e26b-438d-82e9-55a1c70f0899",
               "overrides": [
                 {
                   "path": ["name"],
@@ -753,69 +511,19 @@
           }
         },
         {
-          "id": "d36392a6-a6d5-4635-9b1e-43b73eae1f18",
-          "name": "Bullet 7",
+          "id": "5ba1c2bb-8820-437e-9d11-78b2d1443bcb",
+          "name": "Drone 3",
           "enabled": true,
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
+              "local": [1, 0, 0, 1, 180, 0]
             },
             "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 16,
-              "height": 5,
-              "tint": "#ffdf8e",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "d6484d49-d30f-4119-9ff2-91342e2a541f",
-          "name": "Bullet 8",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 16,
-              "height": 5,
-              "tint": "#ffdf8e",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "d6fa9abe-4229-48c0-a26c-0ec5eb3f8dc7",
-          "name": "Drone 1",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 180, -140]
-            },
-            "protomake.sprite": {
-              "texture": "c863c7e6-39ea-42f6-8319-397fc4c3b5ea",
+              "texture": "57de820b-c6cb-44c4-9fc6-6bc7e52e1515",
               "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 36,
               "height": 36,
               "tint": "#ffffff",
@@ -829,16 +537,128 @@
               "order": 0
             },
             "protomake.prefab": {
-              "prefab": "a2443869-18dd-4c11-8d12-f35de8ca6a2a",
-              "source": "d6fa9abe-4229-48c0-a26c-0ec5eb3f8dc7",
-              "root": "d6fa9abe-4229-48c0-a26c-0ec5eb3f8dc7",
-              "overrides": []
+              "prefab": "08263744-3ba5-426e-aa54-ed9cc6f5d3db",
+              "source": "3cf86277-059e-4d6a-a475-635a4eeaaa20",
+              "root": "5ba1c2bb-8820-437e-9d11-78b2d1443bcb",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Drone 3"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 180, 0]
+                }
+              ]
             }
           }
         },
         {
-          "id": "f1102f11-3f10-4d7c-af22-29c493ce2cff",
-          "name": "Defeat",
+          "id": "6389991b-3ddb-4702-b47e-6dfb61234c25",
+          "name": "Cool area",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 200, 60]
+            },
+            "protomake.light": {
+              "kind": "area",
+              "mobility": "dynamic",
+              "color": "#75caff",
+              "intensity": 0.65,
+              "range": 220,
+              "falloff": 1,
+              "innerAngle": 40,
+              "outerAngle": 70,
+              "width": 220,
+              "height": 100,
+              "channelMask": 15,
+              "castShadows": true,
+              "shadowOpacity": 1,
+              "shadowBias": 1,
+              "shadowSoftness": 0
+            }
+          }
+        },
+        {
+          "id": "6a2f3409-e6b6-4b7f-b158-b5a430348a6d",
+          "name": "Instructions",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, -225]
+            },
+            "protomake.sprite": {
+              "texture": "438e128b-0d34-4abe-b35d-5a290b10dda5",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 760,
+              "height": 44,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 20,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "82f89447-9905-41d7-b378-30fabf4a26d4",
+          "name": "Drone 6",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 290, 140]
+            },
+            "protomake.sprite": {
+              "texture": "57de820b-c6cb-44c4-9fc6-6bc7e52e1515",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 36,
+              "height": 36,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            },
+            "protomake.prefab": {
+              "prefab": "08263744-3ba5-426e-aa54-ed9cc6f5d3db",
+              "source": "3cf86277-059e-4d6a-a475-635a4eeaaa20",
+              "root": "82f89447-9905-41d7-b378-30fabf4a26d4",
+              "overrides": [
+                {
+                  "path": ["name"],
+                  "removed": false,
+                  "value": "Drone 6"
+                },
+                {
+                  "path": ["components", "protomake.transform", "local"],
+                  "removed": false,
+                  "value": [1, 0, 0, 1, 290, 140]
+                }
+              ]
+            }
+          }
+        },
+        {
+          "id": "86779a66-a158-4e6b-b394-df622e20874f",
+          "name": "Bullet 9",
           "enabled": true,
           "parent": null,
           "components": {
@@ -846,24 +666,250 @@
               "local": [1, 0, 0, 1, 0, 0]
             },
             "protomake.sprite": {
-              "texture": "f7c7b06a-b9de-4240-9e74-ef69df3db945",
+              "texture": "",
               "lit": false,
-              "width": 520,
-              "height": 120,
-              "tint": "#ffffff",
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 16,
+              "height": 5,
+              "tint": "#ffdf8e",
               "opacity": 1,
               "visible": false,
               "flipX": false,
               "flipY": false,
               "anchorX": 0.5,
               "anchorY": 0.5,
-              "layer": 30,
+              "layer": 0,
               "order": 0
             }
           }
         },
         {
-          "id": "f9f9f577-ab01-4e1d-a73a-503cf85abb33",
+          "id": "86a1eb71-456c-44d7-853b-e26e61272ba1",
+          "name": "Health background",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -350, -192]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 160,
+              "height": 12,
+              "tint": "#26313d",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0,
+              "anchorY": 0.5,
+              "layer": 20,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "a0da0330-87ab-4612-bb18-6ee5f15bc9bd",
+          "name": "Bullet 6",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 16,
+              "height": 5,
+              "tint": "#ffdf8e",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "b89e585b-9372-4203-8faf-15af4c6739c7",
+          "name": "Health",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -350, -192]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 160,
+              "height": 12,
+              "tint": "#74e8b8",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0,
+              "anchorY": 0.5,
+              "layer": 20,
+              "order": 1
+            }
+          }
+        },
+        {
+          "id": "bf92c880-b7ca-4068-9cfc-62b9cd345d73",
+          "name": "Bullet 12",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 16,
+              "height": 5,
+              "tint": "#ffdf8e",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "c09c140a-24ee-45ee-b3e4-1c043f55646c",
+          "name": "Score background",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 190, -192]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 160,
+              "height": 12,
+              "tint": "#26313d",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0,
+              "anchorY": 0.5,
+              "layer": 20,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "c14e8f35-3a03-4a97-a16b-1a5b1c748928",
+          "name": "Bullet 1",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 16,
+              "height": 5,
+              "tint": "#ffdf8e",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "ccb2924c-e6c8-459c-9914-1fc6c7e36cbb",
+          "name": "Bullet 7",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 16,
+              "height": 5,
+              "tint": "#ffdf8e",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "d68c34f1-2870-4802-92b4-c8bcce1be4b9",
+          "name": "Bullet 11",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 16,
+              "height": 5,
+              "tint": "#ffdf8e",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "e4eaf464-635c-41e9-b0d2-fa79b59c778d",
           "name": "Player",
           "enabled": true,
           "parent": null,
@@ -872,8 +918,10 @@
               "local": [1, 0, 0, 1, -310, 0]
             },
             "protomake.sprite": {
-              "texture": "4655adf8-fcd2-46c5-9d73-0b5a6b981b14",
+              "texture": "bc050193-52bb-4724-a0da-44ef0aa501cb",
               "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 32,
               "height": 32,
               "tint": "#ffffff",
@@ -887,25 +935,61 @@
               "order": 0
             },
             "protomake.animator": {
-              "controller": "6a705cbd-5014-4340-9fbe-5df05cdb071f",
+              "controller": "6576e21a-924e-4947-a5c3-20d2640b4b15",
               "speed": 1
             },
             "protomake.audio-source": {
-              "clip": "8e25a437-1404-4a4d-accb-230fff472eb7",
+              "clip": "349aaebb-5ebc-4fb7-b11a-d808fa0ae2ea",
               "loop": false,
               "volume": 0.3,
               "rate": 1,
               "bus": "SFX",
               "playOnAwake": false
             },
-            "protomake.script": {
-              "script": "df91a5a9-a5d4-418d-89dc-6c4dbf91d8d3",
-              "values": {}
+            "protomake.behaviours": {
+              "order": ["977f5ce8-0b21-40be-aa3e-866bd773d8a5"],
+              "items": {
+                "977f5ce8-0b21-40be-aa3e-866bd773d8a5": {
+                  "id": "977f5ce8-0b21-40be-aa3e-866bd773d8a5",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "b686b3c2-23fc-4bd5-a84c-5409c3985f87",
+                  "values": {}
+                }
+              }
             }
           }
         },
         {
-          "id": "fda35f92-fddd-4c61-9680-74fa266c76e8",
+          "id": "eb0c5718-dc0f-40ed-83e9-e92f2a92a653",
+          "name": "Score",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 190, -192]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 1,
+              "height": 12,
+              "tint": "#f3ac66",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0,
+              "anchorY": 0.5,
+              "layer": 20,
+              "order": 1
+            }
+          }
+        },
+        {
+          "id": "f27a06d9-ff76-4823-95fa-3e22683de5bb",
           "name": "Bullet 2",
           "enabled": true,
           "parent": null,
@@ -916,6 +1000,8 @@
             "protomake.sprite": {
               "texture": "",
               "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 16,
               "height": 5,
               "tint": "#ffdf8e",
@@ -935,7 +1021,7 @@
   ],
   "assets": [
     {
-      "id": "4655adf8-fcd2-46c5-9d73-0b5a6b981b14",
+      "id": "bc050193-52bb-4724-a0da-44ef0aa501cb",
       "path": "Assets/Images/Actor-0.png",
       "kind": "image",
       "mime": "image/png",
@@ -944,7 +1030,7 @@
       "height": 48
     },
     {
-      "id": "63a61d2c-d3f5-47ca-80cb-1a9e0b02067d",
+      "id": "bd0e8365-5977-4a94-85d5-bad851e5c2ec",
       "path": "Assets/Images/Actor-1.png",
       "kind": "image",
       "mime": "image/png",
@@ -953,7 +1039,7 @@
       "height": 48
     },
     {
-      "id": "327204ed-bc80-482e-a56f-8d8074dfadd1",
+      "id": "e2967385-f774-4d59-8b6b-b7b69dcadbdc",
       "path": "Assets/Images/Actor-2.png",
       "kind": "image",
       "mime": "image/png",
@@ -962,7 +1048,7 @@
       "height": 48
     },
     {
-      "id": "f55cf767-f8da-4eb3-bedb-7a879fd65b2b",
+      "id": "fc5e28a6-f805-4dea-8d0b-1d16a8cb8e64",
       "path": "Assets/Images/Actor-3.png",
       "kind": "image",
       "mime": "image/png",
@@ -971,7 +1057,7 @@
       "height": 48
     },
     {
-      "id": "c863c7e6-39ea-42f6-8319-397fc4c3b5ea",
+      "id": "57de820b-c6cb-44c4-9fc6-6bc7e52e1515",
       "path": "Assets/Images/Enemy.png",
       "kind": "image",
       "mime": "image/png",
@@ -980,7 +1066,7 @@
       "height": 32
     },
     {
-      "id": "d73417d7-95ab-49b4-a62d-58ef14acf21c",
+      "id": "cb4e3ff6-cb84-4672-997c-04c3f72fc713",
       "path": "Assets/Images/Platform.png",
       "kind": "image",
       "mime": "image/png",
@@ -989,7 +1075,7 @@
       "height": 24
     },
     {
-      "id": "d0528a73-1862-4d43-a47f-579d24750d00",
+      "id": "011027be-f794-4008-9766-f1df46d7c756",
       "path": "Assets/Images/Coin.png",
       "kind": "image",
       "mime": "image/png",
@@ -998,7 +1084,7 @@
       "height": 18
     },
     {
-      "id": "9f2141f5-2737-4821-be25-9a15f2c2b6a1",
+      "id": "b3426014-0ee6-448e-a284-b0ef031182bc",
       "path": "Assets/Images/Flag.png",
       "kind": "image",
       "mime": "image/png",
@@ -1007,7 +1093,7 @@
       "height": 36
     },
     {
-      "id": "617dc6b3-4ed8-4b9d-93bc-67e863842c96",
+      "id": "e0ff8734-ae1c-4b74-a9f5-f12d9feaae01",
       "path": "Assets/Images/Goal.png",
       "kind": "image",
       "mime": "image/png",
@@ -1016,7 +1102,7 @@
       "height": 48
     },
     {
-      "id": "6a664aa2-0f35-4d97-9c45-2c42a46d5307",
+      "id": "683bc437-0acd-4c87-9cbd-3d1271a1474a",
       "path": "Assets/Images/Backdrop.png",
       "kind": "image",
       "mime": "image/png",
@@ -1025,7 +1111,7 @@
       "height": 500
     },
     {
-      "id": "6bec45dd-62ee-4151-8258-c036d07dab21",
+      "id": "438e128b-0d34-4abe-b35d-5a290b10dda5",
       "path": "Assets/Images/Instructions.png",
       "kind": "image",
       "mime": "image/png",
@@ -1034,7 +1120,7 @@
       "height": 44
     },
     {
-      "id": "98ef988b-68e6-4ee7-9690-969fa30e989a",
+      "id": "aa2a6b9f-22d7-4397-bb5e-6ac7a983eb8d",
       "path": "Assets/Images/Victory.png",
       "kind": "image",
       "mime": "image/png",
@@ -1043,7 +1129,7 @@
       "height": 120
     },
     {
-      "id": "f7c7b06a-b9de-4240-9e74-ef69df3db945",
+      "id": "2cf8de21-8346-4079-89e1-fb4395462f6a",
       "path": "Assets/Images/Defeat.png",
       "kind": "image",
       "mime": "image/png",
@@ -1052,7 +1138,7 @@
       "height": 120
     },
     {
-      "id": "8e25a437-1404-4a4d-accb-230fff472eb7",
+      "id": "349aaebb-5ebc-4fb7-b11a-d808fa0ae2ea",
       "path": "Assets/Audio/Action.wav",
       "kind": "audio",
       "mime": "audio/wav",
@@ -1061,7 +1147,7 @@
       "height": 0
     },
     {
-      "id": "8a2e33d0-c43e-471d-9e00-778239eae9d7",
+      "id": "94c0dd85-49fc-4593-9742-0404d9b8f399",
       "path": "Assets/Scripts/Helpers.ts",
       "kind": "text",
       "mime": "text/typescript",
@@ -1070,7 +1156,7 @@
       "height": 0
     },
     {
-      "id": "df91a5a9-a5d4-418d-89dc-6c4dbf91d8d3",
+      "id": "b686b3c2-23fc-4bd5-a84c-5409c3985f87",
       "path": "Assets/Scripts/Shooter.ts",
       "kind": "text",
       "mime": "text/typescript",
@@ -1079,38 +1165,38 @@
       "height": 0
     },
     {
-      "id": "985db99b-b038-4532-9a3b-04a5f3e38144",
+      "id": "c1a03fdf-a247-4c9e-bc55-75d33ac893b2",
       "path": "Assets/Animations/Idle.animation.json",
       "kind": "text",
       "mime": "application/x-protomake-animation",
-      "data": "{\"version\":1,\"name\":\"Idle\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"4655adf8-fcd2-46c5-9d73-0b5a6b981b14\",\"duration\":0.3},{\"texture\":\"63a61d2c-d3f5-47ca-80cb-1a9e0b02067d\",\"duration\":0.3}]}",
+      "data": "{\"version\":1,\"name\":\"Idle\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"bc050193-52bb-4724-a0da-44ef0aa501cb\",\"duration\":0.3},{\"texture\":\"bd0e8365-5977-4a94-85d5-bad851e5c2ec\",\"duration\":0.3}]}",
       "width": 0,
       "height": 0
     },
     {
-      "id": "9b4aeee9-0e80-406e-b45a-056ed7f6d8e2",
+      "id": "866b1a1c-1eb6-4b0d-bf56-15d9a4099e5d",
       "path": "Assets/Animations/Action.animation.json",
       "kind": "text",
       "mime": "application/x-protomake-animation",
-      "data": "{\"version\":1,\"name\":\"Action\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"327204ed-bc80-482e-a56f-8d8074dfadd1\",\"duration\":0.08},{\"texture\":\"f55cf767-f8da-4eb3-bedb-7a879fd65b2b\",\"duration\":0.08}]}",
+      "data": "{\"version\":1,\"name\":\"Action\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"e2967385-f774-4d59-8b6b-b7b69dcadbdc\",\"duration\":0.08},{\"texture\":\"fc5e28a6-f805-4dea-8d0b-1d16a8cb8e64\",\"duration\":0.08}]}",
       "width": 0,
       "height": 0
     },
     {
-      "id": "6a705cbd-5014-4340-9fbe-5df05cdb071f",
+      "id": "6576e21a-924e-4947-a5c3-20d2640b4b15",
       "path": "Assets/Animations/Actor.animator.json",
       "kind": "text",
       "mime": "application/x-protomake-animator",
-      "data": "{\"version\":1,\"initial\":\"Idle\",\"parameters\":{\"active\":{\"type\":\"bool\",\"default\":false}},\"states\":[{\"name\":\"Idle\",\"clip\":\"985db99b-b038-4532-9a3b-04a5f3e38144\",\"speed\":1},{\"name\":\"Action\",\"clip\":\"9b4aeee9-0e80-406e-b45a-056ed7f6d8e2\",\"speed\":1}],\"transitions\":[{\"from\":\"Idle\",\"to\":\"Action\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"active\",\"operator\":\"==\",\"value\":true}]},{\"from\":\"Action\",\"to\":\"Idle\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"active\",\"operator\":\"==\",\"value\":false}]}]}",
+      "data": "{\"version\":1,\"initial\":\"Idle\",\"parameters\":{\"active\":{\"type\":\"bool\",\"default\":false}},\"states\":[{\"name\":\"Idle\",\"clip\":\"c1a03fdf-a247-4c9e-bc55-75d33ac893b2\",\"speed\":1},{\"name\":\"Action\",\"clip\":\"866b1a1c-1eb6-4b0d-bf56-15d9a4099e5d\",\"speed\":1}],\"transitions\":[{\"from\":\"Idle\",\"to\":\"Action\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"active\",\"operator\":\"==\",\"value\":true}]},{\"from\":\"Action\",\"to\":\"Idle\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"active\",\"operator\":\"==\",\"value\":false}]}]}",
       "width": 0,
       "height": 0
     },
     {
-      "id": "a2443869-18dd-4c11-8d12-f35de8ca6a2a",
+      "id": "08263744-3ba5-426e-aa54-ed9cc6f5d3db",
       "path": "Assets/Prefabs/Drone.prefab.json",
       "kind": "text",
       "mime": "application/x-protomake-prefab",
-      "data": "{\"schemaVersion\":1,\"id\":\"a2443869-18dd-4c11-8d12-f35de8ca6a2a\",\"name\":\"Assets/Prefabs/Drone.prefab.json\",\"entities\":[{\"id\":\"d6fa9abe-4229-48c0-a26c-0ec5eb3f8dc7\",\"name\":\"Drone 1\",\"enabled\":true,\"parent\":null,\"components\":{\"protomake.transform\":{\"local\":[1,0,0,1,180,-140]},\"protomake.sprite\":{\"texture\":\"c863c7e6-39ea-42f6-8319-397fc4c3b5ea\",\"lit\":true,\"width\":36,\"height\":36,\"tint\":\"#ffffff\",\"opacity\":1,\"visible\":true,\"flipX\":false,\"flipY\":false,\"anchorX\":0.5,\"anchorY\":0.5,\"layer\":0,\"order\":0}}}]}",
+      "data": "{\"schemaVersion\":1,\"id\":\"08263744-3ba5-426e-aa54-ed9cc6f5d3db\",\"name\":\"Assets/Prefabs/Drone.prefab.json\",\"entities\":[{\"id\":\"3cf86277-059e-4d6a-a475-635a4eeaaa20\",\"name\":\"Drone 1\",\"enabled\":true,\"parent\":null,\"components\":{\"protomake.transform\":{\"local\":[1,0,0,1,180,-140]},\"protomake.sprite\":{\"texture\":\"57de820b-c6cb-44c4-9fc6-6bc7e52e1515\",\"lit\":true,\"castShadow\":false,\"lightingChannel\":\"World\",\"width\":36,\"height\":36,\"tint\":\"#ffffff\",\"opacity\":1,\"visible\":true,\"flipX\":false,\"flipY\":false,\"anchorX\":0.5,\"anchorY\":0.5,\"layer\":0,\"order\":0}}}]}",
       "width": 0,
       "height": 0
     }
@@ -1129,7 +1215,12 @@
   "input": [
     {
       "name": "Move",
+      "map": "Gameplay",
       "kind": "vector2",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyD", "ArrowRight", "GamepadAxis0+"],
       "negativeX": ["KeyA", "ArrowLeft", "GamepadAxis0-"],
       "positiveY": ["KeyS", "ArrowDown", "GamepadAxis1+"],
@@ -1137,7 +1228,12 @@
     },
     {
       "name": "Jump",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["Space", "GamepadButton0"],
       "negativeX": [],
       "positiveY": [],
@@ -1145,7 +1241,12 @@
     },
     {
       "name": "Interact",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyE", "Mouse0", "GamepadButton2"],
       "negativeX": [],
       "positiveY": [],
@@ -1153,7 +1254,12 @@
     },
     {
       "name": "Restart",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyR"],
       "negativeX": [],
       "positiveY": [],
@@ -1161,7 +1267,12 @@
     },
     {
       "name": "Fire",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["Space", "Mouse0"],
       "negativeX": [],
       "positiveY": [],
@@ -1205,6 +1316,6 @@
     "Scenes"
   ],
   "sceneFolders": {
-    "fc6a13ab-d752-4f6f-8a1a-0039872bc20b": "Scenes"
+    "cc0a654a-97ff-4503-90ec-10465e5df82c": "Scenes"
   }
 }

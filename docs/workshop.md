@@ -129,7 +129,7 @@ With no active lights, sprites retain their original appearance. Start with a lo
 
 # 6 Wire input and project scripts
 
-Open Settings. Input action definitions are a JSON array. Retain the default actions and append the game-specific actions from its project JSON, or enter the records described on the relevant game page. Each action has name, kind, positiveX, negativeX, positiveY and negativeY. Unused bindings are empty arrays.
+Open Settings and use the Input Actions editor. Retain the default Gameplay map, add the game-specific actions described on the relevant game page, then enter each keyboard, mouse or gamepad binding in its directional field. Sensitivity, dead zone and inversion are authored per action.
 
 ```json
 {

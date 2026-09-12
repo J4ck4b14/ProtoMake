@@ -1,18 +1,102 @@
 {
-  "schemaVersion": 4,
-  "id": "f9079e45-18fc-4ed8-98b6-2872b10e2100",
+  "schemaVersion": 5,
+  "id": "ef2914df-6766-4370-8a03-a314809c047f",
   "name": "Sparring Room",
-  "engineVersion": "0.8.0",
-  "startupScene": "522cee09-3a29-4803-a20f-e2d5cec40377",
+  "engineVersion": "0.10.0",
+  "startupScene": "223228f8-4854-4df6-96e8-33842537eee6",
   "scenes": [
     {
       "schemaVersion": 1,
-      "id": "522cee09-3a29-4803-a20f-e2d5cec40377",
+      "id": "223228f8-4854-4df6-96e8-33842537eee6",
       "name": "Scene 1",
       "entities": [
         {
-          "id": "05d3584a-7189-4540-9ff0-97486d978b3a",
-          "name": "Health 1",
+          "id": "3989226c-6455-45a5-a9d8-a3614704296c",
+          "name": "Victory",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "65f1d61c-3e23-4862-a949-764cf77e0ebb",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 520,
+              "height": 120,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 30,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "606142e0-48aa-465d-a772-d4029dfc74b8",
+          "name": "Hitbox 1",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 48,
+              "height": 12,
+              "tint": "#f3ac66",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "709db791-1095-4a17-be28-fe622ed29768",
+          "name": "Ring floor",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 170]
+            },
+            "protomake.sprite": {
+              "texture": "0c84eee9-076b-4460-b55a-41c0facb4230",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 760,
+              "height": 24,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": true,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 0,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "8285092a-0063-4e7d-9f21-b8a99f34b48a",
+          "name": "Health background 1",
           "enabled": true,
           "parent": null,
           "components": {
@@ -22,9 +106,11 @@
             "protomake.sprite": {
               "texture": "",
               "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 160,
               "height": 12,
-              "tint": "#f3ac66",
+              "tint": "#26313d",
               "opacity": 1,
               "visible": true,
               "flipX": false,
@@ -32,12 +118,12 @@
               "anchorX": 0,
               "anchorY": 0.5,
               "layer": 20,
-              "order": 1
+              "order": 0
             }
           }
         },
         {
-          "id": "0b5beefc-635f-40db-a4c1-ed7cb5fca34c",
+          "id": "8566a78d-7754-4bc4-b71e-f1a6ba5dbf31",
           "name": "Fighter 2",
           "enabled": true,
           "parent": null,
@@ -46,8 +132,10 @@
               "local": [1, 0, 0, 1, 160, 128]
             },
             "protomake.sprite": {
-              "texture": "a4ef4b2f-8290-4eee-8f46-17d490f67b32",
+              "texture": "6cd81440-7017-4390-a762-e974754fc7f4",
               "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 36,
               "height": 60,
               "tint": "#ffffff",
@@ -61,13 +149,13 @@
               "order": 0
             },
             "protomake.animator": {
-              "controller": "d468dcd7-9bea-4e97-b118-05f80c39e408",
+              "controller": "0505f0e8-9b5d-4f79-b0a2-49038badc681",
               "speed": 1
             },
             "protomake.prefab": {
-              "prefab": "e53f0fb7-3a6d-409c-bca4-f469f3c822f7",
-              "source": "d8d21f67-e092-4c13-af27-3b4326b040ce",
-              "root": "0b5beefc-635f-40db-a4c1-ed7cb5fca34c",
+              "prefab": "d5297f56-640e-42c6-900f-a559889da0ee",
+              "source": "dae708e0-b33c-4c62-a6e8-1713ced6667e",
+              "root": "8566a78d-7754-4bc4-b71e-f1a6ba5dbf31",
               "overrides": [
                 {
                   "path": ["name"],
@@ -84,20 +172,109 @@
           }
         },
         {
-          "id": "1e108cf4-21fa-445b-8416-33117acd3b77",
-          "name": "Health background 2",
+          "id": "887793bd-0674-46c1-afa5-f6230d5bbb09",
+          "name": "Spotlight",
           "enabled": true,
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [1, 0, 0, 1, 190, -192]
+              "local": [
+                0.9210609940028851, 0.3894183423086505, -0.3894183423086505,
+                0.9210609940028851, -350, -160
+              ]
+            },
+            "protomake.light": {
+              "kind": "spot",
+              "mobility": "dynamic",
+              "color": "#fff0ce",
+              "intensity": 0.8,
+              "range": 700,
+              "falloff": 1,
+              "innerAngle": 30,
+              "outerAngle": 75,
+              "width": 160,
+              "height": 80,
+              "channelMask": 15,
+              "castShadows": true,
+              "shadowOpacity": 1,
+              "shadowBias": 1,
+              "shadowSoftness": 0
+            }
+          }
+        },
+        {
+          "id": "88942a3f-44da-4dd1-9625-7479fcb16231",
+          "name": "Defeat",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.sprite": {
+              "texture": "2a95cba0-f633-4da1-8543-b70d1d7daf89",
+              "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 520,
+              "height": 120,
+              "tint": "#ffffff",
+              "opacity": 1,
+              "visible": false,
+              "flipX": false,
+              "flipY": false,
+              "anchorX": 0.5,
+              "anchorY": 0.5,
+              "layer": 30,
+              "order": 0
+            }
+          }
+        },
+        {
+          "id": "9e69ba19-368e-4c48-b061-801920314065",
+          "name": "Ambient",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.light": {
+              "kind": "ambient",
+              "mobility": "dynamic",
+              "color": "#d4e5ff",
+              "intensity": 0.65,
+              "range": 300,
+              "falloff": 1,
+              "innerAngle": 40,
+              "outerAngle": 70,
+              "width": 160,
+              "height": 80,
+              "channelMask": 15,
+              "castShadows": true,
+              "shadowOpacity": 1,
+              "shadowBias": 1,
+              "shadowSoftness": 0
+            }
+          }
+        },
+        {
+          "id": "b0348880-98b7-47d7-8673-09f507bfd4bc",
+          "name": "Health 1",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -350, -192]
             },
             "protomake.sprite": {
               "texture": "",
               "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 160,
               "height": 12,
-              "tint": "#26313d",
+              "tint": "#f3ac66",
               "opacity": 1,
               "visible": true,
               "flipX": false,
@@ -105,38 +282,12 @@
               "anchorX": 0,
               "anchorY": 0.5,
               "layer": 20,
-              "order": 0
+              "order": 1
             }
           }
         },
         {
-          "id": "2984a0c3-09c9-4428-880c-27ddfa465c3a",
-          "name": "Instructions",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, -225]
-            },
-            "protomake.sprite": {
-              "texture": "6c8bb273-19ab-44fa-8fd2-49bf8ea25fe5",
-              "lit": false,
-              "width": 760,
-              "height": 44,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 20,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "34abe043-0f3f-4938-829c-90b8111e6427",
+          "id": "b402e818-d563-4577-a311-5502bbec83de",
           "name": "Camera",
           "enabled": true,
           "parent": null,
@@ -156,77 +307,7 @@
           }
         },
         {
-          "id": "36feb5d0-13b0-4491-944d-5cfb3d2c4095",
-          "name": "Cool area",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 200, 60]
-            },
-            "protomake.light": {
-              "kind": "area",
-              "color": "#75caff",
-              "intensity": 0.65,
-              "range": 220,
-              "falloff": 1,
-              "innerAngle": 40,
-              "outerAngle": 70,
-              "width": 220,
-              "height": 100
-            }
-          }
-        },
-        {
-          "id": "3f407b5e-d5b8-4c98-ad63-3dec61f25c5b",
-          "name": "Ring floor",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 170]
-            },
-            "protomake.sprite": {
-              "texture": "c855e598-81b6-43ec-9688-112873764e3f",
-              "lit": true,
-              "width": 760,
-              "height": 24,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": true,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 0,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "52796326-3fc9-4da7-83c7-dfa5e5970b01",
-          "name": "Warm pool",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, -190, 0]
-            },
-            "protomake.light": {
-              "kind": "point",
-              "color": "#ffb76b",
-              "intensity": 0.8,
-              "range": 350,
-              "falloff": 1.4,
-              "innerAngle": 40,
-              "outerAngle": 70,
-              "width": 160,
-              "height": 80
-            }
-          }
-        },
-        {
-          "id": "5aa8acc4-a408-4732-9320-6755a770eed9",
+          "id": "b4906a1a-f1e1-4f6b-8bf5-d84078fb7ca0",
           "name": "Hitbox 2",
           "enabled": true,
           "parent": null,
@@ -237,6 +318,8 @@
             "protomake.sprite": {
               "texture": "",
               "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 48,
               "height": 12,
               "tint": "#82baff",
@@ -252,34 +335,74 @@
           }
         },
         {
-          "id": "5b30e926-ef32-4a35-af45-a4046255781a",
-          "name": "Hitbox 1",
+          "id": "cc227321-a254-4dd0-9e9d-616fda46ae08",
+          "name": "Warm pool",
           "enabled": true,
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
+              "local": [1, 0, 0, 1, -190, 0]
+            },
+            "protomake.light": {
+              "kind": "point",
+              "mobility": "dynamic",
+              "color": "#ffb76b",
+              "intensity": 0.8,
+              "range": 350,
+              "falloff": 1.4,
+              "innerAngle": 40,
+              "outerAngle": 70,
+              "width": 160,
+              "height": 80,
+              "channelMask": 15,
+              "castShadows": true,
+              "shadowOpacity": 1,
+              "shadowBias": 1,
+              "shadowSoftness": 0
+            }
+          }
+        },
+        {
+          "id": "dae708e0-b33c-4c62-a6e8-1713ced6667e",
+          "name": "Fighter 1",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, -160, 128]
             },
             "protomake.sprite": {
-              "texture": "",
-              "lit": false,
-              "width": 48,
-              "height": 12,
-              "tint": "#f3ac66",
+              "texture": "6cd81440-7017-4390-a762-e974754fc7f4",
+              "lit": true,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 36,
+              "height": 60,
+              "tint": "#ffffff",
               "opacity": 1,
-              "visible": false,
+              "visible": true,
               "flipX": false,
               "flipY": false,
               "anchorX": 0.5,
               "anchorY": 0.5,
               "layer": 0,
               "order": 0
+            },
+            "protomake.animator": {
+              "controller": "0505f0e8-9b5d-4f79-b0a2-49038badc681",
+              "speed": 1
+            },
+            "protomake.prefab": {
+              "prefab": "d5297f56-640e-42c6-900f-a559889da0ee",
+              "source": "dae708e0-b33c-4c62-a6e8-1713ced6667e",
+              "root": "dae708e0-b33c-4c62-a6e8-1713ced6667e",
+              "overrides": []
             }
           }
         },
         {
-          "id": "67e0c9b5-57e0-4094-9b87-2d12f7aa22f3",
-          "name": "Health 2",
+          "id": "dd6663ce-2b9f-447b-af59-42277fbfc65d",
+          "name": "Health background 2",
           "enabled": true,
           "parent": null,
           "components": {
@@ -289,9 +412,11 @@
             "protomake.sprite": {
               "texture": "",
               "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 160,
               "height": 12,
-              "tint": "#82baff",
+              "tint": "#26313d",
               "opacity": 1,
               "visible": true,
               "flipX": false,
@@ -299,12 +424,71 @@
               "anchorX": 0,
               "anchorY": 0.5,
               "layer": 20,
-              "order": 1
+              "order": 0
             }
           }
         },
         {
-          "id": "878d94ae-5250-453b-bb30-93be67cf4581",
+          "id": "dfc77256-0b47-4b4f-99ad-8c4623f3a5bb",
+          "name": "Cool area",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 200, 60]
+            },
+            "protomake.light": {
+              "kind": "area",
+              "mobility": "dynamic",
+              "color": "#75caff",
+              "intensity": 0.65,
+              "range": 220,
+              "falloff": 1,
+              "innerAngle": 40,
+              "outerAngle": 70,
+              "width": 220,
+              "height": 100,
+              "channelMask": 15,
+              "castShadows": true,
+              "shadowOpacity": 1,
+              "shadowBias": 1,
+              "shadowSoftness": 0
+            }
+          }
+        },
+        {
+          "id": "e3f7e588-91e0-497d-81d7-4ce62a60204e",
+          "name": "Arena logic",
+          "enabled": true,
+          "parent": null,
+          "components": {
+            "protomake.transform": {
+              "local": [1, 0, 0, 1, 0, 0]
+            },
+            "protomake.behaviours": {
+              "order": ["5ad2c63f-3457-427c-9ae8-7300cf3084ed"],
+              "items": {
+                "5ad2c63f-3457-427c-9ae8-7300cf3084ed": {
+                  "id": "5ad2c63f-3457-427c-9ae8-7300cf3084ed",
+                  "kind": "script",
+                  "enabled": true,
+                  "script": "ec86f00c-28c5-416f-9e35-37461d228c55",
+                  "values": {}
+                }
+              }
+            },
+            "protomake.audio-source": {
+              "clip": "083a6fa1-426f-4439-b46a-f54ab1f5a116",
+              "loop": false,
+              "volume": 0.3,
+              "rate": 1,
+              "bus": "SFX",
+              "playOnAwake": false
+            }
+          }
+        },
+        {
+          "id": "f04bee4e-99ae-4a27-9fad-fae2cb9b042a",
           "name": "Backdrop",
           "enabled": true,
           "parent": null,
@@ -313,8 +497,10 @@
               "local": [1, 0, 0, 1, 0, 0]
             },
             "protomake.sprite": {
-              "texture": "ee11533e-4c94-4a6b-bae1-7f880a78cd99",
+              "texture": "55ea5ff5-3fe8-4b7f-a318-6b36e7f61750",
               "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 800,
               "height": 500,
               "tint": "#ffffff",
@@ -330,116 +516,21 @@
           }
         },
         {
-          "id": "88af592c-a1d1-4ed0-83fa-ceeb9a3b9477",
-          "name": "Ambient",
+          "id": "fbaa944c-835e-4127-ac85-2598ea59a3f9",
+          "name": "Instructions",
           "enabled": true,
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.light": {
-              "kind": "ambient",
-              "color": "#d4e5ff",
-              "intensity": 0.65,
-              "range": 300,
-              "falloff": 1,
-              "innerAngle": 40,
-              "outerAngle": 70,
-              "width": 160,
-              "height": 80
-            }
-          }
-        },
-        {
-          "id": "93267cbb-7446-4b33-996f-56edb20ffdb9",
-          "name": "Arena logic",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.script": {
-              "script": "18be01f2-029d-46cc-b242-521d7eee6244",
-              "values": {}
-            },
-            "protomake.audio-source": {
-              "clip": "08de56d2-35d5-407d-b423-519be14f6a86",
-              "loop": false,
-              "volume": 0.3,
-              "rate": 1,
-              "bus": "SFX",
-              "playOnAwake": false
-            }
-          }
-        },
-        {
-          "id": "c31d96fd-41d1-44c0-8ad7-cc95a755d422",
-          "name": "Victory",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
+              "local": [1, 0, 0, 1, 0, -225]
             },
             "protomake.sprite": {
-              "texture": "5b1a30e9-f16c-43f6-b1a9-513087b5bbe5",
+              "texture": "ff75ce1b-1926-4013-a156-bafd6c598fdf",
               "lit": false,
-              "width": 520,
-              "height": 120,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 30,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "c50dabe0-50d1-46a1-831e-500dc6b7c790",
-          "name": "Defeat",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, 0, 0]
-            },
-            "protomake.sprite": {
-              "texture": "a00be488-a533-46cd-924b-ee47fb63d45a",
-              "lit": false,
-              "width": 520,
-              "height": 120,
-              "tint": "#ffffff",
-              "opacity": 1,
-              "visible": false,
-              "flipX": false,
-              "flipY": false,
-              "anchorX": 0.5,
-              "anchorY": 0.5,
-              "layer": 30,
-              "order": 0
-            }
-          }
-        },
-        {
-          "id": "d8d21f67-e092-4c13-af27-3b4326b040ce",
-          "name": "Fighter 1",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, -160, 128]
-            },
-            "protomake.sprite": {
-              "texture": "a4ef4b2f-8290-4eee-8f46-17d490f67b32",
-              "lit": true,
-              "width": 36,
-              "height": 60,
+              "castShadow": false,
+              "lightingChannel": "World",
+              "width": 760,
+              "height": 44,
               "tint": "#ffffff",
               "opacity": 1,
               "visible": true,
@@ -447,61 +538,28 @@
               "flipY": false,
               "anchorX": 0.5,
               "anchorY": 0.5,
-              "layer": 0,
+              "layer": 20,
               "order": 0
-            },
-            "protomake.animator": {
-              "controller": "d468dcd7-9bea-4e97-b118-05f80c39e408",
-              "speed": 1
-            },
-            "protomake.prefab": {
-              "prefab": "e53f0fb7-3a6d-409c-bca4-f469f3c822f7",
-              "source": "d8d21f67-e092-4c13-af27-3b4326b040ce",
-              "root": "d8d21f67-e092-4c13-af27-3b4326b040ce",
-              "overrides": []
             }
           }
         },
         {
-          "id": "dcec46b4-b5c6-4289-a4b3-a7a3b6a3a113",
-          "name": "Spotlight",
+          "id": "fdd43a8d-d746-4739-9909-1b72a6c07cb6",
+          "name": "Health 2",
           "enabled": true,
           "parent": null,
           "components": {
             "protomake.transform": {
-              "local": [
-                0.9210609940028851, 0.3894183423086505, -0.3894183423086505,
-                0.9210609940028851, -350, -160
-              ]
-            },
-            "protomake.light": {
-              "kind": "spot",
-              "color": "#fff0ce",
-              "intensity": 0.8,
-              "range": 700,
-              "falloff": 1,
-              "innerAngle": 30,
-              "outerAngle": 75,
-              "width": 160,
-              "height": 80
-            }
-          }
-        },
-        {
-          "id": "ea6e9ccc-4b7e-4a93-91f0-c209904025b6",
-          "name": "Health background 1",
-          "enabled": true,
-          "parent": null,
-          "components": {
-            "protomake.transform": {
-              "local": [1, 0, 0, 1, -350, -192]
+              "local": [1, 0, 0, 1, 190, -192]
             },
             "protomake.sprite": {
               "texture": "",
               "lit": false,
+              "castShadow": false,
+              "lightingChannel": "World",
               "width": 160,
               "height": 12,
-              "tint": "#26313d",
+              "tint": "#82baff",
               "opacity": 1,
               "visible": true,
               "flipX": false,
@@ -509,7 +567,7 @@
               "anchorX": 0,
               "anchorY": 0.5,
               "layer": 20,
-              "order": 0
+              "order": 1
             }
           }
         }
@@ -518,7 +576,7 @@
   ],
   "assets": [
     {
-      "id": "a4ef4b2f-8290-4eee-8f46-17d490f67b32",
+      "id": "6cd81440-7017-4390-a762-e974754fc7f4",
       "path": "Assets/Images/Actor-0.png",
       "kind": "image",
       "mime": "image/png",
@@ -527,7 +585,7 @@
       "height": 48
     },
     {
-      "id": "ff301d17-b92b-45a1-993a-544b735b0c03",
+      "id": "d66e9c71-11f3-4739-9ab2-3277ebd534d4",
       "path": "Assets/Images/Actor-1.png",
       "kind": "image",
       "mime": "image/png",
@@ -536,7 +594,7 @@
       "height": 48
     },
     {
-      "id": "8ea36af9-9039-4e06-a348-d817c3d15fc3",
+      "id": "d2865237-f5c6-44fe-be26-2deff5afff0e",
       "path": "Assets/Images/Actor-2.png",
       "kind": "image",
       "mime": "image/png",
@@ -545,7 +603,7 @@
       "height": 48
     },
     {
-      "id": "97f76e83-aa38-4fd8-b3dd-b466b7d6031d",
+      "id": "af6e695a-60d4-4e38-8e7d-19b7b064438d",
       "path": "Assets/Images/Actor-3.png",
       "kind": "image",
       "mime": "image/png",
@@ -554,7 +612,7 @@
       "height": 48
     },
     {
-      "id": "1eed0aec-e0ff-4415-8204-2f60f1e0272e",
+      "id": "9c2273a6-f166-4e6c-9d21-266af958e33d",
       "path": "Assets/Images/Enemy.png",
       "kind": "image",
       "mime": "image/png",
@@ -563,7 +621,7 @@
       "height": 32
     },
     {
-      "id": "c855e598-81b6-43ec-9688-112873764e3f",
+      "id": "0c84eee9-076b-4460-b55a-41c0facb4230",
       "path": "Assets/Images/Platform.png",
       "kind": "image",
       "mime": "image/png",
@@ -572,7 +630,7 @@
       "height": 24
     },
     {
-      "id": "afea3e33-b449-4be9-96c2-bba66661768f",
+      "id": "6dd94450-bb9a-48fe-81b5-9697cfac5fda",
       "path": "Assets/Images/Coin.png",
       "kind": "image",
       "mime": "image/png",
@@ -581,7 +639,7 @@
       "height": 18
     },
     {
-      "id": "73063b0b-ceb9-4cdf-b092-68ecc0293c0a",
+      "id": "e6cbb816-fc7e-4df7-862b-9f4418873c1b",
       "path": "Assets/Images/Flag.png",
       "kind": "image",
       "mime": "image/png",
@@ -590,7 +648,7 @@
       "height": 36
     },
     {
-      "id": "524328ff-f698-47ac-8c0b-a23a03b9a49a",
+      "id": "3feedb76-d0cc-4b40-bf5f-168accd1cc10",
       "path": "Assets/Images/Goal.png",
       "kind": "image",
       "mime": "image/png",
@@ -599,7 +657,7 @@
       "height": 48
     },
     {
-      "id": "ee11533e-4c94-4a6b-bae1-7f880a78cd99",
+      "id": "55ea5ff5-3fe8-4b7f-a318-6b36e7f61750",
       "path": "Assets/Images/Backdrop.png",
       "kind": "image",
       "mime": "image/png",
@@ -608,7 +666,7 @@
       "height": 500
     },
     {
-      "id": "6c8bb273-19ab-44fa-8fd2-49bf8ea25fe5",
+      "id": "ff75ce1b-1926-4013-a156-bafd6c598fdf",
       "path": "Assets/Images/Instructions.png",
       "kind": "image",
       "mime": "image/png",
@@ -617,7 +675,7 @@
       "height": 44
     },
     {
-      "id": "5b1a30e9-f16c-43f6-b1a9-513087b5bbe5",
+      "id": "65f1d61c-3e23-4862-a949-764cf77e0ebb",
       "path": "Assets/Images/Victory.png",
       "kind": "image",
       "mime": "image/png",
@@ -626,7 +684,7 @@
       "height": 120
     },
     {
-      "id": "a00be488-a533-46cd-924b-ee47fb63d45a",
+      "id": "2a95cba0-f633-4da1-8543-b70d1d7daf89",
       "path": "Assets/Images/Defeat.png",
       "kind": "image",
       "mime": "image/png",
@@ -635,7 +693,7 @@
       "height": 120
     },
     {
-      "id": "08de56d2-35d5-407d-b423-519be14f6a86",
+      "id": "083a6fa1-426f-4439-b46a-f54ab1f5a116",
       "path": "Assets/Audio/Action.wav",
       "kind": "audio",
       "mime": "audio/wav",
@@ -644,7 +702,7 @@
       "height": 0
     },
     {
-      "id": "18be01f2-029d-46cc-b242-521d7eee6244",
+      "id": "ec86f00c-28c5-416f-9e35-37461d228c55",
       "path": "Assets/Scripts/Fighter.ts",
       "kind": "text",
       "mime": "text/typescript",
@@ -653,7 +711,7 @@
       "height": 0
     },
     {
-      "id": "249d1a83-7f88-4b54-aaec-615381ae1793",
+      "id": "ffea25c9-144e-4e5e-927c-56d224044edf",
       "path": "Assets/Scripts/Helpers.ts",
       "kind": "text",
       "mime": "text/typescript",
@@ -662,38 +720,38 @@
       "height": 0
     },
     {
-      "id": "4004155d-a5c1-4191-816b-a1dd1b03b975",
+      "id": "1cf51526-54d8-4bda-a086-c4fdb259c0ea",
       "path": "Assets/Animations/Idle.animation.json",
       "kind": "text",
       "mime": "application/x-protomake-animation",
-      "data": "{\"version\":1,\"name\":\"Idle\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"a4ef4b2f-8290-4eee-8f46-17d490f67b32\",\"duration\":0.3},{\"texture\":\"ff301d17-b92b-45a1-993a-544b735b0c03\",\"duration\":0.3}]}",
+      "data": "{\"version\":1,\"name\":\"Idle\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"6cd81440-7017-4390-a762-e974754fc7f4\",\"duration\":0.3},{\"texture\":\"d66e9c71-11f3-4739-9ab2-3277ebd534d4\",\"duration\":0.3}]}",
       "width": 0,
       "height": 0
     },
     {
-      "id": "51b7adf8-995c-4ffc-9bb5-246ca73f044e",
+      "id": "afa52595-3abf-4c0f-a633-b1ca63bc1bb3",
       "path": "Assets/Animations/Action.animation.json",
       "kind": "text",
       "mime": "application/x-protomake-animation",
-      "data": "{\"version\":1,\"name\":\"Action\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"8ea36af9-9039-4e06-a348-d817c3d15fc3\",\"duration\":0.08},{\"texture\":\"97f76e83-aa38-4fd8-b3dd-b466b7d6031d\",\"duration\":0.08}]}",
+      "data": "{\"version\":1,\"name\":\"Action\",\"loop\":true,\"speed\":1,\"frames\":[{\"texture\":\"d2865237-f5c6-44fe-be26-2deff5afff0e\",\"duration\":0.08},{\"texture\":\"af6e695a-60d4-4e38-8e7d-19b7b064438d\",\"duration\":0.08}]}",
       "width": 0,
       "height": 0
     },
     {
-      "id": "d468dcd7-9bea-4e97-b118-05f80c39e408",
+      "id": "0505f0e8-9b5d-4f79-b0a2-49038badc681",
       "path": "Assets/Animations/Actor.animator.json",
       "kind": "text",
       "mime": "application/x-protomake-animator",
-      "data": "{\"version\":1,\"initial\":\"Idle\",\"parameters\":{\"active\":{\"type\":\"bool\",\"default\":false}},\"states\":[{\"name\":\"Idle\",\"clip\":\"4004155d-a5c1-4191-816b-a1dd1b03b975\",\"speed\":1},{\"name\":\"Action\",\"clip\":\"51b7adf8-995c-4ffc-9bb5-246ca73f044e\",\"speed\":1}],\"transitions\":[{\"from\":\"Idle\",\"to\":\"Action\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"active\",\"operator\":\"==\",\"value\":true}]},{\"from\":\"Action\",\"to\":\"Idle\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"active\",\"operator\":\"==\",\"value\":false}]}]}",
+      "data": "{\"version\":1,\"initial\":\"Idle\",\"parameters\":{\"active\":{\"type\":\"bool\",\"default\":false}},\"states\":[{\"name\":\"Idle\",\"clip\":\"1cf51526-54d8-4bda-a086-c4fdb259c0ea\",\"speed\":1},{\"name\":\"Action\",\"clip\":\"afa52595-3abf-4c0f-a633-b1ca63bc1bb3\",\"speed\":1}],\"transitions\":[{\"from\":\"Idle\",\"to\":\"Action\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"active\",\"operator\":\"==\",\"value\":true}]},{\"from\":\"Action\",\"to\":\"Idle\",\"exitTime\":null,\"conditions\":[{\"parameter\":\"active\",\"operator\":\"==\",\"value\":false}]}]}",
       "width": 0,
       "height": 0
     },
     {
-      "id": "e53f0fb7-3a6d-409c-bca4-f469f3c822f7",
+      "id": "d5297f56-640e-42c6-900f-a559889da0ee",
       "path": "Assets/Prefabs/Fighter.prefab.json",
       "kind": "text",
       "mime": "application/x-protomake-prefab",
-      "data": "{\"schemaVersion\":1,\"id\":\"e53f0fb7-3a6d-409c-bca4-f469f3c822f7\",\"name\":\"Assets/Prefabs/Fighter.prefab.json\",\"entities\":[{\"id\":\"d8d21f67-e092-4c13-af27-3b4326b040ce\",\"name\":\"Fighter 1\",\"enabled\":true,\"parent\":null,\"components\":{\"protomake.transform\":{\"local\":[1,0,0,1,-160,128]},\"protomake.sprite\":{\"texture\":\"a4ef4b2f-8290-4eee-8f46-17d490f67b32\",\"lit\":true,\"width\":36,\"height\":60,\"tint\":\"#ffffff\",\"opacity\":1,\"visible\":true,\"flipX\":false,\"flipY\":false,\"anchorX\":0.5,\"anchorY\":0.5,\"layer\":0,\"order\":0},\"protomake.animator\":{\"controller\":\"d468dcd7-9bea-4e97-b118-05f80c39e408\",\"speed\":1}}}]}",
+      "data": "{\"schemaVersion\":1,\"id\":\"d5297f56-640e-42c6-900f-a559889da0ee\",\"name\":\"Assets/Prefabs/Fighter.prefab.json\",\"entities\":[{\"id\":\"dae708e0-b33c-4c62-a6e8-1713ced6667e\",\"name\":\"Fighter 1\",\"enabled\":true,\"parent\":null,\"components\":{\"protomake.transform\":{\"local\":[1,0,0,1,-160,128]},\"protomake.sprite\":{\"texture\":\"6cd81440-7017-4390-a762-e974754fc7f4\",\"lit\":true,\"castShadow\":false,\"lightingChannel\":\"World\",\"width\":36,\"height\":60,\"tint\":\"#ffffff\",\"opacity\":1,\"visible\":true,\"flipX\":false,\"flipY\":false,\"anchorX\":0.5,\"anchorY\":0.5,\"layer\":0,\"order\":0},\"protomake.animator\":{\"controller\":\"0505f0e8-9b5d-4f79-b0a2-49038badc681\",\"speed\":1}}}]}",
       "width": 0,
       "height": 0
     }
@@ -712,7 +770,12 @@
   "input": [
     {
       "name": "Move",
+      "map": "Gameplay",
       "kind": "vector2",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyD", "ArrowRight", "GamepadAxis0+"],
       "negativeX": ["KeyA", "ArrowLeft", "GamepadAxis0-"],
       "positiveY": ["KeyS", "ArrowDown", "GamepadAxis1+"],
@@ -720,7 +783,12 @@
     },
     {
       "name": "Jump",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["Space", "GamepadButton0"],
       "negativeX": [],
       "positiveY": [],
@@ -728,7 +796,12 @@
     },
     {
       "name": "Interact",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyE", "Mouse0", "GamepadButton2"],
       "negativeX": [],
       "positiveY": [],
@@ -736,7 +809,12 @@
     },
     {
       "name": "Restart",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyR"],
       "negativeX": [],
       "positiveY": [],
@@ -752,7 +830,12 @@
     },
     {
       "name": "Jump1",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["Space"],
       "negativeX": [],
       "positiveY": [],
@@ -760,7 +843,12 @@
     },
     {
       "name": "Attack1",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyF"],
       "negativeX": [],
       "positiveY": [],
@@ -768,7 +856,12 @@
     },
     {
       "name": "Block1",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyG"],
       "negativeX": [],
       "positiveY": [],
@@ -784,7 +877,12 @@
     },
     {
       "name": "Jump2",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["ArrowUp"],
       "negativeX": [],
       "positiveY": [],
@@ -792,7 +890,12 @@
     },
     {
       "name": "Attack2",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyK"],
       "negativeX": [],
       "positiveY": [],
@@ -800,7 +903,12 @@
     },
     {
       "name": "Block2",
+      "map": "Gameplay",
       "kind": "button",
+      "sensitivity": 1,
+      "deadZone": 0.15,
+      "invertX": false,
+      "invertY": false,
       "positiveX": ["KeyL"],
       "negativeX": [],
       "positiveY": [],
@@ -844,6 +952,6 @@
     "Scenes"
   ],
   "sceneFolders": {
-    "522cee09-3a29-4803-a20f-e2d5cec40377": "Scenes"
+    "223228f8-4854-4df6-96e8-33842537eee6": "Scenes"
   }
 }

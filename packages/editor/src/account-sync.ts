@@ -28,11 +28,13 @@ export class AccountSync {
     try {
       this.endpoint = localStorage.getItem('protomake.sync.endpoint') || '/api';
       this.token = sessionStorage.getItem('protomake.sync.token') ?? '';
-      const user = JSON.parse(sessionStorage.getItem('protomake.sync.user') ?? 'null') as
-        | { id: string; email: string }
-        | null;
+      const user = JSON.parse(
+        sessionStorage.getItem('protomake.sync.user') ?? 'null',
+      ) as { id: string; email: string } | null;
       if (user) this.userValue = user;
-      const revisions = JSON.parse(localStorage.getItem('protomake.sync.revisions') ?? '{}') as Record<string, number>;
+      const revisions = JSON.parse(
+        localStorage.getItem('protomake.sync.revisions') ?? '{}',
+      ) as Record<string, number>;
       this.revisions = new Map(Object.entries(revisions));
     } catch {
       /* Storage is optional. */
@@ -71,9 +73,16 @@ export class AccountSync {
     try {
       if (this.token) sessionStorage.setItem('protomake.sync.token', this.token);
       else sessionStorage.removeItem('protomake.sync.token');
-      if (this.userValue) sessionStorage.setItem('protomake.sync.user', JSON.stringify(this.userValue));
+      if (this.userValue)
+        sessionStorage.setItem(
+          'protomake.sync.user',
+          JSON.stringify(this.userValue),
+        );
       else sessionStorage.removeItem('protomake.sync.user');
-      localStorage.setItem('protomake.sync.revisions', JSON.stringify(Object.fromEntries(this.revisions)));
+      localStorage.setItem(
+        'protomake.sync.revisions',
+        JSON.stringify(Object.fromEntries(this.revisions)),
+      );
     } catch {
       /* Account state remains active for this session. */
     }
@@ -87,14 +96,19 @@ export class AccountSync {
         ...(this.token ? { Authorization: `Bearer ${this.token}` } : {}),
       },
     });
-    const payload = (await response.json().catch(() => ({}))) as Record<string, unknown>;
+    const payload = (await response.json().catch(() => ({}))) as Record<
+      string,
+      unknown
+    >;
     if (!response.ok) {
       if (response.status === 409 && payload.error === 'revision_conflict')
         throw new Error(
           `Cloud save conflict. This device has an older revision; open the cloud copy before saving again.`,
         );
       if (response.status === 401) this.signOut();
-      throw new Error(String(payload.error ?? `Sync server returned ${response.status}`));
+      throw new Error(
+        String(payload.error ?? `Sync server returned ${response.status}`),
+      );
     }
     return payload as T;
   }
@@ -125,8 +139,11 @@ export class AccountSync {
 
   async signOutRemote(): Promise<void> {
     if (this.token) {
-      try { await this.request<{ ok: true }>('/auth/signout', { method: 'POST' }); }
-      catch { /* Local sign-out must still succeed if the server is unreachable. */ }
+      try {
+        await this.request<{ ok: true }>('/auth/signout', { method: 'POST' });
+      } catch {
+        /* Local sign-out must still succeed if the server is unreachable. */
+      }
     }
     this.signOut();
   }
@@ -143,12 +160,16 @@ export class AccountSync {
   }
 
   async list(): Promise<CloudProjectSummary[]> {
-    const result = await this.request<{ projects: CloudProjectSummary[] }>('/projects');
+    const result = await this.request<{ projects: CloudProjectSummary[] }>(
+      '/projects',
+    );
     return result.projects;
   }
 
   async load(id: string): Promise<CloudProject> {
-    const result = await this.request<CloudProject>(`/projects/${encodeURIComponent(id)}`);
+    const result = await this.request<CloudProject>(
+      `/projects/${encodeURIComponent(id)}`,
+    );
     this.revisions.set(id, result.revision);
     this.persist();
     return result;
@@ -156,21 +177,26 @@ export class AccountSync {
 
   async save(project: ProjectData, activeScene?: string): Promise<number> {
     const revision = this.revisions.get(project.id);
-    const result = await this.request<{ revision: number }>(`/projects/${encodeURIComponent(project.id)}`, {
-      method: 'PUT',
-      body: JSON.stringify({
-        project,
-        ...(activeScene ? { activeScene } : {}),
-        ...(revision !== undefined ? { revision } : {}),
-      }),
-    });
+    const result = await this.request<{ revision: number }>(
+      `/projects/${encodeURIComponent(project.id)}`,
+      {
+        method: 'PUT',
+        body: JSON.stringify({
+          project,
+          ...(activeScene ? { activeScene } : {}),
+          ...(revision !== undefined ? { revision } : {}),
+        }),
+      },
+    );
     this.revisions.set(project.id, result.revision);
     this.persist();
     return result.revision;
   }
 
   async delete(id: string): Promise<void> {
-    await this.request<{ ok: true }>(`/projects/${encodeURIComponent(id)}`, { method: 'DELETE' });
+    await this.request<{ ok: true }>(`/projects/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    });
     this.revisions.delete(id);
     this.persist();
   }

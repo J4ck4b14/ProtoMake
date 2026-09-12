@@ -7,7 +7,7 @@
 | `@protomake/core`          | None                                                                 | Identity, component registry/stores, world/hierarchy, math, events               |
 | `@protomake/assets`        | Core, Zod                                                            | Asset records, GUID/path indexes, import/dependency checks                       |
 | `@protomake/input`         | Zod                                                                  | Action schemas and keyboard/mouse/gamepad state                                  |
-| `@protomake/runtime`       | Core                                                                 | Time and ordered system lifecycle                                                |
+| `@protomake/runtime`       | Core                                                                 | Time, ordered lifecycle, signals, timers and tweens                              |
 | `@protomake/physics2d`     | Core, runtime types, Zod, Rapier adapter                             | Physics configuration, components and simulation                                 |
 | `@protomake/renderer`      | Core, assets, Zod, Pixi adapter                                      | Sprite/camera data and rendering contract                                        |
 | `@protomake/serialization` | Core, assets, physics/input/prefab/animation/audio schemas, Zod      | Strict project/scene validation and migrations                                   |
@@ -26,7 +26,7 @@ A `World` owns entities, GUID lookup, parent/children indexes and one sparse sto
 
 Entity records and component values are immutable snapshots. Component writes validate and clone values before storing them. Systems iterate the relevant component index through `query` instead of scanning all entities. Query iterators are live Map iterators: defer structural mutation until after iteration if traversal must be stable. `components()` is a detached map for authoring/serialization, not a hot-path API.
 
-`enabled` is local authored state; `isActive` walks ancestors. Systems decide whether their operation should filter inactive entities.
+`enabled` is local authored state; `isActive` walks ancestors. Lightweight `protomake.tags` data is indexed by `World`, which supplies component, tag, nearest-tag and radius queries without putting game semantics into core.
 
 ## Transforms
 
@@ -44,13 +44,13 @@ The host passes seconds to `Engine.tick`; no hidden animation-frame singleton ex
 
 Component parsers and inspector metadata are explicit. The serializer validates envelopes and invokes registered schemas. Unknown components fail rather than disappearing. Physics/rendering/scripting components are registered by the editor without game-specific core logic.
 
-Project TS source stays in authored assets and executes on Play only. Static field metadata is parsed without evaluation. Runtime code receives explicit context services and may call public entity/component APIs. The same-origin iframe runs trusted developer code and can access browser APIs; it does not safely contain malicious or nonterminating code. See docs/scripting.md for compiler and trust limits.
+Project TS source stays in authored assets and executes on Play only. `protomake.behaviours` stores ordered, identity-keyed slots so each script has independent enable state, values and lifecycle. Runtime services are owner-scoped; destroying a behaviour removes its signal listeners, timers and tweens. Static field metadata is parsed without evaluation. See docs/scripting.md for compiler and trust limits.
 
 ## Editor mutations
 
 EditorModel owns authored project/world state, selection and command history. History stores before/after snapshots for transactions; pointer gestures mutate only the working world until committed as one command. Invalid operations restore the prior snapshot. Asset bytes are serialized only on authoring/storage operations, never as part of the runtime frame loop.
 
-SceneViewport owns camera navigation, selection geometry and gizmos. Inspector derives controls from component metadata, extending ScriptBehaviour fields from static project metadata. ProjectStorage owns IndexedDB transactions and separate active-scene metadata. PlayMode exchanges cloned project data with an iframe; removing it discards runtime changes.
+SceneViewport owns camera navigation, selection geometry and gizmos. Inspector derives ordinary controls from component metadata and provides specialized TRS, tag and multi-behaviour authoring. ProjectStorage owns IndexedDB transactions and separate active-scene metadata. PlayMode exchanges cloned project data with an iframe; removing it discards runtime changes.
 
 ## Production boundary
 

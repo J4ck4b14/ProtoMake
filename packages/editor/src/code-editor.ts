@@ -3,13 +3,17 @@ import { node } from './dom';
 import { SCRIPT_CONTEXT_API, type ScriptApiEntry } from './scripting-api';
 
 const escape = (value: string) =>
-  value.replace(/[&<>"']/g, (character) => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#39;',
-  })[character]!);
+  value.replace(
+    /[&<>"']/g,
+    (character) =>
+      ({
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#39;',
+      })[character]!,
+  );
 
 function tokenClass(kind: ScriptLexeme['kind']): string {
   return kind === 'plain' ? '' : `tok-${kind}`;
@@ -57,17 +61,34 @@ export class ScriptCodeEditor {
     this.refresh();
   }
 
-  get value(): string { return this.textarea.value; }
-  set value(value: string) { this.textarea.value = value; this.refresh(); this.hideAutocomplete(); }
-  get selectionStart(): number { return this.textarea.selectionStart; }
-  get selectionEnd(): number { return this.textarea.selectionEnd; }
-  focus(): void { this.textarea.focus(); }
+  get value(): string {
+    return this.textarea.value;
+  }
+  set value(value: string) {
+    this.textarea.value = value;
+    this.refresh();
+    this.hideAutocomplete();
+  }
+  get selectionStart(): number {
+    return this.textarea.selectionStart;
+  }
+  get selectionEnd(): number {
+    return this.textarea.selectionEnd;
+  }
+  focus(): void {
+    this.textarea.focus();
+  }
   onInput(listener: () => void): () => void {
     this.inputListeners.add(listener);
     return () => this.inputListeners.delete(listener);
   }
 
-  setRangeText(replacement: string, start: number, end: number, mode: SelectionMode = 'end'): void {
+  setRangeText(
+    replacement: string,
+    start: number,
+    end: number,
+    mode: SelectionMode = 'end',
+  ): void {
     this.textarea.setRangeText(replacement, start, end, mode);
     this.refresh();
   }
@@ -75,19 +96,24 @@ export class ScriptCodeEditor {
   jumpTo(line: number, column = 1): void {
     const lines = this.value.split('\n');
     let offset = 0;
-    for (let i = 0; i < Math.max(0, line - 1); i++) offset += (lines[i]?.length ?? 0) + 1;
-    offset += Math.max(0, Math.min((lines[line - 1]?.length ?? 0), column - 1));
+    for (let i = 0; i < Math.max(0, line - 1); i++)
+      offset += (lines[i]?.length ?? 0) + 1;
+    offset += Math.max(0, Math.min(lines[line - 1]?.length ?? 0, column - 1));
     this.textarea.focus();
     this.textarea.setSelectionRange(offset, offset);
-    const lineHeight = Number.parseFloat(getComputedStyle(this.textarea).lineHeight) || 20;
+    const lineHeight =
+      Number.parseFloat(getComputedStyle(this.textarea).lineHeight) || 20;
     this.textarea.scrollTop = Math.max(0, (line - 3) * lineHeight);
     this.syncScroll();
   }
 
   showApi(prefix = ''): void {
     const query = prefix.toLowerCase();
-    this.suggestions = SCRIPT_CONTEXT_API.filter((entry) =>
-      !query || entry.name.toLowerCase().includes(query) || entry.signature.toLowerCase().includes(query),
+    this.suggestions = SCRIPT_CONTEXT_API.filter(
+      (entry) =>
+        !query ||
+        entry.name.toLowerCase().includes(query) ||
+        entry.signature.toLowerCase().includes(query),
     ).slice(0, 12);
     this.suggestionIndex = 0;
     this.renderAutocomplete(false);
@@ -96,7 +122,9 @@ export class ScriptCodeEditor {
   private refresh(): void {
     this.highlight.innerHTML = highlightTypeScript(this.value);
     const count = Math.max(1, this.value.split('\n').length);
-    this.gutter.textContent = Array.from({ length: count }, (_, index) => String(index + 1)).join('\n');
+    this.gutter.textContent = Array.from({ length: count }, (_, index) =>
+      String(index + 1),
+    ).join('\n');
     this.syncScroll();
   }
 
@@ -109,7 +137,9 @@ export class ScriptCodeEditor {
     const cursor = this.textarea.selectionStart,
       before = this.value.slice(0, cursor),
       match = /ctx\.([A-Za-z0-9_.]*)$/.exec(before);
-    return match ? { start: cursor - match[1]!.length, prefix: match[1]! } : undefined;
+    return match
+      ? { start: cursor - match[1]!.length, prefix: match[1]! }
+      : undefined;
   }
 
   private updateAutocomplete(): void {
@@ -128,18 +158,23 @@ export class ScriptCodeEditor {
     if (!this.suggestions.length) return this.hideAutocomplete();
     this.autocomplete.hidden = false;
     this.suggestions.forEach((entry, index) => {
-      const row = node('button', index === this.suggestionIndex ? 'selected' : '');
+      const row = node(
+        'button',
+        index === this.suggestionIndex ? 'selected' : '',
+      );
       row.type = 'button';
       row.innerHTML = `<strong>${escape(entry.signature)}</strong><span>${escape(entry.description)}</span>`;
       row.onmousedown = (event) => event.preventDefault();
-      row.onclick = () => insertable ? this.acceptSuggestion(index) : undefined;
+      row.onclick = () =>
+        insertable ? this.acceptSuggestion(index) : undefined;
       row.title = entry.description;
       this.autocomplete.append(row);
     });
   }
 
   private acceptSuggestion(index = this.suggestionIndex): void {
-    const entry = this.suggestions[index], context = this.completionContext();
+    const entry = this.suggestions[index],
+      context = this.completionContext();
     if (!entry || !context) return;
     const cursor = this.textarea.selectionStart,
       insertion = entry.name;
@@ -166,7 +201,9 @@ export class ScriptCodeEditor {
       if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
         event.preventDefault();
         const direction = event.key === 'ArrowDown' ? 1 : -1;
-        this.suggestionIndex = (this.suggestionIndex + direction + this.suggestions.length) % this.suggestions.length;
+        this.suggestionIndex =
+          (this.suggestionIndex + direction + this.suggestions.length) %
+          this.suggestions.length;
         this.renderAutocomplete(!!this.completionContext());
         return;
       }
@@ -183,7 +220,8 @@ export class ScriptCodeEditor {
     }
     if (event.key === 'Tab') {
       event.preventDefault();
-      const start = this.textarea.selectionStart, end = this.textarea.selectionEnd;
+      const start = this.textarea.selectionStart,
+        end = this.textarea.selectionEnd;
       this.textarea.setRangeText('  ', start, end, 'end');
       this.refresh();
       for (const listener of this.inputListeners) listener();

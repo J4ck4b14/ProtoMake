@@ -7,7 +7,7 @@ import { InputService } from '@protomake/input';
 import { Physics2D } from '@protomake/physics2d/rapier';
 import {
   ScriptSystem,
-  ScriptBehaviour,
+  Behaviours,
   type ScriptModule,
   type ScriptContext,
 } from '@protomake/scripting';
@@ -29,6 +29,10 @@ function asset(path: string, code: string): AssetData {
     width: 0,
     height: 0,
   };
+}
+function firstBehaviour(editor: EditorModel, entity: string) {
+  const data = editor.world.read(editor.entity(entity), Behaviours)!;
+  return data.items[data.order[0]!]!;
 }
 it('compiles real TypeScript with literal inspector metadata and source-specific errors', () => {
   const source = readFileSync(
@@ -148,16 +152,14 @@ it('loads compiled modules and executes two independent project mechanics withou
 });
 it('applies exposed overrides and reports callback failures with entity and script context', async () => {
   const editor = new EditorModel(),
-    stable = editor.createEntity('Faulty'),
     script = asset('Test.ts', 'export default class Test {}');
+  editor.createEntity('Faulty');
   editor.project.assets.push(script);
-  editor.world.add(editor.entity(stable), ScriptBehaviour.type, {
-    script: script.id,
-    values: { speed: 4 },
-  });
+  editor.addScriptBehaviour(script.id, { speed: 4 });
   const physics = await Physics2D.create(editor.world, editor.project.physics),
     input = new InputService(editor.project.input);
-  let received = 0, illumination = -1;
+  let received = 0,
+    illumination = -1;
   class Behaviour {
     speed = 0;
     start(ctx: ScriptContext) {
@@ -201,7 +203,7 @@ it('remaps internal script entity references when duplicating multiple roots', (
     ),
     newPlayer = copied.find((e) => e.name === 'Player')!,
     newTrigger = copied.find((e) => e.name === 'Trigger')!;
-  expect(editor.world.read(newTrigger.id, ScriptBehaviour)?.values.target).toBe(
+  expect(firstBehaviour(editor, newTrigger.guid).values.target).toBe(
     newPlayer.guid,
   );
 });
@@ -211,10 +213,7 @@ it('dispatches enable/disable/destroy hooks once and leaves physics available du
     id = editor.createEntity(),
     script = asset('Lifecycle.ts', 'export default class {}');
   editor.project.assets.push(script);
-  editor.world.add(editor.entity(id), ScriptBehaviour.type, {
-    script: script.id,
-    values: {},
-  });
+  editor.addScriptBehaviour(script.id);
   const calls: string[] = [];
   class Lifecycle {
     awake() {
@@ -264,13 +263,26 @@ it('dispatches enable/disable/destroy hooks once and leaves physics available du
 });
 
 it('validates rich Inspector metadata without executing project code', () => {
-  const fields = scriptFields(`
+  const fields = scriptFields(
+    `
     export const fields = {
       speed: { type: 'number', default: 4, label: 'Move speed', help: 'Units per second', min: 0, max: 20, step: 0.5 },
       stance: { type: 'string', default: 'patrol', options: ['patrol', 'alert'] },
     } as const;
-  `, 'Guard.ts');
-  expect(fields.speed).toMatchObject({ label: 'Move speed', min: 0, max: 20, step: 0.5 });
+  `,
+    'Guard.ts',
+  );
+  expect(fields.speed).toMatchObject({
+    label: 'Move speed',
+    min: 0,
+    max: 20,
+    step: 0.5,
+  });
   expect(fields.stance?.options).toEqual(['patrol', 'alert']);
-  expect(() => scriptFields(`export const fields = { speed: { type: 'number', default: 1, min: 2, max: 1 } }`, 'Bad.ts')).toThrow(/min must not exceed max/);
+  expect(() =>
+    scriptFields(
+      `export const fields = { speed: { type: 'number', default: 1, min: 2, max: 1 } }`,
+      'Bad.ts',
+    ),
+  ).toThrow(/min must not exceed max/);
 });

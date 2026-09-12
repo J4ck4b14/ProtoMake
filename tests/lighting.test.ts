@@ -47,8 +47,7 @@ it('canonicalizes the briefly shipped camelCase shadow-caster id', () => {
   authored.addComponent(ShadowCaster2D.type);
   const legacy = structuredClone(authored.project),
     wall = legacy.scenes[0]!.entities.find((entity) => entity.id === wallId)!;
-  wall.components['protomake.shadowCaster'] =
-    wall.components[ShadowCaster2D.type]!;
+  wall.components['protomake.shadowCaster'] = wall.components[ShadowCaster2D.type]!;
   delete wall.components[ShadowCaster2D.type];
 
   const reopened = new EditorModel();
@@ -129,8 +128,20 @@ it('respects receiver channels and partial shadow opacity for gameplay samples',
   m.world.setLocalMatrix(m.entity(wall), compose(50, 0));
 
   expect(sampleLighting(m.world, 100, 0, undefined, 'World').intensity).toBe(0);
-  const exposed = sampleLighting(m.world, -100, 0, undefined, 'Characters').intensity,
-    shadowed = sampleLighting(m.world, 100, 0, undefined, 'Characters').intensity;
+  const exposed = sampleLighting(
+      m.world,
+      -100,
+      0,
+      undefined,
+      'Characters',
+    ).intensity,
+    shadowed = sampleLighting(
+      m.world,
+      100,
+      0,
+      undefined,
+      'Characters',
+    ).intensity;
   expect(exposed).toBeGreaterThan(0);
   expect(shadowed).toBeGreaterThan(0);
   expect(shadowed).toBeLessThan(exposed);

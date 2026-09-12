@@ -15,6 +15,9 @@ it('generic inspector edits and adds/removes a real component', () => {
   name.value = 'Renamed';
   name.dispatchEvent(new Event('change'));
   expect(model.world.get(model.entity(id)).name).toBe('Renamed');
+  host.querySelector<HTMLSelectElement>(
+    '[aria-label="Component type"]',
+  )!.value = 'editor.note';
   [...host.querySelectorAll('button')]
     .find((b) => b.textContent === 'Add component')!
     .click();

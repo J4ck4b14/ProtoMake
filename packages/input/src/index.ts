@@ -7,7 +7,12 @@ const BindingSchema = z
   );
 export const InputActionSchema = z.strictObject({
   name: z.string().min(1),
+  map: z.string().min(1).default('Gameplay'),
   kind: z.enum(['button', 'axis', 'vector2']),
+  sensitivity: z.number().finite().positive().default(1),
+  deadZone: z.number().finite().min(0).max(0.95).default(0.15),
+  invertX: z.boolean().default(false),
+  invertY: z.boolean().default(false),
   positiveX: z.array(BindingSchema),
   negativeX: z.array(BindingSchema),
   positiveY: z.array(BindingSchema),
@@ -24,7 +29,12 @@ export function defaultInput(): InputAction[] {
   return [
     {
       name: 'Move',
+      map: 'Gameplay',
       kind: 'vector2',
+      sensitivity: 1,
+      deadZone: 0.15,
+      invertX: false,
+      invertY: false,
       positiveX: ['KeyD', 'ArrowRight', 'GamepadAxis0+'],
       negativeX: ['KeyA', 'ArrowLeft', 'GamepadAxis0-'],
       positiveY: ['KeyS', 'ArrowDown', 'GamepadAxis1+'],
@@ -32,7 +42,12 @@ export function defaultInput(): InputAction[] {
     },
     {
       name: 'Jump',
+      map: 'Gameplay',
       kind: 'button',
+      sensitivity: 1,
+      deadZone: 0.15,
+      invertX: false,
+      invertY: false,
       positiveX: ['Space', 'GamepadButton0'],
       negativeX: [],
       positiveY: [],
@@ -40,7 +55,12 @@ export function defaultInput(): InputAction[] {
     },
     {
       name: 'Interact',
+      map: 'Gameplay',
       kind: 'button',
+      sensitivity: 1,
+      deadZone: 0.15,
+      invertX: false,
+      invertY: false,
       positiveX: ['KeyE', 'Mouse0', 'GamepadButton2'],
       negativeX: [],
       positiveY: [],
@@ -54,6 +74,11 @@ export class InputService {
   private pressed = new Set<string>();
   private previous = new Set<string>();
   private vectors = new Map<string, readonly [number, number]>();
+  private readonly disabledMaps = new Set<string>();
+  private pointerPosition: readonly [number, number] = [0, 0];
+  private pointerKnown = false;
+  private pointerDeltaValue: readonly [number, number] = [0, 0];
+  private wheelValue = 0;
   private remove: (() => void) | undefined;
   constructor(readonly actions: readonly InputAction[]) {
     InputMapSchema.parse(actions);
@@ -80,17 +105,33 @@ export class InputService {
     const up = (e: KeyboardEvent) => this.keys.delete(e.code);
     const mouseDown = (e: MouseEvent) => this.keys.add(`Mouse${e.button}`),
       mouseUp = (e: MouseEvent) => this.keys.delete(`Mouse${e.button}`),
+      mouseMove = (e: MouseEvent) => {
+        if (this.pointerKnown)
+          this.pointerDeltaValue = [
+            this.pointerDeltaValue[0] + e.clientX - this.pointerPosition[0],
+            this.pointerDeltaValue[1] + e.clientY - this.pointerPosition[1],
+          ];
+        this.pointerPosition = [e.clientX, e.clientY];
+        this.pointerKnown = true;
+      },
+      wheel = (e: WheelEvent) => {
+        this.wheelValue += e.deltaY;
+      },
       blur = () => this.clear();
     target.addEventListener('keydown', down);
     target.addEventListener('keyup', up);
     target.addEventListener('mousedown', mouseDown);
     target.addEventListener('mouseup', mouseUp);
+    target.addEventListener('mousemove', mouseMove);
+    target.addEventListener('wheel', wheel);
     target.addEventListener('blur', blur);
     this.remove = () => {
       target.removeEventListener('keydown', down);
       target.removeEventListener('keyup', up);
       target.removeEventListener('mousedown', mouseDown);
       target.removeEventListener('mouseup', mouseUp);
+      target.removeEventListener('mousemove', mouseMove);
+      target.removeEventListener('wheel', wheel);
       target.removeEventListener('blur', blur);
     };
   }
@@ -101,7 +142,7 @@ export class InputService {
   }
   sample(gamepads: readonly (Gamepad | null)[] = []): void {
     this.pressed.clear();
-    const value = (binding: string): number => {
+    const value = (binding: string, deadZone: number): number => {
       if (this.keys.has(binding)) return 1;
       let match = /^GamepadButton(\d+)$/.exec(binding);
       if (match)
@@ -121,20 +162,29 @@ export class InputService {
             .filter((p) => p?.connected)
             .map((p) => {
               const v = (p!.axes[axis] ?? 0) * sign;
-              return v > 0.15 ? (v - 0.15) / 0.85 : 0;
+              return v > deadZone ? (v - deadZone) / (1 - deadZone) : 0;
             }),
         );
       }
       return 0;
     };
-    const max = (bindings: readonly string[]) =>
-      Math.max(0, ...bindings.map(value));
     for (const action of this.actions) {
+      if (this.disabledMaps.has(action.map)) {
+        this.vectors.set(action.name, [0, 0]);
+        continue;
+      }
+      const max = (bindings: readonly string[]) =>
+        Math.max(
+          0,
+          ...bindings.map((binding) => value(binding, action.deadZone)),
+        );
       let x = max(action.positiveX) - max(action.negativeX),
         y =
           action.kind === 'vector2'
             ? max(action.positiveY) - max(action.negativeY)
             : 0;
+      x *= action.sensitivity * (action.invertX ? -1 : 1);
+      y *= action.sensitivity * (action.invertY ? -1 : 1);
       const length = Math.hypot(x, y);
       if (length > 1) {
         x /= length;
@@ -146,6 +196,8 @@ export class InputService {
   }
   endFrame(): void {
     this.previous = new Set(this.pressed);
+    this.pointerDeltaValue = [0, 0];
+    this.wheelValue = 0;
   }
   getVector(name: string): readonly [number, number] {
     this.require(name);
@@ -164,6 +216,24 @@ export class InputService {
   wasReleased(name: string): boolean {
     return !this.isPressed(name) && this.previous.has(name);
   }
+  setMapEnabled(map: string, enabled: boolean): void {
+    if (!this.actions.some((action) => action.map === map))
+      throw new Error(`Unknown input map: ${map}`);
+    if (enabled) this.disabledMaps.delete(map);
+    else this.disabledMaps.add(map);
+  }
+  isMapEnabled(map: string): boolean {
+    return !this.disabledMaps.has(map);
+  }
+  get pointerScreenPosition(): readonly [number, number] {
+    return this.pointerPosition;
+  }
+  get pointerDelta(): readonly [number, number] {
+    return this.pointerDeltaValue;
+  }
+  get pointerWheel(): number {
+    return this.wheelValue;
+  }
   private require(name: string): void {
     if (!this.actions.some((a) => a.name === name))
       throw new Error(`Unknown input action: ${name}`);
@@ -173,6 +243,9 @@ export class InputService {
     this.pressed.clear();
     this.previous.clear();
     this.vectors.clear();
+    this.pointerDeltaValue = [0, 0];
+    this.wheelValue = 0;
+    this.pointerKnown = false;
   }
   detach(): void {
     this.remove?.();

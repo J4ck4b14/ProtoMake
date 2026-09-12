@@ -17,7 +17,13 @@ function rgb(value: string): [number, number, number] {
 }
 
 function color(values: readonly number[]): string {
-  return `#${values.map((v) => Math.round(Math.min(255, Math.max(0, v))).toString(16).padStart(2, '0')).join('')}`;
+  return `#${values
+    .map((v) =>
+      Math.round(Math.min(255, Math.max(0, v)))
+        .toString(16)
+        .padStart(2, '0'),
+    )
+    .join('')}`;
 }
 
 function mix(a: string, b: string, amount: number): string {
@@ -50,10 +56,18 @@ export function automaticText(background: string): '#101820' | '#ffffff' {
 
 export function loadAppearance(): EditorAppearance {
   try {
-    const parsed = JSON.parse(localStorage.getItem(key) ?? '{}') as Partial<EditorAppearance>;
+    const parsed = JSON.parse(
+      localStorage.getItem(key) ?? '{}',
+    ) as Partial<EditorAppearance>;
     return {
-      accent: parsed.accent && hex.test(parsed.accent) ? parsed.accent : defaultAppearance.accent,
-      surface: parsed.surface && hex.test(parsed.surface) ? parsed.surface : defaultAppearance.surface,
+      accent:
+        parsed.accent && hex.test(parsed.accent)
+          ? parsed.accent
+          : defaultAppearance.accent,
+      surface:
+        parsed.surface && hex.test(parsed.surface)
+          ? parsed.surface
+          : defaultAppearance.surface,
     };
   } catch {
     return { ...defaultAppearance };
@@ -71,11 +85,42 @@ export function applyAppearance(value: EditorAppearance, persist = true): void {
   root.style.setProperty('--protomake-accent-text', accentText);
   root.style.setProperty('--protomake-surface', value.surface);
   root.style.setProperty('--protomake-surface-text', surfaceText);
-  root.style.setProperty('--protomake-panel', mix(value.surface, darkSurface ? '#ffffff' : '#000000', darkSurface ? 0.06 : 0.05));
-  root.style.setProperty('--protomake-panel-raised', mix(value.surface, darkSurface ? '#ffffff' : '#000000', darkSurface ? 0.11 : 0.09));
-  root.style.setProperty('--protomake-control', mix(value.surface, darkSurface ? '#ffffff' : '#000000', darkSurface ? 0.15 : 0.13));
-  root.style.setProperty('--protomake-border', mix(value.surface, darkSurface ? '#ffffff' : '#000000', darkSurface ? 0.24 : 0.22));
-  root.style.setProperty('--protomake-muted', mix(surfaceText, value.surface, 0.38));
+  root.style.setProperty(
+    '--protomake-panel',
+    mix(
+      value.surface,
+      darkSurface ? '#ffffff' : '#000000',
+      darkSurface ? 0.06 : 0.05,
+    ),
+  );
+  root.style.setProperty(
+    '--protomake-panel-raised',
+    mix(
+      value.surface,
+      darkSurface ? '#ffffff' : '#000000',
+      darkSurface ? 0.11 : 0.09,
+    ),
+  );
+  root.style.setProperty(
+    '--protomake-control',
+    mix(
+      value.surface,
+      darkSurface ? '#ffffff' : '#000000',
+      darkSurface ? 0.15 : 0.13,
+    ),
+  );
+  root.style.setProperty(
+    '--protomake-border',
+    mix(
+      value.surface,
+      darkSurface ? '#ffffff' : '#000000',
+      darkSurface ? 0.24 : 0.22,
+    ),
+  );
+  root.style.setProperty(
+    '--protomake-muted',
+    mix(surfaceText, value.surface, 0.38),
+  );
   root.style.colorScheme = darkSurface ? 'dark' : 'light';
   if (persist) {
     try {
