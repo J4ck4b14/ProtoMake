@@ -46,6 +46,7 @@ export default defineConfig({
           'physics2d',
           'input',
           'scripting',
+          'graphs',
           'renderer',
         ].map((name) => [
           `@protomake/${name}`,

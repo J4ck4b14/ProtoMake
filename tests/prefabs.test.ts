@@ -16,7 +16,9 @@ import { guid } from '@protomake/core';
 import { validateProject } from '@protomake/serialization';
 function behaviour(m: EditorModel, entity: string): ScriptBehaviourData {
   const data = m.world.read(m.entity(entity), Behaviours)!;
-  return data.items[data.order[0]!]!;
+  const item = data.items[data.order[0]!]!;
+  if (item.kind !== 'script') throw new Error('Expected script behaviour');
+  return item;
 }
 function setup() {
   const m = new EditorModel(),

@@ -28,6 +28,7 @@
       "@protomake/physics2d/rapier": ["./packages/physics2d/src/rapier.ts"],
       "@protomake/scripting": ["./packages/scripting/src/index.ts"],
       "@protomake/scripting/compiler": ["./packages/scripting/src/compiler.ts"],
+      "@protomake/graphs": ["./packages/graphs/src/index.ts"],
       "@protomake/prefabs": ["./packages/prefabs/src/index.ts"],
       "@protomake/animation": ["./packages/animation/src/index.ts"],
       "@protomake/audio": ["./packages/audio/src/index.ts"],

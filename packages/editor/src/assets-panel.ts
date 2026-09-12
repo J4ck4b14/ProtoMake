@@ -17,6 +17,8 @@ import { EditorModel } from './model';
 import type { SceneViewport } from './viewport';
 import { node, button, ask } from './dom';
 import { showScripts } from './scripts-panel';
+import { editBehaviourGraph } from './graph-editor';
+import { GRAPH_MIME } from '@protomake/graphs';
 export class AssetsPanel {
   private folder = 'Assets';
   private selected: string | undefined;
@@ -133,6 +135,12 @@ export class AssetsPanel {
     actions.append(
       button('Import files', () => file.click()),
       button('+ Script', () => showScripts(this.model, this.report)),
+      button('+ Graph', () => editBehaviourGraph(this.model, this.report)),
+      button('Edit graph', () =>
+        this.run(() =>
+          editBehaviourGraph(this.model, this.report, this.selected),
+        ),
+      ),
       button('Edit script', () =>
         this.run(() => {
           const asset = this.model.project.assets.find(
@@ -282,11 +290,13 @@ export class AssetsPanel {
             showScripts(this.model, this.report, asset.id);
           else if (asset.mime === CLIP_MIME || asset.mime === CONTROLLER_MIME)
             editMedia(this.model, asset.mime, asset.id);
+          else if (asset.mime === GRAPH_MIME)
+            editBehaviourGraph(this.model, this.report, asset.id);
         });
       b.title =
         asset.path +
         (asset.mime === 'text/typescript' ||
-        [CLIP_MIME, CONTROLLER_MIME].includes(asset.mime)
+        [CLIP_MIME, CONTROLLER_MIME, GRAPH_MIME].includes(asset.mime)
           ? ' · Double-click to edit'
           : '');
       b.draggable = !this.model.locked;

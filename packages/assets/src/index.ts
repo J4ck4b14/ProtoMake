@@ -24,6 +24,7 @@ export const AssetSchema = z
       'application/x-protomake-prefab',
       'application/x-protomake-animation',
       'application/x-protomake-animator',
+      'application/x-protomake-behaviour-graph',
       'audio/wav',
       'audio/mpeg',
       'audio/ogg',

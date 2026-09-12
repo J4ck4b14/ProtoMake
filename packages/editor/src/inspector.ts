@@ -13,6 +13,7 @@ import {
 } from './prefab-actions';
 import { scriptFields } from '@protomake/scripting/compiler';
 import { Behaviours } from '@protomake/scripting';
+import { BehaviourGraphSchema, GRAPH_MIME } from '@protomake/graphs';
 import { Tags, TransformComponent, decompose } from '@protomake/core';
 import { EditorModel, getPath } from './model';
 import { node, button, input } from './dom';
@@ -22,6 +23,7 @@ export class Inspector {
     private readonly model: EditorModel,
     private readonly run: (action: () => void) => void,
     private readonly openScript?: (assetId: string) => void,
+    private readonly openGraph?: (assetId: string) => void,
   ) {}
   render(): void {
     const model = this.model;
@@ -392,40 +394,113 @@ export class Inspector {
       header = node('div', 'component-header'),
       scripts = this.model.project.assets.filter(
         (asset) => asset.mime === 'text/typescript',
+      ),
+      graphs = this.model.project.assets.filter(
+        (asset) => asset.mime === GRAPH_MIME,
       );
     header.append(node('h3', '', 'Behaviours'));
+    if (scripts[0])
+      header.append(
+        button('+ Script', () =>
+          this.run(() => this.model.addScriptBehaviour(scripts[0]!.id)),
+        ),
+      );
+    if (graphs[0])
+      header.append(
+        button('+ Graph', () =>
+          this.run(() => this.model.addGraphBehaviour(graphs[0]!.id)),
+        ),
+      );
     section.append(header);
     for (const id of behaviours.order) {
       const item = behaviours.items[id]!,
         card = node('article', 'behaviour-card'),
         cardHeader = node('div', 'component-header'),
         enabled = input('Enabled', '', 'checkbox'),
-        select = node('select');
+        select = node('select'),
+        assets = item.kind === 'script' ? scripts : graphs,
+        assetId = item.kind === 'script' ? item.script : item.graph;
       enabled.input.checked = item.enabled;
       enabled.input.onchange = () =>
         this.run(() =>
           this.model.setBehaviourProperty(id, 'enabled', enabled.input.checked),
         );
-      select.setAttribute('aria-label', 'Behaviour script');
-      select.append(new Option('Select script', ''));
-      for (const script of scripts)
-        select.append(new Option(script.path, script.id));
-      select.value = item.script;
+      select.setAttribute(
+        'aria-label',
+        item.kind === 'script' ? 'Behaviour script' : 'Behaviour graph',
+      );
+      select.append(
+        new Option(
+          item.kind === 'script' ? 'Select script' : 'Select graph',
+          '',
+        ),
+      );
+      for (const asset of assets)
+        select.append(new Option(asset.path, asset.id));
+      select.value = assetId;
       select.onchange = () =>
-        this.run(() => this.model.replaceBehaviourScript(id, select.value));
+        this.run(() =>
+          item.kind === 'script'
+            ? this.model.replaceBehaviourScript(id, select.value)
+            : this.model.replaceBehaviourGraph(id, select.value),
+        );
       cardHeader.append(
         node(
           'strong',
           '',
-          scripts
-            .find((script) => script.id === item.script)
+          assets
+            .find((asset) => asset.id === assetId)
             ?.path.split('/')
-            .at(-1) ?? 'Script Behaviour',
+            .at(-1) ??
+            (item.kind === 'script' ? 'Script Behaviour' : 'Graph Behaviour'),
         ),
         button('Remove', () => this.run(() => this.model.removeBehaviour(id))),
       );
       card.append(cardHeader, enabled.row, select);
-      const script = scripts.find((candidate) => candidate.id === item.script);
+      const attached = assets.find((candidate) => candidate.id === assetId);
+      if (item.kind === 'graph' && attached) {
+        if (this.openGraph)
+          card.append(
+            button(`Open graph · ${attached.path.split('/').at(-1)}`, () =>
+              this.openGraph?.(attached.id),
+            ),
+          );
+        try {
+          const graph = BehaviourGraphSchema.parse(JSON.parse(attached.data));
+          for (const [name, variable] of Object.entries(graph.variables)) {
+            const value = item.values[name] ?? variable.default,
+              control = input(
+                name,
+                Array.isArray(value) ? value.join(', ') : String(value ?? ''),
+                variable.type === 'number'
+                  ? 'number'
+                  : variable.type === 'boolean'
+                    ? 'checkbox'
+                    : 'text',
+              );
+            if (variable.type === 'boolean')
+              control.input.checked = Boolean(value);
+            control.input.onchange = () =>
+              this.run(() =>
+                this.model.setBehaviourProperty(
+                  id,
+                  `values.${name}`,
+                  variable.type === 'number'
+                    ? control.input.valueAsNumber
+                    : variable.type === 'boolean'
+                      ? control.input.checked
+                      : variable.type === 'vector2'
+                        ? control.input.value.split(',').map(Number)
+                        : control.input.value,
+                ),
+              );
+            card.append(control.row);
+          }
+        } catch (error) {
+          card.append(node('p', 'error', String(error)));
+        }
+      }
+      const script = item.kind === 'script' ? attached : undefined;
       if (script) {
         if (this.openScript)
           card.append(
@@ -516,7 +591,11 @@ export class Inspector {
     }
     if (!behaviours.order.length)
       section.append(
-        node('p', 'empty', 'Attach scripts from the Scripts workspace.'),
+        node(
+          'p',
+          'empty',
+          'Attach TypeScript or Graph Behaviours from the project browser.',
+        ),
       );
     this.host.append(section);
   }

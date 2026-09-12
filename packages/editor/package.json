@@ -5,6 +5,7 @@
   "type": "module",
   "exports": "./src/index.ts",
   "dependencies": {
+    "@protomake/graphs": "0.1.0",
     "@protomake/core": "0.1.0",
     "@protomake/serialization": "0.1.0",
     "@protomake/runtime": "0.1.0",

@@ -24,6 +24,7 @@ import { showAccount } from './account-dialog';
 import { RecoveryManager } from './recovery';
 import type { RecoverySnapshot } from './storage';
 import { LIGHTING_CHANNELS, type LightingChannel } from '@protomake/renderer';
+import { editBehaviourGraph } from './graph-editor';
 applyAppearance(loadAppearance(), false);
 const model = new EditorModel(),
   storage = new ProjectStorage(),
@@ -110,8 +111,12 @@ const recovery = new RecoveryManager(model, storage, log);
 const viewport = new SceneViewport(canvas, model, (error) =>
     log(String(error), true),
   ),
-  inspector = new Inspector(inspectorBody, model, run, (assetId) =>
-    showScripts(model, log, assetId),
+  inspector = new Inspector(
+    inspectorBody,
+    model,
+    run,
+    (assetId) => showScripts(model, log, assetId),
+    (assetId) => editBehaviourGraph(model, log, assetId),
   ),
   play = new PlayMode(playHost, model, log, refresh);
 

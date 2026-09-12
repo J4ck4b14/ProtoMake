@@ -18,7 +18,11 @@ export class PlayMode {
         event.data.token !== this.token
       )
         return;
-      const data = event.data as { kind: string; message?: string };
+      const data = event.data as {
+        kind: string;
+        message?: string;
+        detail?: unknown;
+      };
       if (data.kind === 'ready')
         this.frame?.contentWindow?.postMessage(
           {
@@ -41,6 +45,10 @@ export class PlayMode {
       }
       if (data.kind === 'error')
         this.report(data.message ?? 'Runtime error', true);
+      if (data.kind === 'graph-trace')
+        window.dispatchEvent(
+          new CustomEvent('protomake-graph-trace', { detail: data.detail }),
+        );
     });
   }
   start(): void {

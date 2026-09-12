@@ -55,6 +55,9 @@ export interface RuntimeScriptServices {
   readonly tweens?: TweenService;
   readonly prefabs?: RuntimePrefabService;
   readonly coordinates?: CoordinateService;
+  readonly graphs?: {
+    create(graph: string, values: Readonly<Record<string, unknown>>): Behaviour;
+  };
 }
 export interface ScriptContext {
   setParameter(name: string, value: boolean | number, entity?: Guid): void;
@@ -153,7 +156,7 @@ interface Instance {
   id: Guid;
   owner: string;
   behaviourId: string;
-  script: string;
+  source: string;
   behaviour: Behaviour;
   active: boolean;
   started: boolean;
@@ -416,7 +419,7 @@ export class ScriptSystem implements System {
         );
     } catch (error) {
       throw new Error(
-        `Script ${instance.script}, entity ${instance.id}, ${hook}: ${String(error)}`,
+        `Behaviour ${instance.source}, entity ${instance.id}, ${hook}: ${String(error)}`,
         { cause: error },
       );
     }
@@ -428,44 +431,53 @@ export class ScriptSystem implements System {
         id = this.world.get(numeric).guid;
       for (const behaviourId of data.order) {
         const dataItem = data.items[behaviourId]!;
-        if (!dataItem.script) continue;
+        const source =
+          dataItem.kind === 'script' ? dataItem.script : dataItem.graph;
+        if (!source) continue;
         const owner = `${id}:${behaviourId}`;
         present.add(owner);
         let instance = this.instances.get(owner);
-        if (instance && instance.script !== dataItem.script) {
+        if (instance && instance.source !== `${dataItem.kind}:${source}`) {
           this.dispose(instance);
           instance = undefined;
         }
         if (!instance) {
-          const module = this.modules.get(dataItem.script),
-            fields = this.fields.get(dataItem.script);
-          if (!module || typeof module.default !== 'function' || !fields)
-            throw new Error(
-              `Entity ${this.world.get(numeric).name}: missing compiled script ${dataItem.script}`,
-            );
-          const behaviour = new module.default();
-          for (const [name, field] of Object.entries(fields)) {
-            const value = dataItem.values[name] ?? field.default;
-            const expected =
-              field.type === 'number'
-                ? 'number'
-                : field.type === 'boolean'
-                  ? 'boolean'
-                  : 'string';
-            if (typeof value !== expected)
-              throw new Error(`Invalid script property ${name}`);
-            if (
-              field.type === 'entity' &&
-              value !== '' &&
-              this.world.find(String(value)) === undefined
-            )
-              throw new Error(`Missing entity reference ${value} in ${name}`);
-            Object.defineProperty(behaviour, name, {
-              value,
-              writable: true,
-              enumerable: true,
-              configurable: true,
-            });
+          let behaviour: Behaviour;
+          if (dataItem.kind === 'script') {
+            const module = this.modules.get(dataItem.script),
+              fields = this.fields.get(dataItem.script);
+            if (!module || typeof module.default !== 'function' || !fields)
+              throw new Error(
+                `Entity ${this.world.get(numeric).name}: missing compiled script ${dataItem.script}`,
+              );
+            behaviour = new module.default();
+            for (const [name, field] of Object.entries(fields)) {
+              const value = dataItem.values[name] ?? field.default;
+              const expected =
+                field.type === 'number'
+                  ? 'number'
+                  : field.type === 'boolean'
+                    ? 'boolean'
+                    : 'string';
+              if (typeof value !== expected)
+                throw new Error(`Invalid script property ${name}`);
+              if (
+                field.type === 'entity' &&
+                value !== '' &&
+                this.world.find(String(value)) === undefined
+              )
+                throw new Error(`Missing entity reference ${value} in ${name}`);
+              Object.defineProperty(behaviour, name, {
+                value,
+                writable: true,
+                enumerable: true,
+                configurable: true,
+              });
+            }
+          } else {
+            const graphs = this.services.graphs;
+            if (!graphs) throw new Error('Behaviour Graph service unavailable');
+            behaviour = graphs.create(dataItem.graph, dataItem.values);
           }
           const context = this.context(
             id,
@@ -477,7 +489,7 @@ export class ScriptSystem implements System {
             id,
             owner,
             behaviourId,
-            script: dataItem.script,
+            source: `${dataItem.kind}:${source}`,
             behaviour,
             active: false,
             started: false,

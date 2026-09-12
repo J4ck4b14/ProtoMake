@@ -17,5 +17,6 @@ This file summarizes the development milestones represented by the Git commit gr
 | ProtoMake 0.9.2          | Corrected partial-shadow regression coverage and final certification metadata                                                                                                                             |
 | ProtoMake 0.9.3          | Explicit local-save/backup terminology, first-run storage guidance, relative-path production hosting, GitHub Pages deployment automation, repository-history documentation and public-alpha launch polish |
 | ProtoMake 0.10           | Multiple behaviours, TRS-first transforms, tags and runtime queries, prefab spawning, signals, timers, tweens, pointer/camera coordinates and visual Input Action authoring                               |
+| ProtoMake 0.11           | Versioned Behaviour Graphs, typed registered nodes, shared script/graph runtime services, visual graph authoring and Play Mode execution traces                                                           |
 
 For the difference between published commits and local reflogs, see [docs/git-history.md](docs/git-history.md).

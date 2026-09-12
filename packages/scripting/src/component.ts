@@ -12,10 +12,22 @@ const ScriptSchema = z.strictObject({
   ),
 });
 export type ScriptBehaviourData = z.infer<typeof ScriptSchema>;
+const GraphSchema = z.strictObject({
+  id: behaviourId,
+  kind: z.literal('graph'),
+  enabled: z.boolean(),
+  graph: z.string(),
+  values: z.record(z.string(), z.json()),
+});
+export type GraphBehaviourData = z.infer<typeof GraphSchema>;
+const BehaviourSchema = z.discriminatedUnion('kind', [
+  ScriptSchema,
+  GraphSchema,
+]);
 const BehavioursSchema = z
   .strictObject({
     order: z.array(behaviourId),
-    items: z.record(z.string(), ScriptSchema),
+    items: z.record(z.string(), BehaviourSchema),
   })
   .superRefine((value, context) => {
     const ids = Object.keys(value.items);
@@ -49,6 +61,20 @@ export function scriptBehaviour(
     kind: 'script',
     enabled: true,
     script,
+    values,
+  });
+}
+
+export function graphBehaviour(
+  id: string,
+  graph = '',
+  values: GraphBehaviourData['values'] = {},
+): GraphBehaviourData {
+  return GraphSchema.parse({
+    id,
+    kind: 'graph',
+    enabled: true,
+    graph,
     values,
   });
 }

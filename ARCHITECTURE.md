@@ -2,21 +2,22 @@
 
 ## Dependency ownership
 
-| Package                | Dependencies                                                         | Responsibility                                                                   |
-| ---------------------- | -------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
-| `@protomake/core`          | None                                                                 | Identity, component registry/stores, world/hierarchy, math, events               |
-| `@protomake/assets`        | Core, Zod                                                            | Asset records, GUID/path indexes, import/dependency checks                       |
-| `@protomake/input`         | Zod                                                                  | Action schemas and keyboard/mouse/gamepad state                                  |
-| `@protomake/runtime`       | Core                                                                 | Time, ordered lifecycle, signals, timers and tweens                              |
-| `@protomake/physics2d`     | Core, runtime types, Zod, Rapier adapter                             | Physics configuration, components and simulation                                 |
-| `@protomake/renderer`      | Core, assets, Zod, Pixi adapter                                      | Sprite/camera data and rendering contract                                        |
-| `@protomake/serialization` | Core, assets, physics/input/prefab/animation/audio schemas, Zod      | Strict project/scene validation and migrations                                   |
-| `@protomake/scripting`     | Core, runtime, assets, input/physics types, TypeScript compiler, Zod | Script data, compilation/linking and behavior lifecycle                          |
-| `@protomake/prefabs`       | Core, Zod                                                            | Linked hierarchy identity, property patches and propagation                      |
-| `@protomake/animation`     | Core, assets, runtime types, renderer, Zod                           | Clips, controllers, parameter evaluation and playback                            |
-| `@protomake/audio`         | Core, assets, runtime types, Zod                                     | AudioSource, decoded buffers and Web Audio bus routing                           |
-| `@protomake/player`        | Runtime engine packages                                              | Shared GameSession composition and standalone player                             |
-| `@protomake/editor`        | Public engine packages                                               | Authoring model, viewport, Inspector, persistence, project scripts and Play host |
+| Package                | Dependencies                                                          | Responsibility                                                                   |
+| ---------------------- | --------------------------------------------------------------------- | -------------------------------------------------------------------------------- |
+| `@protomake/core`          | None                                                                  | Identity, component registry/stores, world/hierarchy, math, events               |
+| `@protomake/assets`        | Core, Zod                                                             | Asset records, GUID/path indexes, import/dependency checks                       |
+| `@protomake/input`         | Zod                                                                   | Action schemas and keyboard/mouse/gamepad state                                  |
+| `@protomake/runtime`       | Core                                                                  | Time, ordered lifecycle, signals, timers and tweens                              |
+| `@protomake/physics2d`     | Core, runtime types, Zod, Rapier adapter                              | Physics configuration, components and simulation                                 |
+| `@protomake/renderer`      | Core, assets, Zod, Pixi adapter                                       | Sprite/camera data and rendering contract                                        |
+| `@protomake/serialization` | Core, assets, physics/input/prefab/animation/audio/graph schemas, Zod | Strict project/scene validation and migrations                                   |
+| `@protomake/scripting`     | Core, runtime, assets, input/physics types, TypeScript compiler, Zod  | Script data, compilation/linking and behavior lifecycle                          |
+| `@protomake/graphs`        | Core, assets, scripting/physics types, Zod                            | Behaviour Graph schema, typed node registry and shared-context execution         |
+| `@protomake/prefabs`       | Core, Zod                                                             | Linked hierarchy identity, property patches and propagation                      |
+| `@protomake/animation`     | Core, assets, runtime types, renderer, Zod                            | Clips, controllers, parameter evaluation and playback                            |
+| `@protomake/audio`         | Core, assets, runtime types, Zod                                      | AudioSource, decoded buffers and Web Audio bus routing                           |
+| `@protomake/player`        | Runtime engine packages                                               | Shared GameSession composition and standalone player                             |
+| `@protomake/editor`        | Public engine packages                                                | Authoring model, viewport, Inspector, persistence, project scripts and Play host |
 
 The import-boundary checker runs during lint. Adapter and compiler subpaths keep schema contracts distinct from implementation. Editor UI is DOM; game rendering is Pixi. Core/runtime have no editor DOM knowledge. The Play host coordinates rendering, simulation, scripting and input without implementing those systems itself.
 
@@ -44,7 +45,7 @@ The host passes seconds to `Engine.tick`; no hidden animation-frame singleton ex
 
 Component parsers and inspector metadata are explicit. The serializer validates envelopes and invokes registered schemas. Unknown components fail rather than disappearing. Physics/rendering/scripting components are registered by the editor without game-specific core logic.
 
-Project TS source stays in authored assets and executes on Play only. `protomake.behaviours` stores ordered, identity-keyed slots so each script has independent enable state, values and lifecycle. Runtime services are owner-scoped; destroying a behaviour removes its signal listeners, timers and tweens. Static field metadata is parsed without evaluation. See docs/scripting.md for compiler and trust limits.
+Project TS source and Behaviour Graph data stay in authored assets and execute on Play only. `protomake.behaviours` stores ordered, identity-keyed slots so each TypeScript or Graph Behaviour has independent enable state, values and lifecycle. Both forms receive the same `ScriptContext`; registered graph nodes cannot introduce a parallel service layer. Runtime services are owner-scoped, so destroying a behaviour removes its signal listeners, timers and tweens. Static script field metadata is parsed without evaluation. See docs/scripting.md and docs/visual-logic-0.11.md for authoring and trust limits.
 
 ## Editor mutations
 

@@ -4,7 +4,9 @@ import { captureOverrides } from './prefab-actions';
 import { scriptFields } from '@protomake/scripting/compiler';
 import {
   Behaviours,
+  graphBehaviour,
   scriptBehaviour,
+  type GraphBehaviourData,
   type ScriptBehaviourData,
 } from '@protomake/scripting';
 import {
@@ -356,8 +358,11 @@ export class EditorModel {
           if (type === Behaviours.type) {
             const behaviours = Behaviours.schema.parse(data);
             for (const behaviourId of behaviours.order) {
-              const item = behaviours.items[behaviourId]!,
-                script = this.project.assets.find((a) => a.id === item.script);
+              const item = behaviours.items[behaviourId]!;
+              if (item.kind !== 'script') continue;
+              const script = this.project.assets.find(
+                (a) => a.id === item.script,
+              );
               if (script)
                 for (const [name, field] of Object.entries(
                   scriptFields(script.data, script.path),
@@ -435,6 +440,25 @@ export class EditorModel {
       }
     });
   }
+  addGraphBehaviour(
+    graph: string,
+    values: GraphBehaviourData['values'] = {},
+  ): void {
+    this.change('Add graph behaviour', () => {
+      for (const stable of this.selection) {
+        const entity = this.entity(stable),
+          id = guid(),
+          current =
+            this.world.read(entity, Behaviours) ?? Behaviours.defaults(),
+          next = structuredClone(current);
+        next.order.push(id);
+        next.items[id] = graphBehaviour(id, graph, values);
+        if (this.world.components(entity).has(Behaviours.type))
+          this.world.set(entity, Behaviours.type, next);
+        else this.world.add(entity, Behaviours.type, next);
+      }
+    });
+  }
   removeBehaviour(id: string): void {
     this.change('Remove behaviour', () => {
       for (const stable of this.selection) {
@@ -465,10 +489,27 @@ export class EditorModel {
       for (const stable of this.selection) {
         const entity = this.entity(stable),
           current = this.world.read(entity, Behaviours);
-        if (!current?.items[id]) continue;
+        if (!current?.items[id] || current.items[id].kind !== 'script')
+          continue;
         const next = structuredClone(current),
           item = next.items[id]!;
+        if (item.kind !== 'script') continue;
         item.script = script;
+        item.values = {};
+        this.world.set(entity, Behaviours.type, next);
+      }
+    });
+  }
+  replaceBehaviourGraph(id: string, graph: string): void {
+    this.change('Replace behaviour graph', () => {
+      for (const stable of this.selection) {
+        const entity = this.entity(stable),
+          current = this.world.read(entity, Behaviours);
+        if (!current?.items[id] || current.items[id].kind !== 'graph') continue;
+        const next = structuredClone(current),
+          item = next.items[id]!;
+        if (item.kind !== 'graph') continue;
+        item.graph = graph;
         item.values = {};
         this.world.set(entity, Behaviours.type, next);
       }

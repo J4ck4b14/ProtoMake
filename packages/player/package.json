@@ -18,6 +18,7 @@
     "@protomake/prefabs": "0.6.0",
     "@protomake/animation": "0.6.0",
     "@protomake/audio": "0.6.0",
-    "@protomake/assets": "0.2.0"
+    "@protomake/assets": "0.2.0",
+    "@protomake/graphs": "0.1.0"
   }
 }

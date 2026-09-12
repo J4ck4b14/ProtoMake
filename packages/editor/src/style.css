@@ -1166,3 +1166,163 @@ textarea {
   background: color-mix(in srgb, var(--protomake-panel), #000 7%);
   color: var(--protomake-surface-text) !important;
 }
+
+.graph-dialog {
+  width: min(1500px, 96vw);
+  height: 92vh;
+  padding: 0;
+  border: 1px solid #526476;
+  background: #111820;
+  color: #d9e2eb;
+}
+.graph-dialog::backdrop {
+  background: rgb(4 8 12 / 78%);
+}
+.graph-shell {
+  display: grid;
+  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  height: 100%;
+}
+.graph-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px;
+  background: #202d38;
+  border-bottom: 1px solid #3b4a58;
+}
+.graph-toolbar strong {
+  margin-right: auto;
+}
+.graph-toolbar input {
+  width: min(360px, 32vw);
+}
+.graph-palette {
+  position: absolute;
+  z-index: 8;
+  top: 48px;
+  left: 220px;
+  width: 330px;
+  max-height: 50vh;
+  padding: 6px;
+  overflow: auto;
+  background: #17232e;
+  border: 1px solid #526476;
+  box-shadow: 0 12px 32px rgb(0 0 0 / 45%);
+}
+.graph-palette button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  border: 0;
+  background: transparent;
+}
+.graph-viewport {
+  position: relative;
+  overflow: hidden;
+  background-color: #10171f;
+  background-image: radial-gradient(#344352 1px, transparent 1px);
+  background-size: 20px 20px;
+  touch-action: none;
+}
+.graph-surface,
+.graph-wires {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform-origin: 0 0;
+}
+.graph-wires {
+  overflow: visible;
+}
+.graph-wires path {
+  fill: none;
+  stroke: #e9a66a;
+  stroke-width: 3;
+  pointer-events: stroke;
+  cursor: pointer;
+}
+.graph-node {
+  position: absolute;
+  width: 190px;
+  border: 1px solid #526476;
+  border-radius: 6px;
+  overflow: hidden;
+  background: #1b2732;
+  box-shadow: 0 5px 14px rgb(0 0 0 / 35%);
+}
+.graph-group {
+  position: absolute;
+  z-index: -1;
+  padding: 8px;
+  border: 2px solid;
+  border-radius: 8px;
+  background: rgb(73 93 112 / 12%);
+}
+.graph-group .field {
+  margin: 0;
+}
+.graph-selection-box {
+  position: absolute;
+  border: 1px solid #ffbd7c;
+  background: rgb(255 189 124 / 12%);
+  pointer-events: none;
+}
+.graph-node.selected {
+  border-color: #ffbd7c;
+  box-shadow: 0 0 0 2px rgb(255 189 124 / 30%);
+}
+.graph-node.active {
+  border-color: #75e3ac;
+  box-shadow: 0 0 0 3px rgb(117 227 172 / 28%);
+}
+.graph-node > header {
+  height: 32px;
+  padding: 7px 10px;
+  background: #2b3c4c;
+  font-weight: 700;
+  cursor: grab;
+}
+.graph-node-body {
+  padding: 6px 0;
+}
+.graph-port {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 26px;
+  padding: 2px 7px;
+}
+.graph-port.output {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+.graph-socket {
+  width: 12px;
+  height: 12px;
+  min-height: 0;
+  padding: 0;
+  border-radius: 50%;
+  border-color: #aebdcc;
+  background: #111820;
+}
+.graph-socket.flow {
+  border-radius: 2px;
+  border-color: #fff;
+}
+.graph-socket.number {
+  border-color: #75c9a8;
+}
+.graph-socket.boolean {
+  border-color: #ef7890;
+}
+.graph-socket.vector2 {
+  border-color: #88a9ff;
+}
+.graph-status {
+  padding: 5px 10px;
+  background: #202d38;
+  color: #aebdcc;
+  border-top: 1px solid #3b4a58;
+}

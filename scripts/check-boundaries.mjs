@@ -20,6 +20,13 @@ const allowed = {
     'typescript',
     'zod',
   ],
+  graphs: [
+    '@protomake/assets',
+    '@protomake/core',
+    '@protomake/physics2d',
+    '@protomake/scripting',
+    'zod',
+  ],
   input: ['zod'],
   physics2d: [
     '@protomake/core',
@@ -37,6 +44,7 @@ const allowed = {
     '@protomake/assets',
     '@protomake/physics2d',
     '@protomake/input',
+    '@protomake/graphs',
     'zod',
   ],
   runtime: ['@protomake/core'],
@@ -52,6 +60,7 @@ const allowed = {
     '@protomake/animation',
     '@protomake/audio',
     '@protomake/assets',
+    '@protomake/graphs',
   ],
   editor: [
     '@protomake/player',
@@ -66,6 +75,7 @@ const allowed = {
     '@protomake/scripting',
     '@protomake/physics2d',
     '@protomake/input',
+    '@protomake/graphs',
   ],
 };
 let errors = 0;

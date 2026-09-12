@@ -12,13 +12,18 @@ import { AssetSchema, AssetDatabase, assetReferences } from '@protomake/assets';
 import { z } from 'zod';
 import { guid, type ComponentRegistry } from '@protomake/core';
 import {
+  BehaviourGraphSchema,
+  GRAPH_MIME,
+  coreNodeRegistry,
+} from '@protomake/graphs';
+import {
   GuidSchema,
   SceneSchema,
   deterministicJSON,
   validateScene,
 } from './scene';
 import { MigrationChain } from './migrations';
-export const PROJECT_SCHEMA_VERSION = 5;
+export const PROJECT_SCHEMA_VERSION = 6;
 export const ProjectSchema = z.strictObject({
   schemaVersion: z.literal(PROJECT_SCHEMA_VERSION),
   id: GuidSchema,
@@ -140,12 +145,17 @@ projectMigrations.register(4, (input) => {
   project.engineVersion = '0.10.0';
   return project;
 });
+projectMigrations.register(5, (input) => ({
+  ...(input as object),
+  schemaVersion: 6,
+  engineVersion: '0.11.0',
+}));
 export function createProject(name: string): ProjectData {
   return ProjectSchema.parse({
     schemaVersion: PROJECT_SCHEMA_VERSION,
     id: guid(),
     name,
-    engineVersion: '0.10.0',
+    engineVersion: '0.11.0',
     startupScene: null,
     scenes: [],
     assets: [],
@@ -164,6 +174,31 @@ export function validateProject(
     ids = new Set<string>();
   validateFolders(project);
   animationAssets(project.assets);
+  const graphRegistry = coreNodeRegistry();
+  for (const asset of project.assets)
+    if (asset.mime === GRAPH_MIME) {
+      const graph = BehaviourGraphSchema.parse(JSON.parse(asset.data)),
+        diagnostics = graphRegistry.validate(graph);
+      if (diagnostics.length)
+        throw new Error(
+          `${asset.path}: ${diagnostics.map((item) => item.message).join('; ')}`,
+        );
+      for (const node of graph.nodes)
+        if (node.type === 'prefab.spawn') {
+          const prefab = node.properties.prefab;
+          if (
+            prefab &&
+            (typeof prefab !== 'string' ||
+              !project.assets.some(
+                (candidate) =>
+                  candidate.id === prefab && candidate.mime === PREFAB_MIME,
+              ))
+          )
+            throw new Error(
+              `${asset.path}: missing prefab reference on ${node.id}`,
+            );
+        }
+    }
   const bases = new Map(
     project.assets
       .filter((a) => a.mime === PREFAB_MIME)
@@ -229,24 +264,26 @@ export function validateProject(
           data &&
           typeof data === 'object'
         ) {
-          const references =
+          const references: { id: unknown; mime: string }[] =
             'texture' in data
-              ? [data.texture]
+              ? [{ id: data.texture, mime: 'image' }]
               : 'items' in data && data.items && typeof data.items === 'object'
                 ? Object.values(data.items).map((item) =>
                     item && typeof item === 'object' && 'script' in item
-                      ? item.script
-                      : '',
+                      ? { id: item.script, mime: 'text/typescript' }
+                      : item && typeof item === 'object' && 'graph' in item
+                        ? { id: item.graph, mime: GRAPH_MIME }
+                        : { id: '', mime: '' },
                   )
                 : [];
           for (const reference of references)
-            if (reference) {
-              const asset = project.assets.find((a) => a.id === reference);
+            if (reference.id) {
+              const asset = project.assets.find((a) => a.id === reference.id);
               if (
                 asset &&
                 ((type === 'protomake.sprite' && asset.kind !== 'image') ||
                   (type === 'protomake.behaviours' &&
-                    asset.mime !== 'text/typescript'))
+                    asset.mime !== reference.mime))
               )
                 throw new Error(
                   `${scene.name}/${entity.name}: incompatible asset type on ${type}`,
@@ -275,23 +312,29 @@ export function validateProject(
           typeof data.items !== 'object'
         )
           return [];
-        return Object.values(data.items).flatMap((item) =>
-          item &&
-          typeof item === 'object' &&
-          'script' in item &&
-          typeof item.script === 'string' &&
-          item.script
+        return Object.values(data.items).flatMap((item) => {
+          if (!item || typeof item !== 'object') return [];
+          const record = item as Record<string, unknown>,
+            field =
+              'script' in record
+                ? 'script'
+                : 'graph' in record
+                  ? 'graph'
+                  : undefined,
+            asset =
+              field && typeof record[field] === 'string' ? record[field] : '';
+          return asset
             ? [
                 {
                   scene: scene.name,
                   entity: entity.name,
                   component: 'protomake.behaviours',
-                  path: `items.${'id' in item ? String(item.id) : 'unknown'}.script`,
-                  asset: item.script,
+                  path: `items.${'id' in item ? String(item.id) : 'unknown'}.${field}`,
+                  asset,
                 },
               ]
-            : [],
-        );
+            : [];
+        });
       }),
     ),
     missing = database.missing([

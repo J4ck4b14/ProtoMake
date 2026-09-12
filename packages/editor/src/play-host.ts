@@ -27,6 +27,16 @@ status.style.cssText =
 function send(kind: string, message?: string): void {
   parent.postMessage({ kind, token, message }, location.origin);
 }
+window.addEventListener('protomake-graph-trace', (event) => {
+  parent.postMessage(
+    {
+      kind: 'graph-trace',
+      token,
+      detail: (event as CustomEvent<unknown>).detail,
+    },
+    location.origin,
+  );
+});
 function report(error: unknown): void {
   send('error', String(error));
   status.textContent = String(error);

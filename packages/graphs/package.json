@@ -1,0 +1,16 @@
+{
+  "name": "@protomake/graphs",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@protomake/assets": "0.2.0",
+    "@protomake/core": "0.1.0",
+    "@protomake/physics2d": "0.3.0",
+    "@protomake/scripting": "0.4.0",
+    "zod": "4.3.6"
+  }
+}
