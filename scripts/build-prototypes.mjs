@@ -1,6 +1,8 @@
 import { execFileSync } from 'node:child_process';
-import { mkdir, copyFile } from 'node:fs/promises';
-for (const game of ['shooter', 'platformer', 'fighter']) {
+import { copyFile, mkdir, rm } from 'node:fs/promises';
+
+await rm('examples/prototypes/web', { recursive: true, force: true });
+for (const game of ['showcase', 'shooter', 'platformer', 'fighter']) {
   execFileSync(
     process.execPath,
     [
@@ -17,5 +19,5 @@ await copyFile(
   'examples/prototypes/web/index.html',
 );
 console.log(
-  'Three standalone games and launcher ready. Run npm run preview:prototypes.',
+  'The flagship showcase, three focused labs and launcher are ready. Run npm run preview:prototypes.',
 );

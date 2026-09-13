@@ -7,6 +7,20 @@ export interface TimeSnapshot {
   readonly alpha: number;
   readonly dropped: number;
 }
+
+/**
+ * Converts two browser frame timestamps into a safe engine delta.
+ *
+ * requestAnimationFrame timestamps can be fractionally older than a
+ * performance.now() value captured by a load/resume handler in the same
+ * refresh cycle. Treat that clock-boundary skew as a zero-length frame rather
+ * than faulting an otherwise healthy play session.
+ */
+export function frameDeltaSeconds(now: number, previous: number): number {
+  if (!Number.isFinite(now) || !Number.isFinite(previous)) return 0;
+  return Math.max(0, (now - previous) / 1000);
+}
+
 export class TimeService {
   private elapsed = 0;
   private fixedElapsed = 0;

@@ -4,11 +4,17 @@ A reusable, browser-native 2D engine and visual editor for human-authored projec
 
 **Milestones 0–7 and ProtoMake 0.9–0.16.3 are implemented.** ProtoMake 0.16.3 completes the portability series with a deterministic Unreal Engine 5 project and C++ plugin. Its Editor module imports source media, maps, actors/components, Paper2D sprites/flipbooks, 2D-plane physics, cameras, audio and Enhanced Input assets through supported engine facilities; its Runtime module executes the declared portable Behaviour Graph subset. ProtoMake never synthesizes `.uasset` files and does not use Unreal Python as a gameplay runtime. Godot 4 and Unity exports remain available from 0.16.1 and 0.16.2.
 
-## Three prototype workshop
+## Flagship showcase
+
+**The Luminous Vault** is a complete action-platforming vertical slice: static, mixed and dynamic ambient/point/spot/area lighting; melee and ranged combat; weapon inventory; hostile and friendly projectile pools; a two-stage crystal puzzle; platforming; pickups; UI; audio; animation; camera feedback; and an achievement. Every rule is an ordinary editable project script—there are no showcase-specific engine shortcuts.
+
+After installing dependencies, run `npm run dev`, then choose **Play showcase** to launch the game immediately or **Edit showcase** to inspect the project before pressing **Play**. `npm run build` also includes a standalone version at `/showcase/` for GitHub Pages.
+
+## Prototype workshop
 
 Read [ProtoMake-Prototype-Workshop.docx](docs/ProtoMake-Prototype-Workshop.docx) or its [Markdown source](docs/workshop.md). The 19-page guide explains reconstruction from a blank scene, exact entities/settings, scripts, tests, common mistakes and export.
 
-After installing dependencies, run `npm run preview:prototypes` to open the launcher for **Signal Patrol** (shooter), **Lantern Steps** (platformer) and **Sparring Room** (two-player local fighter). Complete editable JSON projects and raw images/audio/scripts are in [examples/prototypes](examples/prototypes/README.md). These builds are included in the release archive.
+Run `npm run build:prototypes` and `npm run preview:prototypes` to open the flagship plus three focused teaching labs: **Signal Patrol** (shooter), **Lantern Steps** (platformer) and **Sparring Room** (two-player local fighter). Complete editable JSON projects and raw images/audio/scripts are in [examples/prototypes](examples/prototypes/README.md).
 
 Animation tools include clip playback/scrubbing, a proportional frame timeline, an automatic state graph and transition priority editing. [Light 2D](docs/lighting.md) offers ambient, point, spot and rectangular area types, static/mixed/dynamic mobility, screen-space surface falloff and rectangle shadow casters. Existing projects without active lights keep their previous appearance. ProtoMake does not yet provide normal-map lighting or HDR/bloom.
 
@@ -94,7 +100,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 135 automated tests, with actual Rapier simulation, execution of compiled project modules, and deterministic Interchange/portability/Godot/Unity/Unreal-generation checks. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, target-engine import/compilation, audio behavior and input feel remain part of the manual acceptance checklist.
+The suite includes 137 automated tests, with actual Rapier simulation, execution of compiled project modules, and deterministic Interchange/portability/Godot/Unity/Unreal-generation checks. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, target-engine import/compilation, audio behavior and input feel remain part of the manual acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 

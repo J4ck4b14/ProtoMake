@@ -4,6 +4,7 @@ import type { ScriptModule, ScriptFields } from '@protomake/scripting';
 import { runtimeRegistry } from './registry';
 import { GameSession } from './session';
 import { createPersistentServices } from '@protomake/persistence';
+import { frameDeltaSeconds } from '@protomake/runtime';
 const overlay = document.getElementById('overlay')!,
   start = document.getElementById('start') as HTMLButtonElement,
   status = document.getElementById('status')!,
@@ -160,7 +161,7 @@ async function boot(): Promise<void> {
     });
     const frame = (now: number) => {
       try {
-        if (!loading) session?.tick((now - last) / 1000);
+        if (!loading) session?.tick(frameDeltaSeconds(now, last));
         if (pending && !loading) {
           const id = pending;
           pending = undefined;

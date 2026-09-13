@@ -14,6 +14,7 @@ import {
   createPersistentServices,
   type PersistentGameServices,
 } from '@protomake/persistence';
+import { frameDeltaSeconds } from '@protomake/runtime';
 const token = location.hash.slice(1),
   status = document.getElementById('status')!,
   host = document.getElementById('game')!;
@@ -224,7 +225,7 @@ for (const level of ['log', 'warn', 'error'] as const) {
 function frame(now: number): void {
   try {
     if (!loading) {
-      session?.tick((now - last) / 1000, debug);
+      session?.tick(frameDeltaSeconds(now, last), debug);
       if (session && now - lastInspection >= 200) {
         lastInspection = now;
         send('inspection', undefined, session.inspect());

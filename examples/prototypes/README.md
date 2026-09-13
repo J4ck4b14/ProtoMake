@@ -1,15 +1,26 @@
-# Three playable ProtoMake prototypes
+# ProtoMake flagship showcase and focused labs
 
-Run `npm ci`, then `npm run preview:prototypes`. Open the printed URL for the three-game launcher. Use `npm run dev` and Import JSON to edit a project.
+Run `npm ci`, then `npm run build:prototypes` and `npm run preview:prototypes`. Use `npm run dev` and the editor's **Edit showcase** button to inspect the flagship source project.
 
-| Game          | Editable project                 | Controls and objective                                                                                                 |
-| ------------- | -------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| Signal Patrol | shooter/shooter.protomake.json       | WASD/arrows move; Space/mouse fire right; destroy six drones; three hits lose; R restart                               |
-| Lantern Steps | platformer/platformer.protomake.json | A/D or arrows move; Space jump; collect four coins and reach the gate; checkpoint saves respawn; R restart             |
-| Sparring Room | fighter/fighter.protomake.json       | Two-player local: P1 A/D, Space jump, F attack, G guard; P2 arrows, Up jump, K attack, L guard; knockout and R rematch |
+| Experience             | Editable project                   | Purpose                                                                                                                                                                     |
+| ---------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **The Luminous Vault** | `showcase/showcase.protomake.json`     | Flagship vertical slice: lighting, melee/ranged combat, inventory, multiweapon switching, puzzle progression, platforming, enemy projectiles, UI, audio and camera feedback |
+| Signal Patrol          | `shooter/shooter.protomake.json`       | Focused top-down movement, projectile pooling and enemy lab                                                                                                                 |
+| Lantern Steps          | `platformer/platformer.protomake.json` | Focused platforming, collectible and checkpoint lab                                                                                                                         |
+| Sparring Room          | `fighter/fighter.protomake.json`       | Focused two-player local combat lab                                                                                                                                         |
 
-The `web` directory contains the launcher and three independent exported games. Serve it over HTTP; do not open index.html as a file. Individual game folders can be hosted independently. Source checkouts can generate these builds using `node scripts/build-prototypes.mjs` after `npm run build:player`.
+## The Luminous Vault
 
-Every game folder includes its raw Images, Audio and Scripts. The imported project JSON also embeds those assets. Edits to raw files do not automatically change embedded JSON; import or save them through ProtoMake, or intentionally regenerate the sample projects. The maintainer generator writes fresh IDs and overwrites sample JSON; preserve custom projects first.
+Move with **A/D** or the arrows, jump with **Space**, attack with **J** or the primary mouse button, switch weapons with **1/2** or **Q**, heal with **H**, toggle the carried lantern with **L**, and restart with **R**.
 
-The full guide is `docs/ProtoMake-Prototype-Workshop.docx` at the release root, with Markdown in `docs/workshop.md`. It explains complete scene reconstruction and the implementation tradeoffs. Lights use per-sprite illumination, without shadows or normals. These are compact teaching prototypes with geometric placeholder art; no mobile touch interface, online multiplayer or persistent game saves are included.
+Start with the Sunblade, defeat or evade sentinels, and collect the Arc Caster. Ranged bolts activate the two sun crystals. Together they remove the seal and form a bridge to the Vault Key; the key powers a dynamic rectangular exit light. The final ascent completes the level and unlocks an achievement.
+
+The scene deliberately combines static ambient and spot lights, mixed point fixtures, dynamic crystal and lantern lights, an area exit light, lit receivers and shadow casters. All game rules live in the editable `Assets/Scripts/Showcase.ts` project asset—there are no showcase-only engine shortcuts.
+
+## Builds and source assets
+
+`npm run build:prototypes` creates the launcher and four independent static games in `examples/prototypes/web`. Source checkouts generate those folders after `npm run build:player`; the generated `web` directory is not the canonical source.
+
+Each source folder includes raw images, audio and scripts, and each `.protomake.json` project embeds the same assets. Editing a raw file does not automatically update the embedded project; run `npm run examples:generate` only when intentionally regenerating the checked-in samples.
+
+The workshop remains available as `docs/ProtoMake-Prototype-Workshop.docx` and `docs/workshop.md` for step-by-step reconstruction of the focused labs. The flagship is the recommended first experience; the smaller projects exist to isolate mechanics for learning and debugging.

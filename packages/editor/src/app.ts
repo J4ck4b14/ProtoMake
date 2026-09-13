@@ -184,7 +184,35 @@ function exportBackup(): void {
   log(`Exported portable backup for ${model.project.name}`);
 }
 
+async function loadShowcase(): Promise<boolean> {
+  if (model.locked || !canLeave()) return false;
+  const response = await fetch('./examples/showcase.protomake.json');
+  if (!response.ok)
+    throw new Error(
+      `Could not load the flagship showcase (${response.status})`,
+    );
+  model.load(deserializeProject(await response.text(), model.registry));
+  log('Loaded The Luminous Vault. Press Play to enter the showcase.');
+  return true;
+}
+async function playShowcase(): Promise<void> {
+  if (await loadShowcase()) play.start();
+}
+
 menu.append(
+  button(
+    'Play showcase',
+    () => asyncRun(playShowcase),
+    'Load and immediately play the complete Luminous Vault game',
+  ),
+  button(
+    'Edit showcase',
+    () =>
+      asyncRun(async () => {
+        await loadShowcase();
+      }),
+    'Load the complete Luminous Vault project into the editor',
+  ),
   button('New project', () =>
     asyncRun(async () => {
       if (model.locked || !canLeave()) return;

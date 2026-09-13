@@ -1,6 +1,6 @@
 import { it, expect } from 'vitest';
 import { World, createRegistry } from '@protomake/core';
-import { Engine, TimeService } from '@protomake/runtime';
+import { Engine, TimeService, frameDeltaSeconds } from '@protomake/runtime';
 function engine(time?: TimeService) {
   return new Engine(new World(createRegistry()), time);
 }
@@ -97,6 +97,13 @@ it('rejects invalid time settings and deltas', () => {
   expect(() => e.tick(NaN)).toThrow();
   expect(() => e.tick(-1)).toThrow();
   expect(e.time.snapshot().frame).toBe(0);
+});
+
+it('normalizes browser clock-boundary skew before advancing play sessions', () => {
+  expect(frameDeltaSeconds(1016.67, 1000)).toBeCloseTo(0.01667);
+  expect(frameDeltaSeconds(999.999, 1000)).toBe(0);
+  expect(frameDeltaSeconds(Number.NaN, 1000)).toBe(0);
+  expect(frameDeltaSeconds(1000, Number.POSITIVE_INFINITY)).toBe(0);
 });
 it('reports system context, halts after errors, and cleans up all started systems', () => {
   const e = engine(),

@@ -1,11 +1,34 @@
-# Showcase and demonstrations
+# Flagship showcase
 
-ProtoMake ships three complete, editable projects using the same engine APIs available to creators:
+## The Luminous Vault
 
-- **Signal Patrol** — top-down shooting, prefab enemies, pooled swept projectiles, win/restart flow, animation, audio, and lighting.
-- **Lantern Steps** — platforming, collectibles, hazards, camera movement, and authored level flow.
-- **Sparring Room** — two-player local input, attacks, health, and round outcomes.
+The Luminous Vault is ProtoMake's complete vertical slice: a short action-platforming dungeon in which lighting, combat, inventory and traversal are parts of one progression rather than separate demonstrations.
 
-Run `npm run preview:prototypes` and open the printed local URL for the stable launcher. Project JSON, source TypeScript, images, and audio are under `examples/prototypes/`; none of the game rules are hidden editor special cases. The workshop in `docs/ProtoMake-Prototype-Workshop.docx` reconstructs the examples from blank scenes.
+The player starts with a melee Sunblade. The first combat space awards a ranged Arc Caster and ammunition. Its bolts activate two remote sun crystals; the pair retracts a physical seal, reveals a bridge and exposes the Vault Key. Taking the key powers the exit's rectangular area light. The player then crosses a platforming ascent while fighting sentinels that patrol and fire pooled projectiles.
 
-The lighting-shadow demo focuses on mixed/static/dynamic lights, occlusion, channels, and stealth perception. The milestone workshop demonstrates prefabs, animation, audio, physics, and standalone export. These local demonstrations are the reproducible showcase until public hosted URLs have actually been published.
+The same scene includes:
+
+- static ambient and spot lighting;
+- mixed point fixtures with live shadow casters;
+- a dynamic lantern parented to the player;
+- dynamic crystal lights and a game-state-driven area exit light;
+- visibly lit background, world surfaces and platforms;
+- melee hitboxes, ranged and hostile projectile pools, health and ammunition;
+- multiweapon inventory, a restorative pickup and explicit objective UI;
+- jump buffering, coyote time, hazards and staged platforming;
+- sprite animation, sound, camera shake, kick and zoom feedback;
+- a persistent `vaultbreaker` achievement.
+
+Nothing in the engine recognizes this level specially. Its rules are the ordinary editable `Assets/Scripts/Showcase.ts` behaviour embedded in `examples/prototypes/showcase/showcase.protomake.json`; its scene uses standard ProtoMake entities and components.
+
+## Run and inspect
+
+After `npm ci`, run `npm run dev`. Use **Play showcase** to load and start the game immediately, or **Edit showcase** to inspect its complete project before pressing **Play**. A production `npm run build` also publishes a standalone copy at `./showcase/` beside the editor, including on GitHub Pages.
+
+For a local launcher containing the flagship plus the three narrow teaching labs, run `npm run build:prototypes` followed by `npm run preview:prototypes`.
+
+The labs remain useful when a single mechanic needs to be understood in isolation:
+
+- **Signal Patrol** — top-down shooting and projectile pooling;
+- **Lantern Steps** — movement, collectibles and checkpoints;
+- **Sparring Room** — local two-player attack/guard timing.
