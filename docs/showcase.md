@@ -10,16 +10,18 @@ The run includes:
 
 - zero-intensity static ambient lights that force unlit space to pure black;
 - a 152-pixel dynamic lantern parented to the player;
+- a lantern tradeoff: opening it increases sentinel acquisition range, while shuttering it sacrifices sight for stealth;
 - no more than three tiny authored lights in any room;
 - emissive enemy shots with 48-pixel transient red glows;
 - weak point and spot hints, dynamic ward lights and a reward-state area light;
-- visibly lit background, world surfaces and platforms;
+- layered, visibly lit masonry, arches, chains, water details, world surfaces and platforms;
 - shadow-casting floors, columns, arches and ceiling geometry;
-- melee hitboxes, ranged and hostile projectile pools, health and ammunition;
+- melee hitboxes, ranged and hostile projectile pools, solid-geometry impacts, health and ammunition;
+- telegraphed sentinel attacks and a three-shot Warden volley;
 - multiweapon inventory, one-use pickups and explicit room/objective UI;
 - jump buffering, coyote time, hazards and staged platforming;
-- sprite animation, sound, camera shake, kick and zoom feedback;
-- bidirectional scene traversal with volatile run state that survives scene loads;
+- sprite animation, pooled particles, eight distinct synthesized effects, camera shake, kick and zoom feedback;
+- faded bidirectional scene traversal with volatile run state that survives scene loads;
 - a `vaultbreaker` achievement for completing all three rooms.
 
 Nothing in the engine recognizes this dungeon specially. Its rules are the ordinary editable `Assets/Scripts/Showcase.ts` behaviour embedded in `examples/prototypes/showcase/showcase.protomake.json`; all three scenes use standard ProtoMake entities and components. The general-purpose `ctx.session` service shares structured-cloned state between scene instances and is cleared when Play ends.

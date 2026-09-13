@@ -13,9 +13,9 @@ Run `npm ci`, then `npm run build:prototypes` and `npm run preview:prototypes`. 
 
 Move with **A/D** or the arrows, jump with **Space**, attack with **J** or the primary mouse button, switch weapons with **1/2** or **Q**, heal with **H**, toggle the carried lantern with **L**, and restart with **R**.
 
-Start with the Sunblade in the Black Gate, recover the Arc Caster in the Drowned Gallery, wake both wards, then defeat the Reliquary guard and take the Vault Key. The three rooms connect in both directions and preserve inventory, health, ammunition, pickups, defeated enemies and puzzle state.
+Start with the Sunblade in the Black Gate, recover the Arc Caster in the Drowned Gallery, wake both wards, then defeat the Reliquary guard and take the Vault Key. The three rooms connect in both directions through short fades and preserve inventory, health, ammunition, pickups, defeated enemies and puzzle state. Opening the lantern provides sight but increases enemy acquisition range; press **L** to trade visibility for stealth.
 
-Every room forces ambient illumination to zero. A short carried light reveals lit receivers and hard architectural shadows; no room has more than three authored environmental lights. Projectile glows are tiny and transient. Across the dungeon, the project uses point, spot and area lights with static, mixed and dynamic mobility. All game rules live in the editable `Assets/Scripts/Showcase.ts` project asset—there are no showcase-only engine shortcuts.
+Every room forces ambient illumination to zero. A short carried light reveals layered masonry, arches, water details, lit pickups and hard architectural shadows; no room has more than three authored environmental lights. Enemy attacks charge visibly before firing, the Warden uses a three-bolt spread, and projectiles stop against solid geometry. Projectile glows are tiny and transient. Across the dungeon, the project uses point, spot and area lights with static, mixed and dynamic mobility, plus pooled particles and eight distinct code-synthesized sound effects. All game rules live in the editable `Assets/Scripts/Showcase.ts` project asset—there are no showcase-only engine shortcuts.
 
 ## Builds and source assets
 

@@ -1,6 +1,7 @@
 import { createServer } from 'vite';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
+import { Buffer } from 'node:buffer';
 import { format } from 'prettier';
 
 const server = await createServer({
@@ -30,6 +31,49 @@ try {
     });
     return id;
   };
+  const wave = (
+    duration,
+    startFrequency,
+    endFrequency,
+    noiseAmount = 0,
+    harmonic = 0,
+  ) => {
+    const sampleRate = 22050,
+      samples = Math.floor(duration * sampleRate),
+      buffer = Buffer.alloc(44 + samples * 2);
+    buffer.write('RIFF', 0);
+    buffer.writeUInt32LE(36 + samples * 2, 4);
+    buffer.write('WAVEfmt ', 8);
+    buffer.writeUInt32LE(16, 16);
+    buffer.writeUInt16LE(1, 20);
+    buffer.writeUInt16LE(1, 22);
+    buffer.writeUInt32LE(sampleRate, 24);
+    buffer.writeUInt32LE(sampleRate * 2, 28);
+    buffer.writeUInt16LE(2, 32);
+    buffer.writeUInt16LE(16, 34);
+    buffer.write('data', 36);
+    buffer.writeUInt32LE(samples * 2, 40);
+    let phase = 0,
+      seed = 0x7f4a7c15;
+    for (let index = 0; index < samples; index++) {
+      const progress = index / Math.max(1, samples - 1),
+        frequency = startFrequency + (endFrequency - startFrequency) * progress;
+      phase += (Math.PI * 2 * frequency) / sampleRate;
+      seed ^= seed << 13;
+      seed ^= seed >>> 17;
+      seed ^= seed << 5;
+      const noise = ((seed >>> 0) / 0x7fffffff - 1) * noiseAmount,
+        attack = Math.min(1, progress / 0.045),
+        release = (1 - progress) ** 1.8,
+        body =
+          Math.sin(phase) * (1 - harmonic) +
+          Math.sin(phase * 2.01) * harmonic +
+          noise,
+        sample = Math.max(-1, Math.min(1, body * attack * release * 0.72));
+      buffer.writeInt16LE(Math.round(sample * 32767), 44 + index * 2);
+    }
+    return `data:audio/wav;base64,${buffer.toString('base64')}`;
+  };
   const entity = (
     name,
     x,
@@ -55,6 +99,18 @@ try {
   };
   const component = (id, type, values = {}) =>
     m.world.add(id, type, { ...m.registry.get(type).defaults(), ...values });
+  const rotate = (id, x, y, degrees) => {
+    const angle = (degrees * Math.PI) / 180;
+    m.world.setLocalMatrix(id, [
+      Math.cos(angle),
+      Math.sin(angle),
+      -Math.sin(angle),
+      Math.cos(angle),
+      x,
+      y,
+    ]);
+    return id;
+  };
   const light = (name, kind, mobility, x, y, values = {}) => {
     const id = entity(name, x, y);
     component(id, 'protomake.light', { kind, mobility, ...values });
@@ -100,6 +156,133 @@ try {
     component(id, 'protomake.box-collider', { width, height });
     component(id, 'protomake.rigidbody', { mode: 'static' });
     component(id, 'protomake.shadow-caster', { width, height });
+    return id;
+  };
+  const decor = (
+    name,
+    x,
+    y,
+    width,
+    height,
+    tint = '#263940',
+    layer = -10,
+    opacity = 1,
+  ) =>
+    entity(name, x, y, width, height, tint, '', {
+      lit: true,
+      lightingChannel: 'World',
+      layer,
+      opacity,
+    });
+  const masonry = (prefix, tint = '#26383e') => {
+    for (let row = 0; row < 6; row++) {
+      const y = -208 + row * 80;
+      decor(`${prefix} course ${row + 1}`, 0, y, 800, 2, '#111d22', -12, 0.9);
+      for (let column = 0; column < 9; column++) {
+        const offset = row % 2 ? 45 : 0,
+          x = -400 + column * 90 + offset;
+        decor(
+          `${prefix} joint ${row + 1}.${column + 1}`,
+          x,
+          y + 40,
+          2,
+          78,
+          '#142229',
+          -12,
+          0.88,
+        );
+      }
+    }
+    for (const [index, x, y, width, height] of [
+      [1, -292, -116, 116, 62],
+      [2, 242, -92, 154, 76],
+      [3, -18, 114, 134, 56],
+    ])
+      decor(
+        `${prefix} weathered stone ${index}`,
+        x,
+        y,
+        width,
+        height,
+        tint,
+        -13,
+        0.55,
+      );
+  };
+  const arch = (prefix, x, y, width, height, tint = '#31464b') => {
+    decor(
+      `${prefix} recess`,
+      x,
+      y - height * 0.18,
+      width - 28,
+      height,
+      '#0a1116',
+      -9,
+    );
+    decor(`${prefix} left pier`, x - width / 2, y, 18, height, tint, -7);
+    decor(`${prefix} right pier`, x + width / 2, y, 18, height, tint, -7);
+    decor(`${prefix} lintel`, x, y - height / 2, width + 18, 18, tint, -7);
+    rotate(
+      decor(
+        `${prefix} west voussoir`,
+        x - width * 0.32,
+        y - height * 0.46,
+        width * 0.38,
+        13,
+        tint,
+        -6,
+      ),
+      x - width * 0.32,
+      y - height * 0.46,
+      -18,
+    );
+    rotate(
+      decor(
+        `${prefix} east voussoir`,
+        x + width * 0.32,
+        y - height * 0.46,
+        width * 0.38,
+        13,
+        tint,
+        -6,
+      ),
+      x + width * 0.32,
+      y - height * 0.46,
+      18,
+    );
+    decor(`${prefix} keystone`, x, y - height * 0.55, 18, 25, '#435a5c', -5);
+  };
+  const emitter = (name, values = {}) => {
+    const id = entity(name, 0, 0);
+    component(id, 'protomake.particle-emitter', {
+      emitting: false,
+      playOnAwake: false,
+      rate: 0,
+      burst: 0,
+      lifetimeMin: 0.12,
+      lifetimeMax: 0.3,
+      speedMin: 35,
+      speedMax: 105,
+      angle: -90,
+      spread: 100,
+      gravityY: 120,
+      startSize: 7,
+      endSize: 1,
+      startColor: '#ffe7a8',
+      endColor: '#a95a35',
+      layer: 10,
+      maxParticles: 48,
+      ...values,
+    });
+    return id;
+  };
+  const sound = (name, clip, volume) => {
+    const id = entity(name, 0, 0);
+    component(id, 'protomake.audio-source', {
+      clip: assetIds[`Audio/${clip}.wav`],
+      volume,
+      bus: 'SFX',
+    });
     return id;
   };
   const uiText = (
@@ -214,6 +397,22 @@ try {
       await readFile(`${root}/Audio/Action.wav`)
     ).toString('base64')}`,
   );
+  for (const [name, duration, start, end, noise, harmonic] of [
+    ['Sword', 0.2, 190, 76, 0.42, 0.08],
+    ['Caster', 0.16, 920, 260, 0.04, 0.32],
+    ['Enemy', 0.22, 125, 410, 0.08, 0.22],
+    ['Impact', 0.13, 150, 54, 0.55, 0.08],
+    ['Pickup', 0.32, 350, 870, 0.02, 0.34],
+    ['Ward', 0.58, 170, 560, 0.03, 0.38],
+    ['Hurt', 0.24, 105, 46, 0.48, 0.05],
+    ['Transition', 0.38, 82, 34, 0.24, 0.18],
+  ])
+    asset(
+      `Audio/${name}.wav`,
+      'audio',
+      'audio/wav',
+      wave(duration, start, end, noise, harmonic),
+    );
   for (const name of ['Helpers.ts', 'Showcase.ts'])
     asset(
       `Scripts/${name}`,
@@ -277,21 +476,34 @@ try {
     const camera = entity('Camera', 0, 0);
     component(camera, 'protomake.camera', { background: '#000000', zoom: 1 });
 
-    entity(
-      'Black stone backdrop',
-      0,
-      0,
-      800,
-      500,
-      '#36505d',
-      assetIds['Images/Backdrop.png'],
-      { layer: -30, lit: true, lightingChannel: 'World' },
-    );
-    entity('Black water', 0, 238, 800, 26, '#274656', '', {
+    entity('Black stone backdrop', 0, 0, 800, 500, '#1c2a31', '', {
+      layer: -30,
+      lit: true,
+      lightingChannel: 'World',
+    });
+    masonry(`${room} masonry`);
+    decor(`${room} roof shadow`, 0, -235, 800, 42, '#0a1115', -8);
+    entity('Black water', 0, 238, 800, 26, '#18343e', '', {
       layer: -20,
       lit: true,
       lightingChannel: 'World',
     });
+    for (let index = 1; index <= 7; index++)
+      entity(
+        `Water glint ${index}`,
+        -350 + index * 92,
+        230 + (index % 2) * 4,
+        46 + (index % 3) * 17,
+        2,
+        index % 2 ? '#477583' : '#315b68',
+        '',
+        {
+          layer: -19,
+          lit: true,
+          lightingChannel: 'World',
+          opacity: 0.46,
+        },
+      );
     light('Absolute black', 'ambient', 'static', 0, 0, {
       color: '#000000',
       intensity: 0,
@@ -358,6 +570,44 @@ try {
     m.world.setParent(flame, player);
     m.world.setLocalMatrix(flame, [1, 0, 0, 1, 8, -8]);
 
+    emitter('Gold impact', {
+      startColor: '#fff1b5',
+      endColor: '#a65329',
+      spread: 150,
+    });
+    emitter('Cyan impact', {
+      startColor: '#d8ffff',
+      endColor: '#26728c',
+      gravityY: 28,
+      spread: 220,
+    });
+    emitter('Red impact', {
+      startColor: '#ffb0b9',
+      endColor: '#7c1838',
+      gravityY: 80,
+      spread: 190,
+    });
+    emitter('Water impact', {
+      lifetimeMin: 0.22,
+      lifetimeMax: 0.48,
+      speedMin: 65,
+      speedMax: 150,
+      spread: 72,
+      gravityY: 230,
+      startSize: 8,
+      startColor: '#82c5d4',
+      endColor: '#214b5a',
+    });
+
+    sound('Sword audio', 'Sword', 0.27);
+    sound('Caster audio', 'Caster', 0.24);
+    sound('Enemy audio', 'Enemy', 0.2);
+    sound('Impact audio', 'Impact', 0.24);
+    sound('Pickup audio', 'Pickup', 0.24);
+    sound('Ward audio', 'Ward', 0.28);
+    sound('Hurt audio', 'Hurt', 0.28);
+    sound('Transition audio', 'Transition', 0.2);
+
     entity('Slash', 0, 0, 58, 16, '#fff2b0', '', {
       visible: false,
       lit: false,
@@ -393,12 +643,12 @@ try {
       });
     }
 
-    uiText('Status', 'HEALTH ◆◆◆◆◆  SUNBLADE', 'top-left', '335px');
+    uiText('Status', 'HEALTH ◆◆◆◆◆  SUNBLADE', 'top-left', '315px');
     uiText(
       'Objective',
       'BLACKWARD',
       'top-right',
-      '385px',
+      '350px',
       '#d8ecf3',
       12,
       'right',
@@ -407,20 +657,20 @@ try {
       'Inventory',
       'CASTER —   WARDS 0/2   KEY —   RESTORE 0',
       'bottom-left',
-      '500px',
+      '455px',
       '#91a8b4',
       11,
     );
     uiText(
       'Controls',
-      'A/D MOVE · SPACE JUMP · J ATTACK · Q SWITCH · H HEAL · L LANTERN · R RESET',
+      'A/D MOVE · SPACE JUMP · J ATTACK\nQ WEAPON · H HEAL · L LIGHT · R RESET',
       'bottom-right',
-      '620px',
+      '290px',
       '#718995',
       10,
       'right',
     );
-    uiText('Message', '', 'bottom', '660px', '#f5e5c0', 13, 'center');
+    uiText('Message', '', 'center', '570px', '#f5e5c0', 13, 'center');
     entity(
       'Victory',
       0,
@@ -436,15 +686,40 @@ try {
       visible: false,
       lit: false,
     });
+    entity('Transition veil', 0, 0, 820, 520, '#000000', '', {
+      layer: 28,
+      visible: true,
+      lit: false,
+      opacity: 1,
+    });
   };
 
-  const sentinel = (name, x, y, scale = 38) =>
-    entity(name, x, y, scale, scale, '#ffffff', assetIds['Images/Enemy.png'], {
-      lit: true,
-      castShadow: true,
-      lightingChannel: 'Characters',
-      layer: 3,
+  const sentinel = (name, x, y, scale = 38) => {
+    const id = entity(
+      name,
+      x,
+      y,
+      scale,
+      scale,
+      '#ffffff',
+      assetIds['Images/Enemy.png'],
+      {
+        lit: true,
+        castShadow: true,
+        lightingChannel: 'Characters',
+        layer: 3,
+      },
+    );
+    const match = name.match(/\d+/),
+      index = name === 'Warden' ? 4 : Number(match?.[0] ?? 1);
+    entity(`Enemy tell ${index}`, x, y, 8, 8, '#ff3158', '', {
+      lit: false,
+      visible: false,
+      layer: 9,
+      opacity: 0.9,
     });
+    return id;
+  };
   const microLight = (name, kind, mobility, x, y, color = '#6f91a3') => {
     entity(`${name} ember`, x, y, 4, 4, color, '', {
       lit: false,
@@ -464,9 +739,43 @@ try {
       channelMask: 3,
     });
   };
+  const chain = (prefix, x, y, links) => {
+    for (let index = 0; index < links; index++) {
+      const linkY = y + index * 14,
+        link = decor(
+          `${prefix} link ${index + 1}`,
+          x + (index % 2 ? 2 : -2),
+          linkY,
+          4,
+          11,
+          '#4a5c5e',
+          -4,
+          0.78,
+        );
+      rotate(link, x + (index % 2 ? 2 : -2), linkY, index % 2 ? 20 : -20);
+    }
+  };
 
   const buildGate = () => {
     baseRoom('gate');
+    arch('West threshold arch', -336, 92, 118, 228, '#34494c');
+    arch('East threshold arch', 340, 86, 126, 242, '#3a4e4d');
+    arch('Blind nave arch', -70, 28, 142, 196, '#293e43');
+    decor('Gate heraldic slab', 116, -108, 74, 96, '#273b40', -7, 0.86);
+    decor('Gate heraldic cut', 116, -108, 12, 68, '#0d171c', -6, 0.92);
+    rotate(
+      decor('Gate broken brace west', -152, -126, 92, 10, '#3c4e4e', -5),
+      -152,
+      -126,
+      -22,
+    );
+    rotate(
+      decor('Gate broken brace east', 226, -86, 104, 10, '#35494a', -5),
+      226,
+      -86,
+      18,
+    );
+    chain('Gate chain', -268, -202, 8);
     platform('West threshold', -320, 205, 160);
     platform('Broken nave', -100, 205, 190);
     platform('East threshold', 250, 205, 300);
@@ -487,7 +796,7 @@ try {
       18,
       '#6ff0a8',
       assetIds['Images/Coin.png'],
-      { lit: false, layer: 5 },
+      { lit: true, lightingChannel: 'World', layer: 5 },
     );
     microLight('West pin light', 'point', 'static', -310, 92, '#7291a0');
     microLight('Nave pin light', 'point', 'mixed', -5, -70, '#6e8199');
@@ -496,6 +805,28 @@ try {
 
   const buildGallery = () => {
     baseRoom('gallery');
+    arch('Gallery lower arch', -294, 92, 146, 226, '#2b444b');
+    arch('Gallery upper arch', 354, -92, 104, 214, '#30484d');
+    decor('Gallery sluice', -8, -116, 116, 156, '#172930', -8, 0.82);
+    for (let index = 0; index < 4; index++)
+      decor(
+        `Gallery sluice bar ${index + 1}`,
+        -47 + index * 26,
+        -116,
+        7,
+        142,
+        '#31484c',
+        -6,
+        0.82,
+      );
+    rotate(
+      decor('Gallery fallen beam', -78, 5, 180, 12, '#3a4c4d', -5),
+      -78,
+      5,
+      14,
+    );
+    chain('Gallery chain west', -224, -208, 12);
+    chain('Gallery chain east', 242, -208, 7);
     platform('West gallery floor', -300, 205, 200);
     platform('Lower gallery', -92, 205, 150);
     platform('First ascent', 30, 137, 110);
@@ -509,7 +840,8 @@ try {
     sentinel('Sentinel 1', -82, 166);
     sentinel('Sentinel 2', 150, 29);
     entity('Arc Caster pickup', -276, 165, 34, 12, '#74eaff', '', {
-      lit: false,
+      lit: true,
+      lightingChannel: 'World',
       layer: 5,
     });
     for (const [index, x, y] of [
@@ -524,7 +856,7 @@ try {
         24,
         '#33485a',
         assetIds['Images/Coin.png'],
-        { lit: false, layer: 5 },
+        { lit: true, lightingChannel: 'World', layer: 5 },
       );
       light(`Ward light ${index}`, 'point', 'dynamic', x, y, {
         color: '#6be9ff',
@@ -543,7 +875,7 @@ try {
       16,
       '#63dcff',
       assetIds['Images/Coin.png'],
-      { lit: false, layer: 5 },
+      { lit: true, lightingChannel: 'World', layer: 5 },
     );
     entity(
       'Energy cell 2',
@@ -553,7 +885,7 @@ try {
       16,
       '#63dcff',
       assetIds['Images/Coin.png'],
-      { lit: false, layer: 5 },
+      { lit: true, lightingChannel: 'World', layer: 5 },
     );
     const guide = microLight(
       'Gallery slit light',
@@ -576,6 +908,36 @@ try {
 
   const buildReliquary = () => {
     baseRoom('reliquary');
+    arch('Reliquary west arch', -328, 84, 114, 238, '#37494a');
+    arch('Reliquary east arch', 344, 78, 112, 246, '#37494a');
+    arch('Reliquary apse', 76, 26, 188, 258, '#31464a');
+    decor('Reliquary altar shadow', 78, 83, 100, 78, '#111d22', -5);
+    decor('Reliquary altar face', 78, 112, 116, 30, '#3b5050', -4);
+    decor('Reliquary seal vertical', 78, -58, 10, 98, '#425658', -4);
+    decor('Reliquary seal horizontal', 78, -58, 78, 10, '#425658', -4);
+    for (let index = 0; index < 6; index++) {
+      const angle = index * 60,
+        radians = (angle * Math.PI) / 180,
+        x = 78 + Math.cos(radians) * 69,
+        y = -58 + Math.sin(radians) * 69;
+      rotate(
+        decor(
+          `Reliquary seal ray ${index + 1}`,
+          x,
+          y,
+          38,
+          6,
+          '#354b4e',
+          -5,
+          0.9,
+        ),
+        x,
+        y,
+        angle,
+      );
+    }
+    chain('Reliquary chain west', -244, -208, 9);
+    chain('Reliquary chain east', 270, -208, 10);
     platform('West reliquary floor', -300, 205, 200);
     platform('Arena floor', -42, 205, 270);
     platform('East reliquary floor', 270, 205, 250);
@@ -597,16 +959,29 @@ try {
       28,
       '#ffe2a0',
       assetIds['Images/Flag.png'],
-      { lit: false, visible: false, layer: 6 },
+      {
+        lit: true,
+        lightingChannel: 'World',
+        visible: false,
+        layer: 6,
+      },
     );
     entity('Exit sigil', 385, 130, 20, 120, '#caefff', '', {
-      lit: false,
+      lit: true,
+      lightingChannel: 'World',
       visible: false,
       opacity: 0.68,
       layer: 5,
     });
     microLight('Reliquary pin west', 'point', 'static', -330, 100, '#6d8791');
-    microLight('Reliquary pin crown', 'point', 'mixed', 8, -166, '#85725f');
+    light('Relic glimmer', 'point', 'dynamic', 82, 77, {
+      color: '#ffe1a1',
+      intensity: 0,
+      range: 44,
+      falloff: 2.9,
+      castShadows: false,
+      channelMask: 3,
+    });
     light('Exit area light', 'area', 'dynamic', 379, 130, {
       color: '#b9edff',
       intensity: 0,
