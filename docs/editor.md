@@ -27,3 +27,7 @@ Prefab actions and override visualization are documented in [prefabs](prefabs.md
 Desktop remains the primary layout. At 800 CSS pixels and below, the editor switches to a single-panel tab workspace instead of forcing the desktop split view. Hierarchy, Scene, Inspector, Project, Console and Assets are available as touch-sized tabs. The Scene tab adds explicit Pan, zoom-out, zoom-in and Frame controls so navigation does not depend on a mouse wheel or middle button. Dialogs and script editing expand to the small viewport. The desktop splitter layout is unchanged above the breakpoint.
 
 Mobile support means the authoring UI is usable on a modern touch browser; it does not imply that every large-project workflow is equally comfortable on a phone. For the zero-backend public alpha, Export backup → move the `.protomake.json` file → Import project is the supported cross-device path. Optional account continuity remains available when a ProtoMake sync server is configured.
+
+## Live iteration
+
+During Play, **Runtime** opens the live hierarchy and exposed component, behaviour, graph and physics settings. Controls update the running scene immediately. Each **Apply** action copies only that value into the authored project through validation and history; dynamic physics transforms are rejected because the body owns them. **Restart**, **Play Here**, and **Recompile** shorten the edit-test loop without merging runtime state into the editor world. See [Live Iteration 0.14](live-iteration-0.14.md).

@@ -1,8 +1,14 @@
 import type { EditorModel } from './model';
+import type { RuntimeSnapshot } from '@protomake/player';
 export class PlayMode {
   private frame: HTMLIFrameElement | undefined;
   debug = false;
   private token = '';
+  private playPosition: readonly [number, number] | undefined;
+  private listeners = new Set<
+    (snapshot: RuntimeSnapshot | undefined) => void
+  >();
+  snapshot: RuntimeSnapshot | undefined;
   state: 'stopped' | 'loading' | 'running' | 'paused' | 'faulted' = 'stopped';
   constructor(
     private readonly host: HTMLElement,
@@ -30,6 +36,9 @@ export class PlayMode {
             token: this.token,
             scene: structuredClone(this.model.scene),
             project: structuredClone(this.model.project),
+            detail: this.playPosition
+              ? { position: [...this.playPosition] }
+              : undefined,
           },
           location.origin,
         );
@@ -49,12 +58,23 @@ export class PlayMode {
         window.dispatchEvent(
           new CustomEvent('protomake-graph-trace', { detail: data.detail }),
         );
+      if (data.kind === 'inspection') {
+        this.snapshot = data.detail as RuntimeSnapshot | undefined;
+        for (const listener of this.listeners) listener(this.snapshot);
+      }
     });
   }
-  start(): void {
+  onInspection(
+    listener: (snapshot: RuntimeSnapshot | undefined) => void,
+  ): () => void {
+    this.listeners.add(listener);
+    return () => this.listeners.delete(listener);
+  }
+  start(position?: readonly [number, number]): void {
     if (this.state !== 'stopped') return;
     this.model.cancelGesture();
     this.model.locked = true;
+    this.playPosition = position;
     this.token = crypto.randomUUID();
     const frame = document.createElement('iframe');
     frame.title = 'ProtoMake isolated Play Mode';
@@ -80,9 +100,42 @@ export class PlayMode {
   step(): void {
     if (this.state === 'paused') this.send('step');
   }
-  private send(kind: string): void {
+  restart(): void {
+    if (this.state !== 'stopped') this.send('restart');
+  }
+  recompile(): void {
+    if (this.state !== 'stopped')
+      this.send('recompile', { project: structuredClone(this.model.project) });
+  }
+  inspect(): void {
+    if (this.state !== 'stopped') this.send('inspect');
+  }
+  setRuntimeComponent(
+    entity: string,
+    type: string,
+    path: string,
+    value: unknown,
+  ): void {
+    this.send('set-runtime-component', {
+      detail: { entity, type, path, value },
+    });
+  }
+  setRuntimeBehaviour(
+    entity: string,
+    behaviour: string,
+    field: string,
+    value: unknown,
+  ): void {
+    this.send('set-runtime-behaviour', {
+      detail: { entity, behaviour, field, value },
+    });
+  }
+  setRuntimeSetting(path: string, value: unknown): void {
+    this.send('set-runtime-setting', { detail: { path, value } });
+  }
+  private send(kind: string, data: Record<string, unknown> = {}): void {
     this.frame?.contentWindow?.postMessage(
-      { kind, token: this.token },
+      { kind, token: this.token, ...data },
       location.origin,
     );
   }
@@ -98,6 +151,9 @@ export class PlayMode {
     this.frame = undefined;
     this.host.hidden = true;
     this.state = 'stopped';
+    this.playPosition = undefined;
+    this.snapshot = undefined;
+    for (const listener of this.listeners) listener(undefined);
     this.model.locked = false;
     this.model.notify();
     this.changed();

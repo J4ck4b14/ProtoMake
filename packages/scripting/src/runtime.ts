@@ -16,7 +16,7 @@ import {
   SpriteRenderer,
   type LightingChannel,
 } from '@protomake/renderer';
-import { Behaviours, type ScriptFields } from './component';
+import { Behaviours, type ScriptField, type ScriptFields } from './component';
 export interface MediaServices {
   animation?: {
     setParameter(id: Guid, name: string, value: boolean | number): void;
@@ -225,6 +225,30 @@ interface Instance {
   started: boolean;
   context: ScriptContext;
 }
+export interface RuntimeExposedField {
+  readonly name: string;
+  readonly type: ScriptField['type'] | 'vector2';
+  readonly value: unknown;
+  readonly min?: number;
+  readonly max?: number;
+  readonly step?: number;
+  readonly options?: readonly string[];
+}
+export interface RuntimeBehaviourSnapshot {
+  readonly entity: Guid;
+  readonly id: string;
+  readonly kind: 'script' | 'graph';
+  readonly source: string;
+  readonly active: boolean;
+  readonly fields: readonly RuntimeExposedField[];
+}
+interface RuntimeInspectableBehaviour extends Behaviour {
+  runtimeValues?(): Readonly<Record<string, unknown>>;
+  runtimeFields?(): Readonly<
+    Record<string, { type: RuntimeExposedField['type'] }>
+  >;
+  setRuntimeValue?(name: string, value: unknown): void;
+}
 export class ScriptSystem implements System {
   readonly id = 'protomake.scripts';
   private instances = new Map<string, Instance>();
@@ -241,6 +265,109 @@ export class ScriptSystem implements System {
     private readonly media: MediaServices = {},
     private readonly services: RuntimeScriptServices = {},
   ) {}
+  runtimeBehaviours(): readonly RuntimeBehaviourSnapshot[] {
+    return [...this.instances.values()].map((instance) => {
+      const numeric = this.world.find(instance.id),
+        data =
+          numeric === undefined
+            ? undefined
+            : this.world.read(numeric, Behaviours)?.items[instance.behaviourId],
+        inspectable = instance.behaviour as RuntimeInspectableBehaviour;
+      if (!data)
+        return {
+          entity: instance.id,
+          id: instance.behaviourId,
+          kind: 'script' as const,
+          source: instance.source,
+          active: instance.active,
+          fields: [],
+        };
+      if (data.kind === 'script') {
+        const definitions = this.fields.get(data.script) ?? {};
+        return {
+          entity: instance.id,
+          id: instance.behaviourId,
+          kind: data.kind,
+          source: data.script,
+          active: instance.active,
+          fields: Object.entries(definitions).map(([name, field]) => ({
+            name,
+            type: field.type,
+            value: (instance.behaviour as unknown as Record<string, unknown>)[
+              name
+            ],
+            ...(field.min === undefined ? {} : { min: field.min }),
+            ...(field.max === undefined ? {} : { max: field.max }),
+            ...(field.step === undefined ? {} : { step: field.step }),
+            ...(field.options === undefined ? {} : { options: field.options }),
+          })),
+        };
+      }
+      const values = inspectable.runtimeValues?.() ?? data.values,
+        definitions = inspectable.runtimeFields?.() ?? {};
+      return {
+        entity: instance.id,
+        id: instance.behaviourId,
+        kind: data.kind,
+        source: data.graph,
+        active: instance.active,
+        fields: Object.entries(definitions).map(([name, field]) => ({
+          name,
+          type: field.type,
+          value: values[name],
+        })),
+      };
+    });
+  }
+  setRuntimeValue(
+    entity: Guid,
+    behaviourId: string,
+    name: string,
+    value: unknown,
+  ): void {
+    const owner = `${entity}:${behaviourId}`,
+      instance = this.instances.get(owner),
+      numeric = this.world.find(entity),
+      behaviours =
+        numeric === undefined
+          ? undefined
+          : this.world.read(numeric, Behaviours),
+      item = behaviours?.items[behaviourId];
+    if (!instance || numeric === undefined || !behaviours || !item)
+      throw new Error(`Missing runtime behaviour ${owner}`);
+    if (item.kind === 'script') {
+      const field = this.fields.get(item.script)?.[name];
+      if (!field) throw new Error(`Missing exposed field ${name}`);
+      const expected =
+        field.type === 'number'
+          ? 'number'
+          : field.type === 'boolean'
+            ? 'boolean'
+            : 'string';
+      if (
+        typeof value !== expected ||
+        (typeof value === 'number' && !Number.isFinite(value))
+      )
+        throw new Error(`${name} must be ${expected}`);
+      if (
+        typeof value === 'number' &&
+        ((field.min !== undefined && value < field.min) ||
+          (field.max !== undefined && value > field.max))
+      )
+        throw new Error(`${name} is outside its exposed range`);
+      if (field.options?.length && !field.options.includes(String(value)))
+        throw new Error(`${name} is not an exposed option`);
+      (instance.behaviour as unknown as Record<string, unknown>)[name] = value;
+    } else {
+      const inspectable = instance.behaviour as RuntimeInspectableBehaviour;
+      if (!inspectable.setRuntimeValue)
+        throw new Error('Graph runtime does not support live variables');
+      inspectable.setRuntimeValue(name, value);
+    }
+    const next = structuredClone(behaviours);
+    next.items[behaviourId]!.values[name] = value as never;
+    this.world.set(numeric, Behaviours.type, next);
+  }
   private context(
     id: Guid,
     behaviourId: string,

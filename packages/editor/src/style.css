@@ -1352,3 +1352,72 @@ textarea {
   color: #aebdcc;
   border-top: 1px solid #3b4a58;
 }
+
+.runtime-inspector {
+  width: min(1040px, 94vw);
+  height: min(760px, 90vh);
+  max-width: none;
+  padding: 0;
+}
+.runtime-inspector-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--protomake-border);
+}
+.runtime-inspector-header h2 {
+  flex: 1;
+  margin: 0;
+  padding: 0;
+}
+.runtime-inspector-shell {
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  height: calc(100% - 52px);
+}
+.runtime-hierarchy,
+.runtime-details {
+  min-width: 0;
+  padding: 12px;
+  overflow: auto;
+}
+.runtime-hierarchy {
+  border-right: 1px solid var(--protomake-border);
+}
+.runtime-hierarchy button {
+  width: 100%;
+  text-align: left;
+}
+.runtime-property {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) minmax(120px, 2fr) auto;
+  align-items: center;
+  gap: 8px;
+  margin: 5px 0;
+}
+.runtime-property input,
+.runtime-property select {
+  width: 100%;
+  min-width: 0;
+}
+.runtime-details fieldset,
+.runtime-details section {
+  margin: 10px 0;
+  border: 1px solid var(--protomake-border);
+  border-radius: 5px;
+  padding: 9px;
+}
+.runtime-details legend {
+  padding: 0 5px;
+  color: var(--protomake-accent);
+}
+.runtime-profile-row {
+  margin: 3px 0;
+  font-family: ui-monospace, monospace;
+}
+.runtime-graphs pre {
+  overflow: auto;
+  padding: 8px;
+  background: #101820;
+}

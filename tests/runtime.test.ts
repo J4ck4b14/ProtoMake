@@ -32,6 +32,16 @@ it('orders lifecycle phases and reverses teardown', () => {
     'a stop',
   ]);
 });
+it('profiles frame work by system without changing scheduling', () => {
+  const e = engine(new TimeService(0.1));
+  e.addSystem({ id: 'profiled', fixedUpdate() {}, update() {} });
+  e.start();
+  e.tick(0.2);
+  expect(e.profile.fixedSteps).toBe(2);
+  expect(e.profile.frameMs).toBeGreaterThanOrEqual(0);
+  expect(e.profile.systems.profiled).toBeGreaterThanOrEqual(0);
+  e.stop();
+});
 it('supports pause, single step, resume, stop and clean restart timing', () => {
   const e = engine();
   let updates = 0;

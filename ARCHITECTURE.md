@@ -40,7 +40,7 @@ Reparent with `local` preserves the local matrix; `world` preserves the full wor
 
 ## Runtime ownership
 
-The host passes seconds to `Engine.tick`; no hidden animation-frame singleton exists. Systems register only while stopped and run in insertion order. Startup and reverse teardown define service lifetime. Fixed update occurs before update, then late update. Timing bounds prevent an unbounded catch-up loop. The browser example owns requestAnimationFrame.
+The host passes seconds to `Engine.tick`; no hidden animation-frame singleton exists. Systems register only while stopped and run in insertion order. Startup and reverse teardown define service lifetime. Fixed update occurs before update, then late update. Timing bounds prevent an unbounded catch-up loop. The browser example owns requestAnimationFrame. The engine records a detached last-frame profile with total duration, fixed-step count, dropped time and callback time grouped by stable system ID.
 
 `instantiateScene` creates a new independent world from validated serialized data. The isolation test verifies mutation cannot reach authored state. The editor executes Play in a separate iframe. This is data/lifetime isolation, not a hostile-code security boundary.
 
@@ -54,7 +54,7 @@ Project TS source and Behaviour Graph data stay in authored assets and execute o
 
 EditorModel owns authored project/world state, selection and command history. History stores before/after snapshots for transactions; pointer gestures mutate only the working world until committed as one command. Invalid operations restore the prior snapshot. Asset bytes are serialized only on authoring/storage operations, never as part of the runtime frame loop.
 
-SceneViewport owns camera navigation, selection geometry and gizmos. Inspector derives ordinary controls from component metadata and provides specialized TRS, tag and multi-behaviour authoring. ProjectStorage owns IndexedDB transactions and separate active-scene metadata. PlayMode exchanges cloned project data with an iframe; removing it discards runtime changes.
+SceneViewport owns camera navigation, selection geometry and gizmos. Inspector derives ordinary controls from component metadata and provides specialized TRS, tag and multi-behaviour authoring. ProjectStorage owns IndexedDB transactions and separate active-scene metadata. PlayMode exchanges cloned project data with an iframe; removing it discards runtime changes. Runtime inspection uses explicit snapshot and command messages. Live controls affect only the isolated world until a narrow Apply action validates and records one value in authored history; dynamic-body transforms are excluded from that bridge.
 
 Runtime UI is authored as ordinary scene components but rendered into a game-owned DOM overlay, never into editor chrome. UI controls emit through the same runtime signal service used by scripts and graphs. Save and achievement services are project-scoped and may survive scene-session replacement; behaviour-owned state registrations are removed during lifecycle cleanup.
 

@@ -90,6 +90,13 @@ export class Physics2D {
       throw error;
     }
   }
+  setGravity(x: number, y: number): void {
+    if (!Number.isFinite(x) || !Number.isFinite(y))
+      throw new Error('Gravity must contain finite values');
+    this.settings.gravityX = x;
+    this.settings.gravityY = y;
+    this.physics.gravity = { x, y };
+  }
   private affine(id: number): {
     x: number;
     y: number;

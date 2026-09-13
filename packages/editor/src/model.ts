@@ -19,6 +19,7 @@ import {
   Tags,
   composeAffine,
   decompose,
+  TransformComponent,
   type Guid,
   type Matrix2D,
 } from '@protomake/core';
@@ -112,8 +113,12 @@ export class EditorModel {
         redo: () => this.restore(after),
       });
   }
-  change(label: string, operation: () => void): void {
-    this.ensureEditable();
+  private transact(
+    label: string,
+    operation: () => void,
+    allowLocked: boolean,
+  ): void {
+    if (!allowLocked) this.ensureEditable();
     if (this.gesture) throw new Error('Finish the active gesture first');
     const before = this.snapshot();
     try {
@@ -127,6 +132,60 @@ export class EditorModel {
     } finally {
       this.notify();
     }
+  }
+  change(label: string, operation: () => void): void {
+    this.transact(label, operation, false);
+  }
+  changeRuntimeAuthoring(label: string, operation: () => void): void {
+    this.transact(label, operation, true);
+  }
+  applyRuntimeComponent(
+    entity: Guid,
+    type: string,
+    path: string,
+    value: unknown,
+  ): void {
+    this.changeRuntimeAuthoring('Apply runtime component value', () => {
+      const numeric = this.entity(entity);
+      if (type === TransformComponent.type) {
+        const body = this.world.components(numeric).get('protomake.rigidbody') as
+          | { mode?: string }
+          | undefined;
+        if (body?.mode === 'dynamic')
+          throw new Error(
+            'Dynamic runtime transforms cannot be applied safely',
+          );
+      }
+      const current = structuredClone(this.world.components(numeric).get(type));
+      if (current === undefined) throw new Error(`Missing component ${type}`);
+      setPath(current, path, value);
+      this.world.set(numeric, type, current);
+    });
+  }
+  applyRuntimeBehaviour(
+    entity: Guid,
+    behaviour: string,
+    field: string,
+    value: unknown,
+  ): void {
+    this.changeRuntimeAuthoring('Apply runtime behaviour value', () => {
+      const numeric = this.entity(entity),
+        current = structuredClone(this.world.read(numeric, Behaviours));
+      if (!current?.items[behaviour])
+        throw new Error(`Missing behaviour ${behaviour}`);
+      current.items[behaviour]!.values[field] = value as never;
+      this.world.set(numeric, Behaviours.type, current);
+    });
+  }
+  applyRuntimeSetting(path: string, value: unknown): void {
+    this.changeRuntimeAuthoring('Apply runtime setting', () => {
+      if (
+        (path !== 'gravityX' && path !== 'gravityY') ||
+        typeof value !== 'number'
+      )
+        throw new Error(`Invalid runtime setting ${path}`);
+      this.project.physics[path] = value;
+    });
   }
   select(ids: Iterable<Guid>, append = false): void {
     if (!append) this.selection.clear();

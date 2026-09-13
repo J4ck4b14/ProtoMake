@@ -34,7 +34,7 @@ import {
   validateScene,
 } from './scene';
 import { MigrationChain } from './migrations';
-export const PROJECT_SCHEMA_VERSION = 8;
+export const PROJECT_SCHEMA_VERSION = 9;
 export const ProjectSchema = z.strictObject({
   schemaVersion: z.literal(PROJECT_SCHEMA_VERSION),
   id: GuidSchema,
@@ -173,12 +173,17 @@ projectMigrations.register(7, (input) => ({
   schemaVersion: 8,
   engineVersion: '0.13.0',
 }));
+projectMigrations.register(8, (input) => ({
+  ...(input as object),
+  schemaVersion: 9,
+  engineVersion: '0.14.0',
+}));
 export function createProject(name: string): ProjectData {
   return ProjectSchema.parse({
     schemaVersion: PROJECT_SCHEMA_VERSION,
     id: guid(),
     name,
-    engineVersion: '0.13.0',
+    engineVersion: '0.14.0',
     startupScene: null,
     scenes: [],
     assets: [],

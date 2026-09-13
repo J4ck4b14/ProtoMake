@@ -3,6 +3,7 @@ import type { AssetData } from '@protomake/assets';
 import type { Behaviour, ScriptContext } from '@protomake/scripting';
 import {
   BehaviourGraphSchema,
+  GraphValueSchema,
   GRAPH_MIME,
   type BehaviourGraph,
   type GraphValue,
@@ -77,6 +78,34 @@ class GraphBehaviour implements Behaviour {
         throw new Error(`Graph variable ${name} must be ${variable.type}`);
       this.variables.set(name, value);
     }
+  }
+  runtimeValues(): Readonly<Record<string, GraphValue>> {
+    return Object.fromEntries(this.variables);
+  }
+  runtimeFields(): Readonly<
+    Record<string, { type: BehaviourGraph['variables'][string]['type'] }>
+  > {
+    return Object.fromEntries(
+      Object.entries(this.graph.variables).map(([name, value]) => [
+        name,
+        { type: value.type },
+      ]),
+    );
+  }
+  setRuntimeValue(name: string, value: unknown): void {
+    const definition = this.graph.variables[name],
+      parsed = GraphValueSchema.parse(value);
+    if (!definition) throw new Error(`Missing graph variable ${name}`);
+    const valid =
+      definition.type === 'number'
+        ? typeof parsed === 'number'
+        : definition.type === 'boolean'
+          ? typeof parsed === 'boolean'
+          : definition.type === 'vector2'
+            ? Array.isArray(parsed)
+            : typeof parsed === 'string';
+    if (!valid) throw new Error(`${name} must be ${definition.type}`);
+    this.variables.set(name, parsed);
   }
   private run(
     phase: string,

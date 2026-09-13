@@ -19,7 +19,9 @@ const token = location.hash.slice(1),
   host = document.getElementById('game')!;
 let session: GameSession | undefined,
   project: ProjectData | undefined,
+  activeScene: string | undefined,
   last = performance.now(),
+  lastInspection = 0,
   loading = false,
   debug = false,
   pendingScene: string | undefined;
@@ -29,8 +31,8 @@ document.body.style.cssText =
   'margin:0;background:#10161d;color:#dce5ed;font:11px system-ui;overflow:hidden';
 status.style.cssText =
   'position:absolute;bottom:4px;left:8px;z-index:2;margin:0;color:#b6c8d8;pointer-events:none';
-function send(kind: string, message?: string): void {
-  parent.postMessage({ kind, token, message }, location.origin);
+function send(kind: string, message?: string, detail?: unknown): void {
+  parent.postMessage({ kind, token, message, detail }, location.origin);
 }
 window.addEventListener('protomake-graph-trace', (event) => {
   parent.postMessage(
@@ -92,6 +94,7 @@ async function loadScene(scene: SceneData): Promise<void> {
       () => {},
       persistent,
     );
+    activeScene = scene.id;
     session.resize(innerWidth, innerHeight);
     last = performance.now();
     status.textContent = `${scene.name} · click game to focus input and enable sound`;
@@ -114,6 +117,15 @@ window.addEventListener('message', (event) => {
       scene?: SceneData;
       project?: ProjectData;
       enabled?: boolean;
+      detail?: {
+        entity?: string;
+        type?: string;
+        path?: string;
+        behaviour?: string;
+        field?: string;
+        value?: unknown;
+        position?: readonly [number, number];
+      };
     };
     if (data.kind === 'load') {
       if (loading) return;
@@ -122,12 +134,72 @@ window.addEventListener('message', (event) => {
       const scene = project.scenes.find((s) => s.id === data.scene?.id);
       if (!scene) throw new Error('Play scene missing');
       await loadScene(scene);
+      if (data.detail?.position) {
+        const entity = session?.playFrom(data.detail.position);
+        send('log', `Playing from here with ${entity}`);
+      }
     } else if (data.kind === 'debug') debug = Boolean(data.enabled);
     else if (data.kind === 'pause') await session?.pause();
     else if (data.kind === 'resume') {
       last = performance.now();
       await session?.resume();
     } else if (data.kind === 'step') session?.step();
+    else if (data.kind === 'restart') {
+      if (!project || !activeScene) throw new Error('No active Play scene');
+      const scene = project.scenes.find((item) => item.id === activeScene);
+      if (!scene) throw new Error('Active Play scene is missing');
+      await loadScene(scene);
+    } else if (data.kind === 'recompile') {
+      try {
+        const next = validateProject(data.project, runtimeRegistry());
+        compileProjectScripts(next.assets);
+        if (!activeScene) throw new Error('No active Play scene');
+        const scene = next.scenes.find((item) => item.id === activeScene);
+        if (!scene) throw new Error('Active Play scene is missing');
+        project = next;
+        await loadScene(scene);
+        send('log', 'Scripts recompiled and scene restarted');
+      } catch (error) {
+        report(error);
+      }
+    } else if (data.kind === 'set-runtime-component') {
+      try {
+        const detail = data.detail;
+        if (!detail?.entity || !detail.type || !detail.path)
+          throw new Error('Invalid live component update');
+        session?.setRuntimeComponent(
+          detail.entity,
+          detail.type,
+          detail.path,
+          detail.value,
+        );
+      } catch (error) {
+        report(error);
+      }
+    } else if (data.kind === 'set-runtime-behaviour') {
+      try {
+        const detail = data.detail;
+        if (!detail?.entity || !detail.behaviour || !detail.field)
+          throw new Error('Invalid live behaviour update');
+        session?.setRuntimeBehaviour(
+          detail.entity,
+          detail.behaviour,
+          detail.field,
+          detail.value,
+        );
+      } catch (error) {
+        report(error);
+      }
+    } else if (data.kind === 'set-runtime-setting') {
+      try {
+        const detail = data.detail;
+        if (!detail?.path) throw new Error('Invalid live setting update');
+        session?.setRuntimeSetting(detail.path, detail.value);
+      } catch (error) {
+        report(error);
+      }
+    } else if (data.kind === 'inspect')
+      send('inspection', undefined, session?.inspect());
   })().catch(fault);
 });
 window.addEventListener('error', (e) =>
@@ -153,6 +225,10 @@ function frame(now: number): void {
   try {
     if (!loading) {
       session?.tick((now - last) / 1000, debug);
+      if (session && now - lastInspection >= 200) {
+        lastInspection = now;
+        send('inspection', undefined, session.inspect());
+      }
       if (pendingScene && project) {
         const id = pendingScene;
         pendingScene = undefined;

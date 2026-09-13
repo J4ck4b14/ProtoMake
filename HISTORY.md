@@ -20,5 +20,6 @@ This file summarizes the development milestones represented by the Git commit gr
 | ProtoMake 0.11           | Versioned Behaviour Graphs, typed registered nodes, shared script/graph runtime services, visual graph authoring and Play Mode execution traces                                                           |
 | ProtoMake 0.12           | Accessible runtime UI, flexible screen layout, save profiles/slots/migrations, autosave, achievements and project-persistent game services                                                                |
 | ProtoMake 0.13           | Sprite regions, tilemap palette/rules/animation, chunked tile collision, Character Body 2D and reusable camera follow/zone behaviours                                                                     |
+| ProtoMake 0.14           | Live runtime hierarchy/property tuning, safe authoring Apply, Play From Here, scene restart, script recompile/restart, graph values and per-system profiling                                              |
 
 For the difference between published commits and local reflogs, see [docs/git-history.md](docs/git-history.md).

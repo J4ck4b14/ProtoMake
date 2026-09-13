@@ -4,6 +4,7 @@ import { compose, guid } from '@protomake/core';
 import { EditorModel, NoteComponent, pivotDelta, getPath } from '@protomake/editor';
 import { ProjectStorage } from '../packages/editor/src/storage';
 import { instantiateScene, serializeProject } from '@protomake/serialization';
+import { Rigidbody2D } from '@protomake/physics2d';
 describe('Milestone 1 acceptance', () => {
   it('creates a project, scene, entities, components, saves and reopens equivalent data', async () => {
     const editor = new EditorModel();
@@ -133,6 +134,18 @@ describe('Milestone 1 acceptance', () => {
     runtime.setLocalMatrix(runtime.find(id)!, compose(99, 44));
     e.locked = false;
     expect(e.world.worldPosition(e.entity(id))).toEqual([0, 0]);
+  });
+  it('applies safe runtime values while Play locks ordinary authoring', () => {
+    const e = new EditorModel(),
+      id = e.createEntity();
+    e.addComponent(NoteComponent.type);
+    e.addComponent(Rigidbody2D.type);
+    e.locked = true;
+    e.applyRuntimeComponent(id, NoteComponent.type, 'text', 'tuned');
+    expect(e.world.read(e.entity(id), NoteComponent)?.text).toBe('tuned');
+    expect(() =>
+      e.applyRuntimeComponent(id, 'protomake.transform', 'local.4', 10),
+    ).toThrow(/Dynamic runtime transforms/);
   });
   it('bounds history and invalidates redo after a new branch', () => {
     const e = new EditorModel();

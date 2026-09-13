@@ -29,6 +29,34 @@ import {
   createPersistentServices,
   type PersistentGameServices,
 } from '@protomake/persistence';
+import { inverse, multiply, type Matrix2D } from '@protomake/core';
+import type { GraphTrace } from '@protomake/graphs';
+import type { RuntimeSnapshot } from './inspection';
+
+function valueAt(data: unknown, path: string): unknown {
+  let value = data;
+  for (const key of path.split('.')) {
+    if (!value || typeof value !== 'object') return undefined;
+    value = (value as Record<string, unknown>)[key];
+  }
+  return value;
+}
+function setValueAt(data: unknown, path: string, value: unknown): void {
+  const keys = path.split('.');
+  if (
+    keys.some((key) => ['__proto__', 'prototype', 'constructor'].includes(key))
+  )
+    throw new Error('Unsafe runtime property path');
+  let cursor = data;
+  for (const key of keys.slice(0, -1)) {
+    if (!cursor || typeof cursor !== 'object')
+      throw new Error(`Invalid runtime property ${path}`);
+    cursor = (cursor as Record<string, unknown>)[key];
+  }
+  if (!cursor || typeof cursor !== 'object')
+    throw new Error(`Invalid runtime property ${path}`);
+  (cursor as Record<string, unknown>)[keys.at(-1)!] = value;
+}
 /** Shared runtime composition for editor Play and exported games. Hosts own scheduling and UI. */
 export class GameSession {
   private constructor(
@@ -38,6 +66,9 @@ export class GameSession {
     readonly input: InputService,
     readonly audio: AudioSystem,
     private readonly persistent: PersistentGameServices,
+    private readonly scripts: ScriptSystem,
+    private readonly sceneName: string,
+    private readonly graphValues: Map<string, GraphTrace>,
   ) {}
   static async create(
     canvas: HTMLCanvasElement,
@@ -97,11 +128,14 @@ export class GameSession {
           worldToScreen: (position: readonly [number, number]) =>
             renderer!.worldToScreen(world, position),
         },
+        graphValues = new Map<string, GraphTrace>(),
         graphs = new GraphRuntime(project.assets, {
-          trace: (event) =>
+          trace: (event) => {
+            graphValues.set(`${event.graph}:${event.node}`, event);
             window.dispatchEvent(
               new CustomEvent('protomake-graph-trace', { detail: event }),
-            ),
+            );
+          },
         }),
         ui = new RuntimeUiSystem(
           world,
@@ -128,30 +162,29 @@ export class GameSession {
       engine.addSystem(tweens);
       engine.addSystem(ui);
       engine.addSystem(cameraEffects);
-      engine.addSystem(
-        new ScriptSystem(
-          world,
-          input,
-          physics,
-          modules,
-          fields,
-          log,
-          loadScene,
-          { animation, audio },
-          {
-            signals,
-            timers,
-            tweens,
-            prefabs,
-            coordinates,
-            graphs,
-            ui,
-            save: persistent.save,
-            achievements: persistent.achievements,
-            cameraEffects,
-          },
-        ),
+      const scriptSystem = new ScriptSystem(
+        world,
+        input,
+        physics,
+        modules,
+        fields,
+        log,
+        loadScene,
+        { animation, audio },
+        {
+          signals,
+          timers,
+          tweens,
+          prefabs,
+          coordinates,
+          graphs,
+          ui,
+          save: persistent.save,
+          achievements: persistent.achievements,
+          cameraEffects,
+        },
       );
+      engine.addSystem(scriptSystem);
       engine.addSystem(animation);
       engine.addSystem({
         id: 'physics-step',
@@ -164,6 +197,9 @@ export class GameSession {
         input,
         audio,
         persistent,
+        scriptSystem,
+        scene.name,
+        graphValues,
       );
       progress('Starting scene');
       engine.start();
@@ -179,6 +215,117 @@ export class GameSession {
       }
       throw error;
     }
+  }
+  inspect(): RuntimeSnapshot {
+    const world = this.engine.world;
+    return {
+      scene: this.sceneName,
+      state: this.engine.state,
+      settings: [
+        {
+          path: 'gravityX',
+          label: 'Gravity X',
+          kind: 'number',
+          value: this.physics.settings.gravityX,
+        },
+        {
+          path: 'gravityY',
+          label: 'Gravity Y',
+          kind: 'number',
+          value: this.physics.settings.gravityY,
+        },
+      ],
+      entities: [...world.all()].map((entity) => ({
+        id: entity.guid,
+        name: entity.name,
+        enabled: entity.enabled,
+        active: world.isActive(entity.id),
+        parent: entity.parent === null ? null : world.get(entity.parent).guid,
+        components: [...world.components(entity.id)].map(([type, data]) => {
+          const definition = world.registry.get(type);
+          return {
+            type,
+            name: definition.displayName,
+            properties: definition.inspector.map((field) => ({
+              ...field,
+              value: structuredClone(valueAt(data, field.path)),
+            })),
+          };
+        }),
+      })),
+      behaviours: this.scripts.runtimeBehaviours(),
+      graphs: [...this.graphValues.values()].map((trace) => ({
+        graph: trace.graph,
+        node: trace.node,
+        phase: trace.phase,
+        values: structuredClone(trace.values),
+      })),
+      profile: this.engine.profile,
+    };
+  }
+  setRuntimeComponent(
+    entity: string,
+    type: string,
+    path: string,
+    value: unknown,
+  ): void {
+    const numeric = this.engine.world.find(entity);
+    if (numeric === undefined)
+      throw new Error(`Missing runtime entity ${entity}`);
+    const data = structuredClone(
+      this.engine.world.components(numeric).get(type),
+    );
+    if (data === undefined)
+      throw new Error(`Missing runtime component ${type}`);
+    setValueAt(data, path, value);
+    this.engine.world.set(numeric, type, data);
+  }
+  setRuntimeBehaviour(
+    entity: string,
+    behaviour: string,
+    field: string,
+    value: unknown,
+  ): void {
+    this.scripts.setRuntimeValue(entity, behaviour, field, value);
+  }
+  setRuntimeSetting(path: string, value: unknown): void {
+    if (
+      (path !== 'gravityX' && path !== 'gravityY') ||
+      typeof value !== 'number'
+    )
+      throw new Error(`Invalid runtime setting ${path}`);
+    this.physics.setGravity(
+      path === 'gravityX' ? value : this.physics.settings.gravityX,
+      path === 'gravityY' ? value : this.physics.settings.gravityY,
+    );
+  }
+  playFrom(position: readonly [number, number]): string {
+    const world = this.engine.world,
+      id = world.withTag('Player')[0];
+    if (id === undefined)
+      throw new Error('Play From Here needs an entity tagged Player');
+    const stable = world.get(id).guid;
+    if (this.physics.hasBody(stable))
+      this.physics.teleport(stable, ...position);
+    else {
+      const matrix = world.worldMatrix(id),
+        desired = [
+          matrix[0],
+          matrix[1],
+          matrix[2],
+          matrix[3],
+          position[0],
+          position[1],
+        ] as Matrix2D,
+        parent = world.get(id).parent;
+      world.setLocalMatrix(
+        id,
+        parent === null
+          ? desired
+          : multiply(inverse(world.worldMatrix(parent)), desired),
+      );
+    }
+    return stable;
   }
   resize(width: number, height: number): void {
     this.renderer.resize(width, height);

@@ -18,6 +18,13 @@ interface EngineEvents {
   error: { system: string; phase: string; cause: unknown };
   frame: TimeSnapshot;
 }
+export interface EngineProfile {
+  readonly frameMs: number;
+  readonly fixedSteps: number;
+  readonly droppedSeconds: number;
+  readonly systems: Readonly<Record<string, number>>;
+}
+const now = () => globalThis.performance?.now() ?? Date.now();
 /** Coordinates lifecycle only. Scheduling is supplied by the host (browser, tests, or future worker). */
 export class Engine {
   readonly events = new EventBus<EngineEvents>();
@@ -25,12 +32,22 @@ export class Engine {
   private started: System[] = [];
   private status: EngineState = 'stopped';
   private busy = false;
+  private profiling: Map<string, number> | undefined;
+  private profileValue: EngineProfile = {
+    frameMs: 0,
+    fixedSteps: 0,
+    droppedSeconds: 0,
+    systems: {},
+  };
   constructor(
     readonly world: World,
     readonly time = new TimeService(),
   ) {}
   get state(): EngineState {
     return this.status;
+  }
+  get profile(): EngineProfile {
+    return structuredClone(this.profileValue);
   }
   addSystem(system: System): void {
     if (this.status !== 'stopped' || this.busy)
@@ -50,12 +67,19 @@ export class Engine {
     system: System,
     phase: 'start' | 'fixedUpdate' | 'update' | 'lateUpdate' | 'stop',
   ): void {
+    const started = now();
     try {
       system[phase]?.(this.context());
     } catch (cause) {
       this.status = 'faulted';
       this.events.emit('error', { system: system.id, phase, cause });
       throw cause;
+    } finally {
+      if (this.profiling)
+        this.profiling.set(
+          system.id,
+          (this.profiling.get(system.id) ?? 0) + now() - started,
+        );
     }
   }
   private guard(): void {
@@ -102,8 +126,11 @@ export class Engine {
   }
   private advance(seconds: number): void {
     this.busy = true;
+    const started = now();
+    this.profiling = new Map();
+    let steps = 0;
     try {
-      const steps = this.time.advance(seconds);
+      steps = this.time.advance(seconds);
       for (let i = 0; i < steps; i++) {
         this.time.consumeFixed();
         for (const system of this.systems) this.invoke(system, 'fixedUpdate');
@@ -112,6 +139,13 @@ export class Engine {
       for (const system of this.systems) this.invoke(system, 'lateUpdate');
       this.events.emit('frame', this.time.snapshot());
     } finally {
+      this.profileValue = {
+        frameMs: now() - started,
+        fixedSteps: steps,
+        droppedSeconds: this.time.snapshot().dropped,
+        systems: Object.fromEntries(this.profiling),
+      };
+      this.profiling = undefined;
       this.busy = false;
     }
   }

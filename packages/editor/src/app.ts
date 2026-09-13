@@ -16,6 +16,7 @@ import { ProjectStorage } from './storage';
 import { SceneViewport, type Tool } from './viewport';
 import { Inspector } from './inspector';
 import { PlayMode } from './play-mode';
+import { RuntimeInspector } from './runtime-inspector';
 import { node, button, input, ask } from './dom';
 import './style.css';
 import { applyAppearance, loadAppearance } from './appearance';
@@ -118,7 +119,8 @@ const viewport = new SceneViewport(canvas, model, (error) =>
     (assetId) => showScripts(model, log, assetId),
     (assetId) => editBehaviourGraph(model, log, assetId),
   ),
-  play = new PlayMode(playHost, model, log, refresh);
+  play = new PlayMode(playHost, model, log, refresh),
+  runtimeInspector = new RuntimeInspector(play, model, log);
 
 const mobilePanels = [
   ['hierarchy', 'Hierarchy'],
@@ -488,10 +490,25 @@ toolbar.append(
   node('span', 'spacer'),
 );
 const playButton = button('▶ Play', () => run(() => play.start())),
+  playHere = button('Play Here', () =>
+    run(() => play.start([viewport.center[0], viewport.center[1]])),
+  ),
   pause = button('Pause', () => run(() => play.pause())),
   step = button('Step', () => run(() => play.step())),
+  restart = button('Restart', () => run(() => play.restart())),
+  recompile = button('Recompile', () => run(() => play.recompile())),
+  runtime = button('Runtime', () => runtimeInspector.open()),
   stop = button('Stop', () => run(() => play.stop()));
-toolbar.append(playButton, pause, step, stop);
+toolbar.append(
+  playButton,
+  playHere,
+  pause,
+  step,
+  restart,
+  recompile,
+  runtime,
+  stop,
+);
 function renderHierarchy(): void {
   hierarchy.replaceChildren(node('h2', '', 'Hierarchy'));
   const actions = node('div', 'actions');
@@ -672,14 +689,19 @@ function refresh(): void {
     b.disabled = model.locked;
   }
   playButton.disabled = play.state !== 'stopped';
+  playHere.disabled = play.state !== 'stopped';
   pause.disabled =
     play.state === 'stopped' ||
     play.state === 'loading' ||
     play.state === 'faulted';
   pause.textContent = play.state === 'paused' ? 'Resume' : 'Pause';
   step.disabled = play.state !== 'paused';
+  restart.disabled = play.state === 'stopped' || play.state === 'loading';
+  recompile.disabled = play.state === 'stopped' || play.state === 'loading';
+  runtime.disabled = play.state === 'stopped' || play.state === 'loading';
   stop.disabled = play.state === 'stopped';
-  for (const b of menu.querySelectorAll('button')) b.disabled = model.locked;
+  for (const b of menu.querySelectorAll('button'))
+    b.disabled = model.locked && b.dataset.playEnabled !== 'true';
   status.textContent = `${model.selection.size} selected · ${model.dirty ? 'Unsaved changes' : 'Saved locally'} · Drag handles to transform · Shift: multi-select · Alt: bypass snapping · Space / middle mouse: pan`;
   renderHierarchy();
   renderProject();
@@ -833,7 +855,9 @@ const debugControl = input('Physics debug', '', 'checkbox');
 debugControl.input.onchange = () => play.setDebug(debugControl.input.checked);
 toolbar.append(debugControl.row);
 
-menu.append(button('Scripts', () => showScripts(model, log)));
+const scriptsButton = button('Scripts', () => showScripts(model, log));
+scriptsButton.dataset.playEnabled = 'true';
+menu.append(scriptsButton);
 
 const resetLayout = installLayout(app, workspace, bottom);
 menu.append(button('Reset layout', resetLayout));

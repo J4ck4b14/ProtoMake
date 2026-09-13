@@ -146,10 +146,6 @@ export function showScripts(
   initialAsset?: string,
   location: ScriptOpenLocation = {},
 ): void {
-  if (model.locked) {
-    report('Stop Play Mode before editing scripts.', true);
-    return;
-  }
   const dialog = node('dialog', 'script-editor'),
     title = node('h2', '', 'Project TypeScript'),
     select = node('select'),
@@ -322,7 +318,7 @@ export function showScripts(
     try {
       check();
       let saved = '';
-      model.change('Save script', () => {
+      model.changeRuntimeAuthoring('Save script', () => {
         const id = currentId || guid(),
           asset = {
             id,
@@ -351,7 +347,9 @@ export function showScripts(
       if (!existing) select.append(new Option(name.input.value, saved));
       else existing.text = name.input.value;
       select.value = saved;
-      report(`Saved and compiled ${name.input.value}`);
+      report(
+        `Saved and compiled ${name.input.value}${model.locked ? ' · choose Recompile in Play to restart with it' : ''}`,
+      );
     } catch (error) {
       showDiagnostics();
       report(String(error), true);

@@ -286,3 +286,39 @@ it('validates rich Inspector metadata without executing project code', () => {
     ),
   ).toThrow(/min must not exceed max/);
 });
+
+it('inspects and changes exposed values during runtime', async () => {
+  const editor = new EditorModel(),
+    id = editor.createEntity('Tunable'),
+    script = asset('Tunable.ts', 'export default class {}');
+  editor.project.assets.push(script);
+  editor.addScriptBehaviour(script.id, { speed: 3 });
+  class Tunable {
+    speed = 0;
+    update() {}
+  }
+  const physics = await Physics2D.create(editor.world, editor.project.physics),
+    system = new ScriptSystem(
+      editor.world,
+      new InputService(editor.project.input),
+      physics,
+      new Map([[script.id, { default: Tunable }]]),
+      new Map([
+        [script.id, { speed: { type: 'number', default: 1, min: 0, max: 10 } }],
+      ]),
+      () => {},
+      () => {},
+    ),
+    engine = new Engine(editor.world);
+  engine.addSystem(system);
+  engine.start();
+  expect(system.runtimeBehaviours()[0]?.fields[0]?.value).toBe(3);
+  const behaviour = editor.world.read(editor.entity(id), Behaviours)!.order[0]!;
+  system.setRuntimeValue(id, behaviour, 'speed', 7);
+  expect(system.runtimeBehaviours()[0]?.fields[0]?.value).toBe(7);
+  expect(() => system.setRuntimeValue(id, behaviour, 'speed', 11)).toThrow(
+    /range/,
+  );
+  engine.stop();
+  physics.destroy();
+});
