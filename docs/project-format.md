@@ -1,6 +1,6 @@
 # Project and scene formats
 
-The current project schema is **v10**; the scene schema remains **v1**. Engine releases are independent of these schema numbers.
+The current project schema is **v11**; the scene schema remains **v1**. Engine releases are independent of these schema numbers.
 
 | Project version | Added data                                                                           | Migration                              |
 | --------------- | ------------------------------------------------------------------------------------ | -------------------------------------- |
@@ -14,6 +14,7 @@ The current project schema is **v10**; the scene schema remains **v1**. Engine r
 | 8               | ProtoMake 0.13 2D authoring generation                                                   | v7 → v8 updates engine metadata        |
 | 9               | ProtoMake 0.14 live-iteration generation                                                 | v8 → v9 updates engine metadata        |
 | 10              | ProtoMake 0.15 game-feel generation                                                      | v9 → v10 updates engine metadata       |
+| 11              | ProtoMake 0.16 public-release and Interchange foundation                                 | v10 → v11 updates engine metadata      |
 
 Scene v1 contains schemaVersion, UUID id, name and entities. Each entity has UUID id, name, enabled, nullable parent UUID and component payloads keyed by stable type ID. Numeric runtime handles never enter serialized data. Transform stores a six-number affine matrix. New registered component types do not require changing the outer scene envelope.
 
@@ -27,7 +28,7 @@ IndexedDB stores the complete project transactionally. The active editor scene i
 
 `examples/milestones-5-7/Workshop.protomake.json` is a complete current project. The previous physics-playground example remains a migration fixture. Its checked-in Images and Scripts directories also provide convenient individual files for import and editing. The JSON is the portable authored project; it is not generated engine geometry. `dist/` and node_modules are disposable and excluded from delivery.
 
-Schema 4 → 5 replaces the single `protomake.script` payload with `protomake.behaviours`: an ordered identity list and an object keyed by stable behaviour IDs. Existing script data, exposed values and prefab override paths migrate together. Prefab instance copies retain source behaviour IDs within their entity scope, so override paths remain deterministic. Schema 5 → 6 introduces Graph Behaviour slots and versioned Behaviour Graph assets. Schema 6 → 7 adds persistence version/autosave settings and achievement definitions. Schema 7 → 8 marks the 0.13 2D authoring generation; its assets and components remain separately versioned. Schema 8 → 9 marks the 0.14 live-iteration generation without changing authored scene payloads. Schema 9 → 10 marks the 0.15 game-feel generation; component and animation payload defaults upgrade existing authored data. Existing v1–v9 projects migrate sequentially. Current engineVersion is 0.15.0.
+Schema 4 → 5 replaces the single `protomake.script` payload with `protomake.behaviours`: an ordered identity list and an object keyed by stable behaviour IDs. Existing script data, exposed values and prefab override paths migrate together. Prefab instance copies retain source behaviour IDs within their entity scope, so override paths remain deterministic. Schema 5 → 6 introduces Graph Behaviour slots and versioned Behaviour Graph assets. Schema 6 → 7 adds persistence version/autosave settings and achievement definitions. Schema 7 → 8 marks the 0.13 2D authoring generation; its assets and components remain separately versioned. Schema 8 → 9 marks the 0.14 live-iteration generation without changing authored scene payloads. Schema 9 → 10 marks the 0.15 game-feel generation; component and animation payload defaults upgrade existing authored data. Schema 10 → 11 marks the public-release and Interchange foundation without constraining ProtoMake runtime semantics. Existing v1–v10 projects migrate sequentially. Current engineVersion is 0.16.0.
 
 Sprite-region assets reference one immutable source image and store a pixel rectangle, normalized pivot, filtering and atlas label. Tile-set assets store stable tile IDs, image/region references, collision flags, animation frames and neighbour rules. `protomake.tilemap` stores cell size, chunk size, collision layer and ordered sparse layers keyed by signed `x,y` coordinates.
 

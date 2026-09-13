@@ -62,6 +62,7 @@ const allowed = {
     'zod',
   ],
   runtime: ['@protomake/core'],
+  interchange: ['@protomake/graphs', '@protomake/serialization'],
   player: [
     '@protomake/core',
     '@protomake/serialization',
@@ -96,6 +97,7 @@ const allowed = {
     '@protomake/ui',
     '@protomake/persistence',
     '@protomake/tilemap',
+    '@protomake/interchange',
   ],
 };
 let errors = 0;

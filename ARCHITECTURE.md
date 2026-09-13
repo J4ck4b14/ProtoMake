@@ -20,6 +20,7 @@
 | `@protomake/animation`     | Core, assets, runtime types, renderer, Zod                            | Clips, events, controllers, cross-fades and parameter evaluation                 |
 | `@protomake/audio`         | Core, assets, runtime types, Zod                                      | Polyphonic/spatial AudioSource, decoded buffers and Web Audio routing            |
 | `@protomake/player`        | Runtime engine packages                                               | Shared GameSession composition and standalone player                             |
+| `@protomake/interchange`   | Serialization, graphs                                                 | Target-neutral IR, capability reports, ID maps and coordinate conversion         |
 | `@protomake/editor`        | Public engine packages                                                | Authoring model, viewport, Inspector, persistence, project scripts and Play host |
 
 The import-boundary checker runs during lint. Adapter and compiler subpaths keep schema contracts distinct from implementation. Editor UI is DOM; game rendering is Pixi. Core/runtime have no editor DOM knowledge. The Play host coordinates rendering, simulation, scripting and input without implementing those systems itself.
@@ -63,3 +64,9 @@ Sprite regions reference an immutable source-image GUID plus pixel bounds and im
 ## Production boundary
 
 The player registry subpath contains component data contracts without importing rendering adapters or the compiler. GameSession composes services for both hosts. Editor Play compiles source to Blob modules; Build compiles it to static ES module files. The standalone player imports those files directly and has no editor UI or TypeScript compiler dependency. scripts/build-player.mjs checks its bundled module graph before writing the runtime manifest.
+
+## Interchange boundary
+
+`@protomake/interchange` lowers validated authored data into a deterministic, target-neutral subset. It owns the ProtoMake coordinate contract, target conversion profiles, feature capability decisions, graph-node portability boundary, diagnostics, stable ProtoMake-to-target ID maps, and export manifest. Target generators consume this layer; they do not inspect editor state or independently reverse-engineer project internals.
+
+ProtoMake remains canonical. Generated target content lives under a ProtoMake-owned root and may be regenerated, while creator-owned target files remain outside that root. An exporter either maps a feature, names a trustworthy approximation, requests manual work, or reports it unsupported. It never silently drops a known IR item or alters ProtoMake runtime semantics to improve a portability score.

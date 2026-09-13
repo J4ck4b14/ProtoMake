@@ -14,4 +14,6 @@ TypeScript is strict, with unchecked-index and exact-optional-property checks. A
 
 Engine release versions and schema versions are independent. When changing a public schema incompatibly, increase its schema version, register the one-step migration, and test old-to-new and chained upgrades. Do not invent fake legacy schemas to demonstrate infrastructure.
 
+Exporter changes must begin at the Interchange capability contract, preserve deterministic ProtoMake GUID mappings, use the central coordinate profiles, and add golden mapping/diagnostic tests. Never silently omit a lowered item, write undocumented native serialization formats, or modify creator-owned target files.
+
 CI runs install, typecheck, lint/format/boundaries, tests and production build. It is configured here; a remote CI run only exists after this repository is pushed to a GitHub host.

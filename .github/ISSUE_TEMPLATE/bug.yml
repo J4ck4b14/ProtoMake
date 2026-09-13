@@ -1,0 +1,37 @@
+name: Bug report
+description: Report a reproducible ProtoMake editor, runtime, export, or documentation defect.
+title: '[Bug] '
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Export a backup before sharing reproduction steps. Remove private assets or credentials.
+  - type: input
+    id: version
+    attributes:
+      label: ProtoMake version or commit
+    validations:
+      required: true
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduction steps
+      description: Include the smallest project/scene and exact actions that reproduce the problem.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, OS, and device
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Console, build, or portability diagnostics

@@ -17,6 +17,7 @@ import { SceneViewport, type Tool } from './viewport';
 import { Inspector } from './inspector';
 import { PlayMode } from './play-mode';
 import { RuntimeInspector } from './runtime-inspector';
+import { showPortability } from './portability-dialog';
 import { node, button, input, ask } from './dom';
 import './style.css';
 import { applyAppearance, loadAppearance } from './appearance';
@@ -863,6 +864,7 @@ const resetLayout = installLayout(app, workspace, bottom);
 menu.append(button('Reset layout', resetLayout));
 
 menu.append(button('Mixer', () => showMixer(model)));
+menu.append(button('Analyze portability', () => showPortability(model)));
 
 let building = false;
 menu.append(

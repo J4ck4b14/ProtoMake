@@ -1,0 +1,13 @@
+{
+  "name": "@protomake/interchange",
+  "version": "0.16.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "@protomake/graphs": "0.1.0",
+    "@protomake/serialization": "0.1.0"
+  }
+}

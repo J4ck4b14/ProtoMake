@@ -1,8 +1,8 @@
-# ProtoMake 0.15.0
+# ProtoMake 0.16.0
 
 A reusable, browser-native 2D engine and visual editor for human-authored projects.
 
-**Milestones 0–7 and ProtoMake 0.9–0.15 are implemented.** ProtoMake 0.15.0 adds authored particle emitters, animation events and cross-fades, bounded polyphonic and spatial audio, impact camera effects, and concise rigid-body scripting helpers. Existing projects migrate on load. It remains a development release with the documented scope below.
+**Milestones 0–7 and ProtoMake 0.9–0.16 are implemented.** ProtoMake 0.16.0 establishes the public-release documentation and a deterministic Interchange IR with target capability metadata, portability analysis, stable ID maps, centralized unit/coordinate conversion, manifests, and explicit diagnostics. Target generators follow in the 0.16.x series; this checkpoint does not claim they already exist.
 
 ## Three prototype workshop
 
@@ -57,6 +57,7 @@ Start testing with [TESTING-CHECKLIST.md](TESTING-CHECKLIST.md). Save your test 
 | 0.13      | Sprite slicing and reusable regions, tile set/palette authoring, sparse layered tilemaps, animation/rules, chunked collision, Character Body 2D, camera follow/zones and shake                                                                           |
 | 0.14      | Runtime hierarchy and property tuning, safe authoring Apply, Play From Here, scene restart, script recompile/restart, graph value inspection and per-system profiling                                                                                    |
 | 0.15      | Particle emitters, animation events/cross-fades, bounded polyphonic and spatial audio, camera kick/zoom pulse, and rigid-body scripting conveniences                                                                                                     |
+| 0.16      | Public release documentation, deterministic Interchange IR, target capability metadata, portability analysis, stable ID maps, coordinate conversion, manifests and diagnostics                                                                           |
 
 ## Editor Quality polish
 
@@ -76,7 +77,7 @@ ProtoMake can be hosted as a static site. **Save locally** writes projects to In
 
 For a free launch, push the repository to GitHub and enable **Settings → Pages → GitHub Actions**. The checked-in Pages workflow verifies ProtoMake, builds `dist/`, and deploys it. Vite uses relative production paths, so a project URL such as `https://YOUR_USERNAME.github.io/ProtoMake/` works without a custom domain. See [zero-cost GitHub Pages deployment](docs/github-pages.md).
 
-Before the first public push, apply the currently recommended dev-tool security upgrades and regenerate the lockfile with `npm install --save-dev vite@7.3.6 vitest@4.1.11 esbuild@0.28.2`, then rerun the launch verification. These packages are build/test tooling and are not served as a development server in production, but a public repository should not knowingly retain avoidable advisories.
+Before a public push, run `npm audit`, review current development-tool advisories, update deliberately, regenerate the lockfile, and rerun the complete launch verification. Build/test tooling is not served by the static production player, but the public repository should still record and address relevant advisories.
 
 The early development-repository reflog format and milestone records are documented in [repository history and reflogs](docs/git-history.md); the public, human-readable timeline is in [HISTORY.md](HISTORY.md).
 
@@ -90,7 +91,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 129 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, audio behavior and input feel remain part of the browser acceptance checklist.
+The suite includes 132 automated tests, with actual Rapier simulation, execution of compiled project modules, and deterministic Interchange/portability checks. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, audio behavior and input feel remain part of the browser acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 
@@ -108,4 +109,4 @@ The suite includes 129 automated tests, with actual Rapier simulation and execut
 
 Prefabs do not yet support nested relationships or structural overrides. Animation remains sprite-based rather than skeletal; spatial audio is a lightweight 2D attenuation/pan model rather than HRTF. Export conservatively includes every project scene/asset. Detailed contracts are in [prefabs](docs/prefabs.md) and [animation/audio](docs/animation-audio.md).
 
-See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [scripting guide](docs/scripting.md), [Developer Velocity 0.10](docs/developer-velocity-0.10.md), [Visual Logic 0.11](docs/visual-logic-0.11.md), [Game UI & Persistence 0.12](docs/game-ui-persistence-0.12.md), [2D Authoring 0.13](docs/authoring-2d-0.13.md), [Live Iteration 0.14](docs/live-iteration-0.14.md), [Game Feel 0.15](docs/game-feel-0.15.md), [lighting](docs/lighting.md), [account continuity](docs/account-sync.md), [0.9.3 launch pass](docs/launch-0.9.3.md), [GitHub Pages deployment](docs/github-pages.md), [project history](HISTORY.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).
+See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [scripting guide](docs/scripting.md), [Developer Velocity 0.10](docs/developer-velocity-0.10.md), [Visual Logic 0.11](docs/visual-logic-0.11.md), [Game UI & Persistence 0.12](docs/game-ui-persistence-0.12.md), [2D Authoring 0.13](docs/authoring-2d-0.13.md), [Live Iteration 0.14](docs/live-iteration-0.14.md), [Game Feel 0.15](docs/game-feel-0.15.md), [Interchange and portability](docs/portability.md), [showcase](docs/showcase.md), [roadmap](docs/roadmap.md), [browser support](docs/browser-support.md), [versioning](docs/versioning.md), [lighting](docs/lighting.md), [account continuity](docs/account-sync.md), [GitHub Pages deployment](docs/github-pages.md), [project history](HISTORY.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), [license](LICENSE), and [contributing](CONTRIBUTING.md).

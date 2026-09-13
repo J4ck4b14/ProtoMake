@@ -1421,3 +1421,23 @@ textarea {
   padding: 8px;
   background: #101820;
 }
+.portability-dialog {
+  width: min(880px, 92vw);
+  max-height: 88vh;
+  overflow: auto;
+}
+.portability-dialog section {
+  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid var(--protomake-border);
+  border-radius: 5px;
+}
+.portability-dialog details p {
+  margin: 5px 0;
+  font-family: ui-monospace, monospace;
+  font-size: 10px;
+}
+.portability-unsupported,
+.portability-manual-work {
+  color: var(--protomake-danger, #ff9d9d);
+}
