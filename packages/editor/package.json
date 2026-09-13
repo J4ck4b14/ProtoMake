@@ -19,6 +19,7 @@
     "@protomake/prefabs": "0.6.0",
     "@protomake/animation": "0.6.0",
     "@protomake/audio": "0.6.0",
-    "@protomake/player": "0.8.0"
+    "@protomake/player": "0.8.0",
+    "@protomake/tilemap": "0.1.0"
   }
 }

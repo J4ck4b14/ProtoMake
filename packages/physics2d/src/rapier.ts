@@ -8,11 +8,19 @@ import {
   type Matrix2D,
 } from '@protomake/core';
 import type { EngineContext } from '@protomake/runtime';
+import type { AssetData } from '@protomake/assets';
+import {
+  Tilemap2D,
+  TileSetSchema,
+  TILESET_MIME,
+  parseCell,
+} from '@protomake/tilemap';
 import {
   Rigidbody2D,
   BoxCollider2D,
   CircleCollider2D,
   CapsuleCollider2D,
+  CharacterBody2D,
   collisionGroups,
   PhysicsSettingsSchema,
   type PhysicsSettings,
@@ -37,14 +45,19 @@ interface BodyRecord {
   sy: number;
   signature: readonly unknown[];
 }
+interface TileChunkRecord {
+  body: RAPIER.RigidBody;
+  signature: string;
+}
 let initialized: Promise<void> | undefined;
 export class Physics2D {
   readonly id = 'protomake.physics';
   readonly events = new EventBus<{ contact: ContactEvent }>();
   private readonly bodies = new Map<number, BodyRecord>();
+  private readonly tileChunks = new Map<string, TileChunkRecord>();
   private readonly colliderOwners = new Map<
     number,
-    { entity: number; sensor: boolean }
+    { entity: number; sensor: boolean; oneWay: boolean }
   >();
   private disposed = false;
   private constructor(
@@ -52,10 +65,12 @@ export class Physics2D {
     readonly settings: PhysicsSettings,
     private readonly physics: RAPIER.World,
     private readonly queue: RAPIER.EventQueue,
+    private readonly assets: readonly AssetData[],
   ) {}
   static async create(
     world: World,
     settings: PhysicsSettings,
+    assets: readonly AssetData[] = [],
   ): Promise<Physics2D> {
     initialized ??= RAPIER.init();
     await initialized;
@@ -65,6 +80,7 @@ export class Physics2D {
       validated,
       new RAPIER.World({ x: validated.gravityX, y: validated.gravityY }),
       new RAPIER.EventQueue(true),
+      assets,
     );
     try {
       service.sync();
@@ -223,10 +239,83 @@ export class Physics2D {
         this.colliderOwners.set(collider.handle, {
           entity: id,
           sensor: colliderData.sensor,
+          oneWay: colliderData.oneWay,
         });
       }
       if (colliders.length === 0) body.setAdditionalMass(data.mass, true);
     }
+    this.syncTilemaps();
+    this.physics.propagateModifiedBodyPositionsToColliders();
+  }
+  private syncTilemaps(): void {
+    const seen = new Set<string>();
+    for (const [id] of this.world.query(Tilemap2D.type)) {
+      if (!this.world.isActive(id)) continue;
+      const map = this.world.read(id, Tilemap2D)!,
+        asset = this.assets.find(
+          (candidate) =>
+            candidate.id === map.tileset && candidate.mime === TILESET_MIME,
+        );
+      if (!asset) continue;
+      const set = TileSetSchema.parse(JSON.parse(asset.data)),
+        tiles = new Map(set.tiles.map((tile) => [tile.id, tile])),
+        chunks = new Map<string, { cell: string; oneWay: boolean }[]>();
+      for (const layer of map.layers)
+        if (layer.visible)
+          for (const [cell, tileId] of Object.entries(layer.cells)) {
+            const tile = tiles.get(tileId);
+            if (!tile?.solid) continue;
+            const [x, y] = parseCell(cell),
+              key = `${Math.floor(x / map.chunkSize)},${Math.floor(y / map.chunkSize)}`,
+              values = chunks.get(key) ?? [];
+            values.push({ cell, oneWay: tile.oneWay });
+            chunks.set(key, values);
+          }
+      const transform = this.affine(id);
+      for (const [chunk, cells] of chunks) {
+        const key = `${this.world.get(id).guid}:${chunk}`,
+          signature = JSON.stringify([map, cells, transform]);
+        seen.add(key);
+        if (this.tileChunks.get(key)?.signature === signature) continue;
+        const previous = this.tileChunks.get(key);
+        if (previous) this.physics.removeRigidBody(previous.body);
+        const body = this.physics.createRigidBody(
+          RAPIER.RigidBodyDesc.fixed()
+            .setTranslation(transform.x, transform.y)
+            .setRotation(transform.rotation),
+        );
+        for (const cell of cells) {
+          const [x, y] = parseCell(cell.cell),
+            collider = this.physics.createCollider(
+              RAPIER.ColliderDesc.cuboid(
+                (map.cellWidth * Math.abs(transform.sx)) / 2,
+                (map.cellHeight * Math.abs(transform.sy)) / 2,
+              )
+                .setTranslation(
+                  (x + 0.5) * map.cellWidth * transform.sx,
+                  (y + 0.5) * map.cellHeight * transform.sy,
+                )
+                .setCollisionGroups(
+                  collisionGroups(map.collisionLayer, this.settings),
+                ),
+              body,
+            );
+          this.colliderOwners.set(collider.handle, {
+            entity: id,
+            sensor: false,
+            oneWay: cell.oneWay,
+          });
+        }
+        this.tileChunks.set(key, { body, signature });
+      }
+    }
+    for (const [key, chunk] of this.tileChunks)
+      if (!seen.has(key)) {
+        for (let i = 0; i < chunk.body.numColliders(); i++)
+          this.colliderOwners.delete(chunk.body.collider(i).handle);
+        this.physics.removeRigidBody(chunk.body);
+        this.tileChunks.delete(key);
+      }
   }
   fixedUpdate(context: EngineContext): void {
     this.step(context.time.fixedDelta);
@@ -324,6 +413,132 @@ export class Physics2D {
       m = this.world.worldMatrix(numeric);
     this.writeWorld(numeric, [m[0], m[1], m[2], m[3], x, y]);
   }
+  characterState(id: string): {
+    readonly grounded: boolean;
+    readonly floorNormal: readonly [number, number];
+    readonly floorEntity?: string;
+    readonly onWall: boolean;
+    readonly onCeiling: boolean;
+  } {
+    this.sync();
+    const numeric = this.world.find(id),
+      data =
+        numeric === undefined
+          ? undefined
+          : this.world.read(numeric, CharacterBody2D);
+    if (numeric === undefined || !data)
+      throw new Error(`No Character Body 2D for ${id}`);
+    const position = this.world.worldPosition(numeric),
+      box = this.world.read(numeric, BoxCollider2D),
+      circle = this.world.read(numeric, CircleCollider2D),
+      capsule = this.world.read(numeric, CapsuleCollider2D),
+      halfWidth = box
+        ? box.width / 2
+        : (circle?.radius ?? capsule?.radius ?? 16),
+      halfHeight = box
+        ? box.height / 2
+        : (circle?.radius ??
+          (capsule?.radius ?? 0) + (capsule?.halfHeight ?? 16)),
+      floor = this.raycast(
+        position,
+        [-data.upX, -data.upY],
+        halfHeight + data.skinWidth + data.groundSnap,
+        id,
+        data.platformLayer,
+      ),
+      ceiling = this.raycast(
+        position,
+        [data.upX, data.upY],
+        halfHeight + data.skinWidth,
+        id,
+        data.platformLayer,
+      ),
+      right = [-data.upY, data.upX] as const,
+      wall =
+        this.raycast(
+          position,
+          right,
+          halfWidth + data.skinWidth,
+          id,
+          data.platformLayer,
+        ) ??
+        this.raycast(
+          position,
+          [-right[0], -right[1]],
+          halfWidth + data.skinWidth,
+          id,
+          data.platformLayer,
+        ),
+      slope = Math.cos((data.maxSlopeDegrees * Math.PI) / 180),
+      grounded = Boolean(
+        floor &&
+        floor.normal[0] * data.upX + floor.normal[1] * data.upY >= slope,
+      );
+    return {
+      grounded,
+      floorNormal: grounded ? floor!.normal : [data.upX, data.upY],
+      ...(grounded ? { floorEntity: floor!.entity } : {}),
+      onWall: Boolean(wall),
+      onCeiling: Boolean(ceiling),
+    };
+  }
+  moveAndSlide(
+    id: string,
+    velocity: readonly [number, number],
+    delta: number,
+  ): {
+    readonly velocity: readonly [number, number];
+    readonly grounded: boolean;
+    readonly floorNormal: readonly [number, number];
+  } {
+    if (
+      !velocity.every(Number.isFinite) ||
+      !Number.isFinite(delta) ||
+      delta <= 0
+    )
+      throw new Error('Character motion must be finite with positive delta');
+    const numeric = this.world.find(id),
+      data =
+        numeric === undefined
+          ? undefined
+          : this.world.read(numeric, CharacterBody2D);
+    if (numeric === undefined || !data)
+      throw new Error(`No Character Body 2D for ${id}`);
+    const start = this.world.worldPosition(numeric),
+      distance = Math.hypot(velocity[0] * delta, velocity[1] * delta),
+      hit =
+        distance > 0
+          ? this.raycast(
+              start,
+              velocity,
+              distance + data.skinWidth,
+              id,
+              data.platformLayer,
+            )
+          : null,
+      travel = hit ? Math.max(0, hit.distance - data.skinWidth) : distance,
+      length = Math.hypot(...velocity) || 1,
+      position = [
+        start[0] + (velocity[0] / length) * travel,
+        start[1] + (velocity[1] / length) * travel,
+      ] as const;
+    this.movePosition(id, position[0], position[1]);
+    let result: readonly [number, number] = velocity;
+    if (hit) {
+      const dot = velocity[0] * hit.normal[0] + velocity[1] * hit.normal[1];
+      if (dot < 0)
+        result = [
+          velocity[0] - hit.normal[0] * dot,
+          velocity[1] - hit.normal[1] * dot,
+        ];
+    }
+    const state = this.characterState(id);
+    return {
+      velocity: result,
+      grounded: state.grounded,
+      floorNormal: state.floorNormal,
+    };
+  }
   teleport(id: string, x: number, y: number): void {
     if (!Number.isFinite(x) || !Number.isFinite(y))
       throw new Error('Position must be finite');
@@ -390,6 +605,7 @@ export class Physics2D {
     this.queue.free();
     this.physics.free();
     this.bodies.clear();
+    this.tileChunks.clear();
     this.colliderOwners.clear();
   }
 }

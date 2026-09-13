@@ -24,6 +24,7 @@ import { runtimeRegistry } from './registry';
 import { RuntimePrefabs } from './prefabs';
 import { GraphRuntime } from '@protomake/graphs';
 import { RuntimeUiSystem } from '@protomake/ui';
+import { CameraBehaviourSystem } from '@protomake/renderer';
 import {
   createPersistentServices,
   type PersistentGameServices,
@@ -74,7 +75,7 @@ export class GameSession {
       );
       physics = await loadStage(
         'Starting physics',
-        () => Physics2D.create(world, project.physics),
+        () => Physics2D.create(world, project.physics, project.assets),
         progress,
         (value) => value.destroy(),
       );
@@ -107,7 +108,8 @@ export class GameSession {
           canvas.parentElement ?? canvas,
           project.assets,
           signals,
-        );
+        ),
+        cameraEffects = new CameraBehaviourSystem(world);
       audio = await loadStage(
         'Decoding audio',
         () => AudioSystem.create(world, project.assets, project.mixer),
@@ -125,6 +127,7 @@ export class GameSession {
       engine.addSystem(timers);
       engine.addSystem(tweens);
       engine.addSystem(ui);
+      engine.addSystem(cameraEffects);
       engine.addSystem(
         new ScriptSystem(
           world,
@@ -145,6 +148,7 @@ export class GameSession {
             ui,
             save: persistent.save,
             achievements: persistent.achievements,
+            cameraEffects,
           },
         ),
       );

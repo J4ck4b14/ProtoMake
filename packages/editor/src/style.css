@@ -1175,6 +1175,32 @@ textarea {
   background: #111820;
   color: #d9e2eb;
 }
+.tilemap-dialog {
+  width: min(920px, calc(100vw - 32px));
+  max-width: none;
+}
+.tilemap-editor {
+  display: grid;
+  grid-template-columns: 190px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px;
+}
+.tile-palette {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.tile-palette button.selected {
+  background: #3978a8;
+  border-color: #74b6e8;
+}
+.tile-canvas {
+  display: block;
+  width: 100%;
+  max-height: 65vh;
+  border: 1px solid #435260;
+  image-rendering: pixelated;
+}
 .graph-dialog::backdrop {
   background: rgb(4 8 12 / 78%);
 }

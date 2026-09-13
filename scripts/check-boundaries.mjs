@@ -29,15 +29,25 @@ const allowed = {
   ],
   ui: ['@protomake/assets', '@protomake/core', '@protomake/runtime', 'zod'],
   persistence: ['zod'],
+  tilemap: ['@protomake/core', 'zod'],
   input: ['zod'],
   physics2d: [
+    '@protomake/assets',
     '@protomake/core',
     '@protomake/runtime',
+    '@protomake/tilemap',
     'zod',
     '@dimforge/rapier2d-compat',
   ],
   assets: ['@protomake/core', 'zod'],
-  renderer: ['@protomake/core', '@protomake/assets', 'zod', 'pixi.js'],
+  renderer: [
+    '@protomake/core',
+    '@protomake/assets',
+    '@protomake/runtime',
+    '@protomake/tilemap',
+    'zod',
+    'pixi.js',
+  ],
   serialization: [
     '@protomake/prefabs',
     '@protomake/animation',
@@ -48,6 +58,7 @@ const allowed = {
     '@protomake/input',
     '@protomake/graphs',
     '@protomake/persistence',
+    '@protomake/tilemap',
     'zod',
   ],
   runtime: ['@protomake/core'],
@@ -66,6 +77,7 @@ const allowed = {
     '@protomake/graphs',
     '@protomake/ui',
     '@protomake/persistence',
+    '@protomake/tilemap',
   ],
   editor: [
     '@protomake/player',
@@ -83,6 +95,7 @@ const allowed = {
     '@protomake/graphs',
     '@protomake/ui',
     '@protomake/persistence',
+    '@protomake/tilemap',
   ],
 };
 let errors = 0;

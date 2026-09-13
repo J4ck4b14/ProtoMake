@@ -60,6 +60,7 @@ const common = {
   friction: finite.nonnegative(),
   restitution: finite.nonnegative(),
   layer: z.number().int().min(0).max(15),
+  oneWay: z.boolean().default(false),
 };
 const commonDefaults = {
   offsetX: 0,
@@ -68,6 +69,7 @@ const commonDefaults = {
   friction: 0.5,
   restitution: 0,
   layer: 0,
+  oneWay: false,
 };
 const BoxSchema = z.strictObject({
   ...common,
@@ -107,6 +109,53 @@ export const CapsuleCollider2D: ComponentDefinition<CapsuleData> = {
   schema: CapsuleSchema,
   inspector: fields(capsuleDefaults),
 };
+const CharacterSchema = z.strictObject({
+  maxSpeed: finite.positive(),
+  acceleration: finite.positive(),
+  deceleration: finite.positive(),
+  maxSlopeDegrees: finite.min(0).max(89),
+  groundSnap: finite.nonnegative(),
+  skinWidth: finite.positive(),
+  upX: finite,
+  upY: finite,
+  platformLayer: z.number().int().min(0).max(15),
+});
+export type CharacterData = z.infer<typeof CharacterSchema>;
+export const CharacterBody2D: ComponentDefinition<CharacterData> = {
+  type: 'protomake.character-body',
+  displayName: 'Character Body 2D',
+  schema: CharacterSchema.superRefine((value, context) => {
+    if (Math.abs(Math.hypot(value.upX, value.upY) - 1) > 0.01)
+      context.addIssue({
+        code: 'custom',
+        message: 'Character up direction must be normalized',
+      });
+  }),
+  defaults: () => ({
+    maxSpeed: 240,
+    acceleration: 1800,
+    deceleration: 2200,
+    maxSlopeDegrees: 50,
+    groundSnap: 8,
+    skinWidth: 1,
+    upX: 0,
+    upY: -1,
+    platformLayer: 1,
+  }),
+  inspector: [
+    ...[
+      'maxSpeed',
+      'acceleration',
+      'deceleration',
+      'maxSlopeDegrees',
+      'groundSnap',
+      'skinWidth',
+      'upX',
+      'upY',
+      'platformLayer',
+    ].map((path) => ({ path, label: path, kind: 'number' as const })),
+  ],
+};
 export const PhysicsSettingsSchema = z
   .strictObject({
     gravityX: finite,
@@ -139,6 +188,7 @@ export function registerPhysics(registry: ComponentRegistry): void {
   registry.register(BoxCollider2D);
   registry.register(CircleCollider2D);
   registry.register(CapsuleCollider2D);
+  registry.register(CharacterBody2D);
 }
 export function collisionGroups(
   layer: number,

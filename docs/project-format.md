@@ -1,6 +1,6 @@
 # Project and scene formats
 
-The current project schema is **v5**; the scene schema remains **v1**. Engine releases are independent of these schema numbers.
+The current project schema is **v8**; the scene schema remains **v1**. Engine releases are independent of these schema numbers.
 
 | Project version | Added data                                                                           | Migration                              |
 | --------------- | ------------------------------------------------------------------------------------ | -------------------------------------- |
@@ -9,6 +9,9 @@ The current project schema is **v5**; the scene schema remains **v1**. Engine re
 | 3               | Gravity, physics layers/matrix and input actions                                     | v2 → v3 adds working defaults          |
 | 4               | Folder paths, scene folder assignments, audio mixer buses                            | v3 → v4 adds defaults                  |
 | 5               | Stable multi-behaviour slots and per-slot enabled state                              | v4 → v5 converts `protomake.script` data   |
+| 6               | Behaviour Graph assets and Graph Behaviour slots                                     | v5 → v6 updates engine metadata        |
+| 7               | Persistence settings and achievement definitions                                     | v6 → v7 adds safe defaults             |
+| 8               | ProtoMake 0.13 2D authoring generation                                                   | v7 → v8 updates engine metadata        |
 
 Scene v1 contains schemaVersion, UUID id, name and entities. Each entity has UUID id, name, enabled, nullable parent UUID and component payloads keyed by stable type ID. Numeric runtime handles never enter serialized data. Transform stores a six-number affine matrix. New registered component types do not require changing the outer scene envelope.
 
@@ -22,6 +25,8 @@ IndexedDB stores the complete project transactionally. The active editor scene i
 
 `examples/milestones-5-7/Workshop.protomake.json` is a complete current project. The previous physics-playground example remains a migration fixture. Its checked-in Images and Scripts directories also provide convenient individual files for import and editing. The JSON is the portable authored project; it is not generated engine geometry. `dist/` and node_modules are disposable and excluded from delivery.
 
-Schema 4 → 5 replaces the single `protomake.script` payload with `protomake.behaviours`: an ordered identity list and an object keyed by stable behaviour IDs. Existing script data, exposed values and prefab override paths migrate together. Prefab instance copies retain source behaviour IDs within their entity scope, so override paths remain deterministic. Schema 5 → 6 introduces Graph Behaviour slots and versioned Behaviour Graph assets. Schema 6 → 7 adds persistence version/autosave settings and achievement definitions. Existing v1–v6 projects migrate sequentially. Current engineVersion is 0.12.0.
+Schema 4 → 5 replaces the single `protomake.script` payload with `protomake.behaviours`: an ordered identity list and an object keyed by stable behaviour IDs. Existing script data, exposed values and prefab override paths migrate together. Prefab instance copies retain source behaviour IDs within their entity scope, so override paths remain deterministic. Schema 5 → 6 introduces Graph Behaviour slots and versioned Behaviour Graph assets. Schema 6 → 7 adds persistence version/autosave settings and achievement definitions. Schema 7 → 8 marks the 0.13 2D authoring generation; its assets and components remain separately versioned. Existing v1–v7 projects migrate sequentially. Current engineVersion is 0.13.0.
+
+Sprite-region assets reference one immutable source image and store a pixel rectangle, normalized pivot, filtering and atlas label. Tile-set assets store stable tile IDs, image/region references, collision flags, animation frames and neighbour rules. `protomake.tilemap` stores cell size, chunk size, collision layer and ordered sparse layers keyed by signed `x,y` coordinates.
 
 Release 0.8 lighting now includes defaulted Sprite Renderer fields `lit` and `castShadow`, `protomake.light.mobility` (`static | mixed | dynamic`), and the optional `protomake.shadow-caster` rectangle component. Older component payloads receive defaults during registered-component parsing; projects without active lights render as before. ProtoMake 0.9.3 also accepts the briefly shipped `protomake.shadowCaster` key on import/recovery and canonicalizes it to `protomake.shadow-caster` on the next validated save. These additions do not change the enclosing project schema version. Editor appearance/account state remain browser preferences/services and are not serialized into project JSON.

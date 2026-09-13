@@ -1,5 +1,20 @@
 import { z } from 'zod';
 import { guid, GUID_PATTERN, type ComponentRegistry } from '@protomake/core';
+export const SPRITE_REGION_MIME = 'application/x-protomake-sprite-region';
+export const SpriteRegionSchema = z.strictObject({
+  version: z.literal(1),
+  source: z.string().regex(GUID_PATTERN),
+  x: z.number().int().nonnegative(),
+  y: z.number().int().nonnegative(),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+  pivotX: z.number().finite(),
+  pivotY: z.number().finite(),
+  filter: z.enum(['nearest', 'linear']),
+  trim: z.boolean(),
+  atlas: z.string(),
+});
+export type SpriteRegion = z.infer<typeof SpriteRegionSchema>;
 export const AssetSchema = z
   .strictObject({
     id: z.string().regex(GUID_PATTERN),
@@ -25,6 +40,8 @@ export const AssetSchema = z
       'application/x-protomake-animation',
       'application/x-protomake-animator',
       'application/x-protomake-behaviour-graph',
+      SPRITE_REGION_MIME,
+      'application/x-protomake-tileset',
       'audio/wav',
       'audio/mpeg',
       'audio/ogg',

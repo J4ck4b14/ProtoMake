@@ -79,6 +79,9 @@ export interface RuntimeScriptServices {
     unlock(id: string): boolean;
     isUnlocked(id: string): boolean;
   };
+  readonly cameraEffects?: {
+    shake(camera: Guid, intensity: number, duration: number): void;
+  };
 }
 export interface ScriptContext {
   setParameter(name: string, value: boolean | number, entity?: Guid): void;
@@ -151,6 +154,25 @@ export interface ScriptContext {
     worldToScreen(
       position: readonly [number, number],
     ): readonly [number, number];
+    shake(camera: Guid, intensity: number, duration: number): void;
+  };
+  readonly character: {
+    moveAndSlide(
+      velocity: readonly [number, number],
+      delta?: number,
+      entity?: Guid,
+    ): {
+      readonly velocity: readonly [number, number];
+      readonly grounded: boolean;
+      readonly floorNormal: readonly [number, number];
+    };
+    state(entity?: Guid): {
+      readonly grounded: boolean;
+      readonly floorNormal: readonly [number, number];
+      readonly floorEntity?: string;
+      readonly onWall: boolean;
+      readonly onCeiling: boolean;
+    };
   };
   readonly ui: {
     setText(entity: Guid, text: string): void;
@@ -420,6 +442,16 @@ export class ScriptSystem implements System {
           coordinates?.screenToWorld(position) ?? position,
         worldToScreen: (position) =>
           coordinates?.worldToScreen(position) ?? position,
+        shake: (camera, intensity, duration) => {
+          const effects = this.services.cameraEffects;
+          if (!effects) return unavailable('Camera effects');
+          effects.shake(camera, intensity, duration);
+        },
+      },
+      character: {
+        moveAndSlide: (velocity, delta = clock().delta, stable = id) =>
+          this.physics.moveAndSlide(stable, velocity, delta),
+        state: (stable = id) => this.physics.characterState(stable),
       },
       ui: {
         setText: (stable, text) => {

@@ -49,6 +49,7 @@ export default defineConfig({
           'graphs',
           'ui',
           'persistence',
+          'tilemap',
           'renderer',
         ].map((name) => [
           `@protomake/${name}`,

@@ -31,6 +31,7 @@
       "@protomake/graphs": ["./packages/graphs/src/index.ts"],
       "@protomake/ui": ["./packages/ui/src/index.ts"],
       "@protomake/persistence": ["./packages/persistence/src/index.ts"],
+      "@protomake/tilemap": ["./packages/tilemap/src/index.ts"],
       "@protomake/prefabs": ["./packages/prefabs/src/index.ts"],
       "@protomake/animation": ["./packages/animation/src/index.ts"],
       "@protomake/audio": ["./packages/audio/src/index.ts"],

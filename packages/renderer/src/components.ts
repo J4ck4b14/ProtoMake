@@ -47,6 +47,7 @@ const SpriteSchema = z.strictObject({
   flipY: z.boolean(),
   anchorX: finite,
   anchorY: finite,
+  useTexturePivot: z.boolean().default(true),
   layer: z.number().int(),
   order: z.number().int(),
 });
@@ -69,6 +70,7 @@ export const SpriteRenderer: ComponentDefinition<SpriteData> = {
     flipY: false,
     anchorX: 0.5,
     anchorY: 0.5,
+    useTexturePivot: true,
     layer: 0,
     order: 0,
   }),
@@ -90,12 +92,89 @@ export const SpriteRenderer: ComponentDefinition<SpriteData> = {
       kind: 'enum',
       options: LIGHTING_CHANNELS,
     },
-    ...['visible', 'flipX', 'flipY', 'lit', 'castShadow'].map((path) => ({
+    ...[
+      'visible',
+      'flipX',
+      'flipY',
+      'useTexturePivot',
+      'lit',
+      'castShadow',
+    ].map((path) => ({
       path,
       label: path,
       kind: 'boolean' as const,
     })),
   ],
+};
+
+const CameraFollowSchema = z.strictObject({
+  target: z.string(),
+  deadZoneWidth: finite.nonnegative(),
+  deadZoneHeight: finite.nonnegative(),
+  lookAheadSeconds: finite.nonnegative(),
+  smoothing: finite.nonnegative(),
+  confine: z.boolean(),
+  minX: finite,
+  minY: finite,
+  maxX: finite,
+  maxY: finite,
+});
+export const CameraFollow2D: ComponentDefinition<
+  z.infer<typeof CameraFollowSchema>
+> = {
+  type: 'protomake.camera-follow',
+  displayName: 'Camera Follow 2D',
+  schema: CameraFollowSchema,
+  defaults: () => ({
+    target: '',
+    deadZoneWidth: 80,
+    deadZoneHeight: 50,
+    lookAheadSeconds: 0.15,
+    smoothing: 8,
+    confine: false,
+    minX: -1000,
+    minY: -1000,
+    maxX: 1000,
+    maxY: 1000,
+  }),
+  inspector: [
+    { path: 'target', label: 'Target', kind: 'entity' },
+    ...[
+      'deadZoneWidth',
+      'deadZoneHeight',
+      'lookAheadSeconds',
+      'smoothing',
+      'minX',
+      'minY',
+      'maxX',
+      'maxY',
+    ].map((path) => ({ path, label: path, kind: 'number' as const })),
+    { path: 'confine', label: 'Confine', kind: 'boolean' },
+  ],
+};
+const CameraZoneSchema = z.strictObject({
+  width: finite.positive(),
+  height: finite.positive(),
+  zoom: finite.positive(),
+  blendSpeed: finite.nonnegative(),
+  priority: z.number().int(),
+});
+export const CameraZone2D: ComponentDefinition<
+  z.infer<typeof CameraZoneSchema>
+> = {
+  type: 'protomake.camera-zone',
+  displayName: 'Camera Zone 2D',
+  schema: CameraZoneSchema,
+  defaults: () => ({
+    width: 320,
+    height: 180,
+    zoom: 1,
+    blendSpeed: 6,
+    priority: 0,
+  }),
+  inspector: ['width', 'height', 'zoom', 'blendSpeed', 'priority'].map(
+    (path) => ({ path, label: path, kind: 'number' as const }),
+  ),
 };
 
 const ShadowCasterSchema = z.strictObject({
@@ -258,5 +337,7 @@ export function registerRendering(registry: ComponentRegistry): void {
   registry.register(SpriteRenderer);
   registry.register(ShadowCaster2D);
   registry.register(Camera2D);
+  registry.register(CameraFollow2D);
+  registry.register(CameraZone2D);
   registry.register(Light2D);
 }

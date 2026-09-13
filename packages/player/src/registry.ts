@@ -5,6 +5,7 @@ import { AudioSource } from '@protomake/audio';
 import { registerPhysics } from '@protomake/physics2d';
 import { registerRendering } from '@protomake/renderer';
 import { registerUi } from '@protomake/ui';
+import { registerTilemap } from '@protomake/tilemap';
 import {
   createRegistry,
   type ComponentRegistry,
@@ -34,6 +35,7 @@ export function runtimeRegistry(): ComponentRegistry {
   registerRendering(registry);
   registerPhysics(registry);
   registerUi(registry);
+  registerTilemap(registry);
   registry.register(Behaviours);
   registry.register(Perception2D);
   registry.register(PrefabLink);

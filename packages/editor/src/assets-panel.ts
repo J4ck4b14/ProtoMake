@@ -19,6 +19,9 @@ import { node, button, ask } from './dom';
 import { showScripts } from './scripts-panel';
 import { editBehaviourGraph } from './graph-editor';
 import { GRAPH_MIME } from '@protomake/graphs';
+import { TILESET_MIME } from '@protomake/tilemap';
+import { sliceSprite } from './sprite-slicer';
+import { createTileSet, editTilemap, editTileSet } from './tilemap-editor';
 export class AssetsPanel {
   private folder = 'Assets';
   private selected: string | undefined;
@@ -134,6 +137,24 @@ export class AssetsPanel {
     const actions = node('div', 'actions');
     actions.append(
       button('Import files', () => file.click()),
+      button('Slice sprite', () =>
+        this.run(() => sliceSprite(this.model, this.selected, this.report)),
+      ),
+      button(
+        '+ Tile set',
+        () =>
+          void query(
+            'Tile set path',
+            `${this.folder || 'Assets'}/Tiles.tileset.json`,
+            (path) => createTileSet(this.model, this.selected, path),
+          ),
+      ),
+      button('Edit tilemap', () =>
+        this.run(() => editTilemap(this.model, this.report)),
+      ),
+      button('Edit tile set', () =>
+        this.run(() => editTileSet(this.model, this.selected, this.report)),
+      ),
       button('+ Script', () => showScripts(this.model, this.report)),
       button('+ Graph', () => editBehaviourGraph(this.model, this.report)),
       button('Edit graph', () =>
@@ -292,11 +313,15 @@ export class AssetsPanel {
             editMedia(this.model, asset.mime, asset.id);
           else if (asset.mime === GRAPH_MIME)
             editBehaviourGraph(this.model, this.report, asset.id);
+          else if (asset.mime === TILESET_MIME)
+            editTileSet(this.model, asset.id, this.report);
         });
       b.title =
         asset.path +
         (asset.mime === 'text/typescript' ||
-        [CLIP_MIME, CONTROLLER_MIME, GRAPH_MIME].includes(asset.mime)
+        [CLIP_MIME, CONTROLLER_MIME, GRAPH_MIME, TILESET_MIME].includes(
+          asset.mime,
+        )
           ? ' · Double-click to edit'
           : '');
       b.draggable = !this.model.locked;

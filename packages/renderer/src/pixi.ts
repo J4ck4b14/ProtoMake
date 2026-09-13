@@ -5,9 +5,21 @@ import {
   Texture,
   Matrix,
   Graphics,
+  Rectangle,
 } from 'pixi.js';
-import { loadImage, type AssetData } from '@protomake/assets';
+import {
+  loadImage,
+  SPRITE_REGION_MIME,
+  SpriteRegionSchema,
+  type AssetData,
+} from '@protomake/assets';
 import { inverse, type World } from '@protomake/core';
+import {
+  Tilemap2D,
+  TileSetSchema,
+  TILESET_MIME,
+  cellPosition,
+} from '@protomake/tilemap';
 import {
   Camera2D,
   SpriteRenderer,
@@ -149,10 +161,13 @@ export class PixiRenderer implements Renderer2D {
   private readonly debugLines = new Graphics();
   private readonly mask = new Graphics();
   private readonly sprites = new Map<string, Sprite>();
+  private readonly tileSprites = new Map<string, Sprite>();
   private readonly textures = new Map<
     string,
-    { data: string; texture: Texture }
+    { data: string; texture: Texture; pivot?: readonly [number, number] }
   >();
+  private currentAssets: readonly AssetData[] = [];
+  private assetSignature = '';
   private readonly lightSurfaces = new Map<LightingChannel, LightSurface>();
   private readonly perLightCanvas: HTMLCanvasElement;
   private readonly perLightContext: CanvasRenderingContext2D;
@@ -241,23 +256,54 @@ export class PixiRenderer implements Renderer2D {
   }
 
   async setAssets(assets: readonly AssetData[]): Promise<void> {
-    const revision = ++this.revision,
-      images = assets.filter((asset) => asset.kind === 'image');
-    for (const [id, cached] of this.textures)
-      if (
-        !images.some((asset) => asset.id === id && asset.data === cached.data)
-      ) {
-        cached.texture.destroy(true);
-        this.textures.delete(id);
-      }
+    const images = assets.filter((asset) => asset.kind === 'image'),
+      regions = assets.filter((asset) => asset.mime === SPRITE_REGION_MIME),
+      signature = JSON.stringify([
+        images.map((asset) => [asset.id, asset.data]),
+        regions.map((asset) => [asset.id, asset.data]),
+      ]);
+    this.currentAssets = assets;
+    if (signature === this.assetSignature) return;
+    this.assetSignature = signature;
+    const revision = ++this.revision;
+    for (const cached of this.textures.values()) cached.texture.destroy(true);
+    this.textures.clear();
     await Promise.all(
       images.map(async (asset) => {
-        if (this.textures.has(asset.id)) return;
         const image = await loadImage(asset.data);
         if (this.disposed || revision !== this.revision) return;
         this.textures.set(asset.id, {
           data: asset.data,
           texture: Texture.from(image),
+        });
+      }),
+    );
+    await Promise.all(
+      regions.map(async (asset) => {
+        const region = SpriteRegionSchema.parse(JSON.parse(asset.data)),
+          sourceAsset = images.find((image) => image.id === region.source);
+        if (!sourceAsset) return;
+        const image = await loadImage(sourceAsset.data),
+          source = Texture.from(
+            { resource: image, scaleMode: region.filter },
+            true,
+          );
+        if (this.disposed || revision !== this.revision) {
+          source.destroy(true);
+          return;
+        }
+        this.textures.set(asset.id, {
+          data: asset.data,
+          texture: new Texture({
+            source: source.source,
+            frame: new Rectangle(
+              region.x,
+              region.y,
+              region.width,
+              region.height,
+            ),
+          }),
+          pivot: [region.pivotX, region.pivotY],
         });
       }),
     );
@@ -775,6 +821,75 @@ export class PixiRenderer implements Renderer2D {
     this.mask.clear().rect(vx, vy, vw, vh).fill(0xffffff);
     const seen = new Set<string>(),
       ordered = renderList(world);
+    const tileSeen = new Set<string>();
+    for (const [id] of world.query(Tilemap2D.type)) {
+      const map = world.read(id, Tilemap2D)!,
+        setAsset = this.currentAssets.find(
+          (asset) => asset.id === map.tileset && asset.mime === TILESET_MIME,
+        );
+      if (!setAsset || !world.isActive(id)) continue;
+      const definitions = new Map(
+          TileSetSchema.parse(JSON.parse(setAsset.data)).tiles.map((tile) => [
+            tile.id,
+            tile,
+          ]),
+        ),
+        matrix = world.worldMatrix(id);
+      for (const layer of [...map.layers].sort((a, b) => a.order - b.order))
+        if (layer.visible)
+          for (const [cell, tileId] of Object.entries(layer.cells)) {
+            const tile = definitions.get(tileId),
+              key = `${world.get(id).guid}:${layer.id}:${cell}`;
+            if (!tile) continue;
+            tileSeen.add(key);
+            let sprite = this.tileSprites.get(key);
+            if (!sprite) {
+              sprite = new Sprite();
+              sprite.anchor.set(0, 0);
+              this.tileSprites.set(key, sprite);
+              this.root.addChild(sprite);
+            }
+            let texture = tile.texture;
+            if (tile.animation.length) {
+              const duration = tile.animation.reduce(
+                  (sum, frame) => sum + frame.duration,
+                  0,
+                ),
+                cursor = (performance.now() / 1000) % duration;
+              let elapsed = 0;
+              for (const frame of tile.animation) {
+                elapsed += frame.duration;
+                if (cursor < elapsed) {
+                  texture = frame.texture;
+                  break;
+                }
+              }
+            }
+            sprite.texture =
+              this.textures.get(texture)?.texture ?? Texture.WHITE;
+            sprite.tint = this.textures.has(texture) ? 0xffffff : 0xff00ff;
+            sprite.visible = true;
+            const [cx, cy] = cellPosition(cell, map.cellWidth, map.cellHeight),
+              sx = map.cellWidth / sprite.texture.width,
+              sy = map.cellHeight / sprite.texture.height;
+            sprite.setFromMatrix(
+              new Matrix(
+                matrix[0] * sx,
+                matrix[1] * sx,
+                matrix[2] * sy,
+                matrix[3] * sy,
+                matrix[0] * cx + matrix[2] * cy + matrix[4],
+                matrix[1] * cx + matrix[3] * cy + matrix[5],
+              ),
+            );
+            this.root.setChildIndex(sprite, this.root.children.length - 1);
+          }
+    }
+    for (const [key, sprite] of this.tileSprites)
+      if (!tileSeen.has(key)) {
+        sprite.destroy();
+        this.tileSprites.delete(key);
+      }
     for (const { id, guid, data } of ordered) {
       seen.add(guid);
       let sprite = this.sprites.get(guid);
@@ -790,7 +905,15 @@ export class PixiRenderer implements Renderer2D {
       sprite.tint =
         data.texture && !this.textures.has(data.texture) ? 0xff00ff : data.tint;
       sprite.alpha = data.opacity;
-      sprite.anchor.set(data.anchorX, data.anchorY);
+      const texture = this.textures.get(data.texture);
+      sprite.anchor.set(
+        data.useTexturePivot && texture?.pivot
+          ? texture.pivot[0]
+          : data.anchorX,
+        data.useTexturePivot && texture?.pivot
+          ? texture.pivot[1]
+          : data.anchorY,
+      );
       const m = world.worldMatrix(id),
         sx = (data.width / sprite.texture.width) * (data.flipX ? -1 : 1),
         sy = (data.height / sprite.texture.height) * (data.flipY ? -1 : 1);
@@ -837,5 +960,6 @@ export class PixiRenderer implements Renderer2D {
     for (const cached of this.textures.values()) cached.texture.destroy(true);
     this.textures.clear();
     this.sprites.clear();
+    this.tileSprites.clear();
   }
 }

@@ -21,6 +21,7 @@
     "@protomake/assets": "0.2.0",
     "@protomake/graphs": "0.1.0",
     "@protomake/ui": "0.1.0",
-    "@protomake/persistence": "0.1.0"
+    "@protomake/persistence": "0.1.0",
+    "@protomake/tilemap": "0.1.0"
   }
 }

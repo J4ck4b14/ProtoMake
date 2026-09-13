@@ -8,7 +8,14 @@ import {
 } from '@protomake/prefabs';
 import { PhysicsSettingsSchema, defaultPhysics } from '@protomake/physics2d';
 import { InputMapSchema, defaultInput } from '@protomake/input';
-import { AssetSchema, AssetDatabase, assetReferences } from '@protomake/assets';
+import {
+  AssetSchema,
+  AssetDatabase,
+  SPRITE_REGION_MIME,
+  SpriteRegionSchema,
+  assetReferences,
+} from '@protomake/assets';
+import { TILESET_MIME, TileSetSchema } from '@protomake/tilemap';
 import { z } from 'zod';
 import {
   PersistenceSettingsSchema,
@@ -27,7 +34,7 @@ import {
   validateScene,
 } from './scene';
 import { MigrationChain } from './migrations';
-export const PROJECT_SCHEMA_VERSION = 7;
+export const PROJECT_SCHEMA_VERSION = 8;
 export const ProjectSchema = z.strictObject({
   schemaVersion: z.literal(PROJECT_SCHEMA_VERSION),
   id: GuidSchema,
@@ -161,12 +168,17 @@ projectMigrations.register(6, (input) => ({
   engineVersion: '0.12.0',
   persistence: defaultPersistence(),
 }));
+projectMigrations.register(7, (input) => ({
+  ...(input as object),
+  schemaVersion: 8,
+  engineVersion: '0.13.0',
+}));
 export function createProject(name: string): ProjectData {
   return ProjectSchema.parse({
     schemaVersion: PROJECT_SCHEMA_VERSION,
     id: guid(),
     name,
-    engineVersion: '0.12.0',
+    engineVersion: '0.13.0',
     startupScene: null,
     scenes: [],
     assets: [],
@@ -194,6 +206,38 @@ export function validateProject(
     )
       throw new Error(`Achievement ${achievement.id}: invalid icon asset`);
   animationAssets(project.assets);
+  for (const asset of project.assets) {
+    if (asset.mime === SPRITE_REGION_MIME) {
+      const region = SpriteRegionSchema.parse(JSON.parse(asset.data)),
+        source = project.assets.find(
+          (candidate) => candidate.id === region.source,
+        );
+      if (!source || source.kind !== 'image')
+        throw new Error(`${asset.path}: missing sprite source image`);
+      if (
+        region.x + region.width > source.width ||
+        region.y + region.height > source.height
+      )
+        throw new Error(`${asset.path}: sprite region exceeds source image`);
+    }
+    if (asset.mime === TILESET_MIME) {
+      const tileset = TileSetSchema.parse(JSON.parse(asset.data));
+      for (const tile of tileset.tiles)
+        for (const texture of [
+          tile.texture,
+          ...tile.animation.map((frame) => frame.texture),
+        ])
+          if (
+            !project.assets.some(
+              (candidate) =>
+                candidate.id === texture &&
+                (candidate.kind === 'image' ||
+                  candidate.mime === SPRITE_REGION_MIME),
+            )
+          )
+            throw new Error(`${asset.path}/${tile.name}: missing tile texture`);
+    }
+  }
   const graphRegistry = coreNodeRegistry();
   for (const asset of project.assets)
     if (asset.mime === GRAPH_MIME) {
@@ -304,7 +348,8 @@ export function validateProject(
               if (
                 asset &&
                 (((type === 'protomake.sprite' || type === 'protomake.ui-image') &&
-                  asset.kind !== 'image') ||
+                  asset.kind !== 'image' &&
+                  asset.mime !== SPRITE_REGION_MIME) ||
                   (type === 'protomake.behaviours' &&
                     asset.mime !== reference.mime))
               )

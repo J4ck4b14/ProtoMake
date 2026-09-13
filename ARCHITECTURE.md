@@ -8,8 +8,9 @@
 | `@protomake/assets`        | Core, Zod                                                             | Asset records, GUID/path indexes, import/dependency checks                       |
 | `@protomake/input`         | Zod                                                                   | Action schemas and keyboard/mouse/gamepad state                                  |
 | `@protomake/runtime`       | Core                                                                  | Time, ordered lifecycle, signals, timers and tweens                              |
-| `@protomake/physics2d`     | Core, runtime types, Zod, Rapier adapter                              | Physics configuration, components and simulation                                 |
-| `@protomake/renderer`      | Core, assets, Zod, Pixi adapter                                       | Sprite/camera data and rendering contract                                        |
+| `@protomake/tilemap`       | Core, Zod                                                             | Tile-set and sparse layered tilemap data contracts                               |
+| `@protomake/physics2d`     | Core, assets, runtime/tilemap types, Zod, Rapier adapter              | Physics, Character Body 2D and chunked tile collision                            |
+| `@protomake/renderer`      | Core, assets, runtime/tilemap types, Zod, Pixi adapter                | Sprite-region/tile/camera data and rendering contract                            |
 | `@protomake/serialization` | Core, assets, physics/input/prefab/animation/audio/graph schemas, Zod | Strict project/scene validation and migrations                                   |
 | `@protomake/scripting`     | Core, runtime, assets, input/physics types, TypeScript compiler, Zod  | Script data, compilation/linking and behavior lifecycle                          |
 | `@protomake/graphs`        | Core, assets, scripting/physics types, Zod                            | Behaviour Graph schema, typed node registry and shared-context execution         |
@@ -56,6 +57,8 @@ EditorModel owns authored project/world state, selection and command history. Hi
 SceneViewport owns camera navigation, selection geometry and gizmos. Inspector derives ordinary controls from component metadata and provides specialized TRS, tag and multi-behaviour authoring. ProjectStorage owns IndexedDB transactions and separate active-scene metadata. PlayMode exchanges cloned project data with an iframe; removing it discards runtime changes.
 
 Runtime UI is authored as ordinary scene components but rendered into a game-owned DOM overlay, never into editor chrome. UI controls emit through the same runtime signal service used by scripts and graphs. Save and achievement services are project-scoped and may survive scene-session replacement; behaviour-owned state registrations are removed during lifecycle cleanup.
+
+Sprite regions reference an immutable source-image GUID plus pixel bounds and import settings. Tile sets reference images or regions; tilemaps reference tile sets and keep sparse cells in ordered layers. Rendering expands cells while physics groups solid cells into fixed chunk bodies. Character Body 2D and camera behaviours consume shared services rather than introducing parallel simulations.
 
 ## Production boundary
 
