@@ -1,15 +1,30 @@
 import {
   analyzePortability,
+  exportGodot,
   lowerProject,
   serializeInterchange,
   serializeReport,
 } from '@protomake/interchange';
 import type { EditorModel } from './model';
 import { button, node } from './dom';
+import { zipFiles } from './build-game';
 
 function download(name: string, data: string): void {
   const url = URL.createObjectURL(
       new Blob([data], { type: 'application/json' }),
+    ),
+    anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = name;
+  anchor.click();
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+function downloadArchive(name: string, data: Uint8Array): void {
+  const url = URL.createObjectURL(
+      new Blob([data as Uint8Array<ArrayBuffer>], {
+        type: 'application/zip',
+      }),
     ),
     anchor = document.createElement('a');
   anchor.href = url;
@@ -70,6 +85,15 @@ export function showPortability(model: EditorModel): void {
         ),
       ),
     );
+    if (report.target === 'godot')
+      section.append(
+        button('Export Godot project', () =>
+          downloadArchive(
+            `${model.project.name.replace(/[^a-z0-9_-]/gi, '_')}-godot.zip`,
+            zipFiles(exportGodot(interchange)),
+          ),
+        ),
+      );
     dialog.append(section);
   }
   actions.append(

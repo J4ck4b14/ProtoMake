@@ -118,12 +118,12 @@ const componentCapabilities: Readonly<
     unreal: approximate('Orthographic camera actor'),
   },
   'protomake.camera-follow': {
-    godot: approximate('Generated follow script'),
+    godot: manual('Follow settings retained for target-side implementation'),
     unity: approximate('Generated follow component'),
     unreal: approximate('Generated component'),
   },
   'protomake.camera-zone': {
-    godot: approximate('Generated area/script'),
+    godot: manual('Zone settings retained for target-side implementation'),
     unity: approximate('Generated trigger/component'),
     unreal: approximate('Generated volume/component'),
   },
@@ -153,17 +153,17 @@ const componentCapabilities: Readonly<
     unreal: approximate('Capsule collision component'),
   },
   'protomake.light': {
-    godot: approximate('PointLight2D/ambient environment'),
+    godot: approximate('PointLight2D radial-light reconstruction'),
     unity: approximate('URP 2D Light when installed'),
     unreal: approximate('2D/orthographic light approximation'),
   },
   'protomake.shadow-caster': {
-    godot: approximate('LightOccluder2D'),
+    godot: manual('Occluder bounds retained for target-side implementation'),
     unity: approximate('URP ShadowCaster2D when installed'),
     unreal: unsupported('No reliable Paper2D shadow equivalent'),
   },
   'protomake.animator': {
-    godot: approximate('AnimationPlayer/state script'),
+    godot: manual('Animator metadata retained for target-side implementation'),
     unity: full('AnimatorController via importer'),
     unreal: approximate('Flipbook state component'),
   },
@@ -173,72 +173,72 @@ const componentCapabilities: Readonly<
     unreal: full('Audio component'),
   },
   'protomake.tilemap': {
-    godot: full('TileMapLayer'),
+    godot: manual('Tile map data retained for target-side reconstruction'),
     unity: approximate('Tilemap package importer'),
     unreal: approximate('Paper2D tile map'),
   },
   'protomake.particle-emitter': {
-    godot: approximate('GPUParticles2D'),
+    godot: manual('Emitter settings retained for target-side reconstruction'),
     unity: approximate('ParticleSystem'),
     unreal: approximate('Niagara/Paper2D emitter setup'),
   },
   'protomake.ui-layout': {
-    godot: full('Control containers'),
+    godot: manual('Layout data retained for target-side reconstruction'),
     unity: full('UGUI hierarchy'),
     unreal: approximate('UMG hierarchy via importer'),
   },
   'protomake.ui-root': {
-    godot: full('CanvasLayer/Control root'),
+    godot: manual('UI root data retained for target-side reconstruction'),
     unity: full('Canvas root'),
     unreal: approximate('UMG widget root'),
   },
   'protomake.ui-panel': {
-    godot: full('Panel'),
+    godot: manual('Panel data retained for target-side reconstruction'),
     unity: full('UGUI Image panel'),
     unreal: approximate('UMG Border'),
   },
   'protomake.ui-text': {
-    godot: full('Label'),
+    godot: manual('Text data retained for target-side reconstruction'),
     unity: approximate('UGUI Text'),
     unreal: approximate('UMG TextBlock'),
   },
   'protomake.ui-image': {
-    godot: full('TextureRect'),
+    godot: manual('Image data retained for target-side reconstruction'),
     unity: full('UGUI Image'),
     unreal: approximate('UMG Image'),
   },
   'protomake.ui-button': {
-    godot: full('Button'),
+    godot: manual('Button data retained for target-side reconstruction'),
     unity: full('UGUI Button'),
     unreal: approximate('UMG Button'),
   },
   'protomake.ui-progress': {
-    godot: full('ProgressBar'),
+    godot: manual('Progress data retained for target-side reconstruction'),
     unity: full('UGUI Slider/Image'),
     unreal: approximate('UMG ProgressBar'),
   },
   'protomake.ui-slider': {
-    godot: full('Slider'),
+    godot: manual('Slider data retained for target-side reconstruction'),
     unity: full('UGUI Slider'),
     unreal: approximate('UMG Slider'),
   },
   'protomake.ui-toggle': {
-    godot: full('CheckButton'),
+    godot: manual('Toggle data retained for target-side reconstruction'),
     unity: full('UGUI Toggle'),
     unreal: approximate('UMG CheckBox'),
   },
   'protomake.ui-input': {
-    godot: full('LineEdit'),
+    godot: manual('Input data retained for target-side reconstruction'),
     unity: approximate('UGUI InputField'),
     unreal: approximate('UMG EditableText'),
   },
   'protomake.ui-text-input': {
-    godot: full('LineEdit'),
+    godot: manual('Text-input data retained for target-side reconstruction'),
     unity: approximate('UGUI InputField'),
     unreal: approximate('UMG EditableText'),
   },
   'protomake.ui-scroll': {
-    godot: full('ScrollContainer'),
+    godot: manual('Scroll data retained for target-side reconstruction'),
     unity: full('UGUI ScrollRect'),
     unreal: approximate('UMG ScrollBox'),
   },
@@ -248,7 +248,9 @@ const componentCapabilities: Readonly<
     unreal: manual('Gameplay perception requires target-side behaviour'),
   },
   'protomake.prefab': {
-    godot: full('PackedScene metadata'),
+    godot: manual(
+      'Source prefab metadata retained; scene instances are expanded',
+    ),
     unity: full('Prefab metadata'),
     unreal: approximate('Blueprint/actor source metadata'),
   },
@@ -260,19 +262,9 @@ const componentCapabilities: Readonly<
 };
 
 const portableGraphNodes = new Set([
-  'event.awake',
   'event.start',
   'event.update',
   'event.fixedUpdate',
-  'event.enable',
-  'event.disable',
-  'event.destroy',
-  'event.collisionEnter',
-  'event.collisionExit',
-  'event.triggerEnter',
-  'event.triggerExit',
-  'event.inputPressed',
-  'event.inputReleased',
   'flow.branch',
   'flow.sequence',
   'flow.once',
@@ -282,8 +274,6 @@ const portableGraphNodes = new Set([
   'math.add',
   'math.compare',
   'entity.self',
-  'entity.hasTag',
-  'entity.closestTag',
   'transform.position',
   'transform.setPosition',
   'input.axis',
@@ -424,14 +414,18 @@ function assetCapability(
         );
   if (asset.mime === 'application/x-protomake-sprite-region')
     return full('Atlas rectangle and pivot retained');
-  if (asset.mime === 'application/x-protomake-tile-set')
+  if (asset.mime === 'application/x-protomake-tileset')
     return target === 'godot'
-      ? full('TileSet resource generated')
+      ? manual('TileSet source retained for target-side reconstruction')
       : approximate('Target tile tooling reconstructs supported cells');
   if (asset.mime === 'application/x-protomake-prefab')
     return target === 'unreal'
       ? approximate('Importer reconstructs actor source hierarchy')
-      : full('Reusable hierarchy reconstructed');
+      : target === 'godot'
+        ? manual(
+            'Prefab source retained; exported scenes contain expanded instances',
+          )
+        : full('Reusable hierarchy reconstructed');
   return unsupported(`No ${target} mapping for asset MIME ${asset.mime}`);
 }
 
@@ -469,6 +463,50 @@ export function analyzePortability(
   target: ExportTarget,
 ): PortabilityReport {
   const items: PortabilityItem[] = [];
+  items.push({
+    ...(target === 'godot'
+      ? full(
+          'Gravity and collision layer matrix lower through project/body settings',
+        )
+      : approximate(
+          'Physics settings lower through the target importer and require simulation review',
+        )),
+    feature: 'project:physics',
+    sourceId: interchange.source.project,
+    path: interchange.source.name,
+  });
+  for (const action of interchange.input)
+    items.push({
+      ...(target === 'unreal'
+        ? approximate(
+            'Input Mapping Context reconstruction requires importer review',
+          )
+        : full(
+            target === 'godot'
+              ? 'InputMap actions generated at startup'
+              : 'Input actions generated through the editor importer',
+          )),
+      feature: `input:${action.kind}`,
+      sourceId: action.name,
+      path: `${interchange.source.name}/Input/${action.map}/${action.name}`,
+    });
+  items.push({
+    ...(target === 'godot'
+      ? full('Audio bus layout generated')
+      : approximate('Mixer values reconstructed by target importer')),
+    feature: 'project:mixer',
+    sourceId: interchange.source.project,
+    path: `${interchange.source.name}/Audio`,
+  });
+  for (const achievement of interchange.achievements)
+    items.push({
+      ...manual(
+        'Definition retained; platform achievement integration is target-side work',
+      ),
+      feature: 'project:achievement',
+      sourceId: achievement.id,
+      path: `${interchange.source.name}/Achievements/${achievement.id}`,
+    });
   for (const asset of interchange.assets) {
     const capability = assetCapability(asset, target);
     items.push({
@@ -506,9 +544,34 @@ export function analyzePortability(
           }
           continue;
         }
-        const capability =
+        let capability =
           componentCapabilities[component.type]?.[target] ??
           unsupported(`No declared ${target} component mapping`);
+        const data =
+          component.data && typeof component.data === 'object'
+            ? (component.data as Record<string, unknown>)
+            : {};
+        if (
+          target === 'godot' &&
+          component.type === 'protomake.sprite' &&
+          data.secondaryTexture &&
+          data.blend !== 1
+        )
+          capability = approximate(
+            'Primary Sprite2D is generated; active cross-fade needs target-side animation work',
+          );
+        if (
+          target === 'godot' &&
+          [
+            'protomake.box-collider',
+            'protomake.circle-collider',
+            'protomake.capsule-collider',
+          ].includes(component.type) &&
+          (data.sensor === true || data.oneWay === true)
+        )
+          capability = approximate(
+            'Collision shape is generated; sensor/one-way semantics require target-side review',
+          );
         items.push({
           ...capability,
           feature: `component:${component.type}`,
@@ -591,3 +654,6 @@ export function serializeInterchange(interchange: ProtoMakeInterchange): string 
 export function serializeReport(report: PortabilityReport): string {
   return deterministicJSON(report);
 }
+
+export * from './files';
+export * from './godot';

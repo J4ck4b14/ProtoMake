@@ -222,7 +222,7 @@ it('runs the complete 0.10 behaviour-service acceptance workflow', async () => {
     JSON.parse(serializeProject(model.project, model.registry)),
   ).toMatchObject({
     schemaVersion: 11,
-    engineVersion: '0.16.0',
+    engineVersion: '0.16.1',
   });
 });
 

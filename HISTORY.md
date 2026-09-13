@@ -23,5 +23,6 @@ This file summarizes the development milestones represented by the Git commit gr
 | ProtoMake 0.14           | Live runtime hierarchy/property tuning, safe authoring Apply, Play From Here, scene restart, script recompile/restart, graph values and per-system profiling                                              |
 | ProtoMake 0.15           | Particle emitters, animation events/cross-fades, polyphonic/spatial audio, camera impact effects and rigid-body scripting conveniences                                                                    |
 | ProtoMake 0.16           | Public release foundation, deterministic Interchange IR, target capability analysis, stable ID maps, centralized coordinate conversion, manifests and diagnostics                                         |
+| ProtoMake 0.16.1         | Deterministic Godot 4 project/scene export, copied media, core 2D reconstruction, generated input/audio configuration and portable Behaviour Graph runtime                                                |
 
 For the difference between published commits and local reflogs, see [docs/git-history.md](docs/git-history.md).
