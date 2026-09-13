@@ -39,7 +39,8 @@
       "@protomake/player/session": ["./packages/player/src/session.ts"],
       "@protomake/interchange": ["./packages/interchange/src/index.ts"],
       "@protomake/interchange/godot": ["./packages/interchange/src/godot.ts"],
-      "@protomake/interchange/unity": ["./packages/interchange/src/unity.ts"]
+      "@protomake/interchange/unity": ["./packages/interchange/src/unity.ts"],
+      "@protomake/interchange/unreal": ["./packages/interchange/src/unreal.ts"]
     }
   },
   "include": ["packages", "examples", "tests", "vite.config.ts"]

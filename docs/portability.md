@@ -27,6 +27,14 @@ The bundle intentionally contains no generated `.unity`, `.prefab`, `.anim`, `.c
 
 Generated assets live in `Assets/Generated/ProtoMake`; keep target-side code and content elsewhere. Affine shear, atlas-region slicing, exact animation threshold semantics, custom audio buses/polyphony, UI, render-pipeline-specific 2D lighting, prefab authoring assets, arbitrary TypeScript and platform services are retained and explicitly reported for review or manual work.
 
+## Unreal Engine 5 export
+
+ProtoMake 0.16.3 generates a UE 5.4+ project with the ProtoMake Portability plugin. Its Editor module imports media through AssetTools, creates maps and attached actors through world/component APIs, reconstructs supported Paper2D sprites and flipbooks, collision primitives, orthographic cameras, audio components and Enhanced Input assets, and stores the complete ProtoMake payload on stable identity components. **Tools → ProtoMake → Reimport** reruns the source-fingerprint-aware import.
+
+The plugin's separate Runtime module provides the portable Behaviour Graph ActorComponent in C++. Unreal Python is not part of gameplay or import. ProtoMake writes source code, JSON and source media only—never `.uasset` or `.umap` binaries. Unreal creates those under `/Game/Generated/ProtoMake` through its own asset system.
+
+Keep custom Unreal work outside that generated Content path. TRS reduction of affine shear, atlas slicing, detailed physics/material parity, complete animation state logic, Enhanced Input modifiers, UMG, Niagara, 2D lighting, prefab/Blueprint authoring assets, arbitrary TypeScript and platform services remain explicit fidelity notes rather than silent omissions.
+
 ## Coordinate contract
 
 ProtoMake uses pixels, +X right, +Y down, and clockwise radians. Conversion is centralized in `@protomake/interchange`: Godot retains pixel/Y-down coordinates, Unity uses 100 pixels per unit with Y inversion, and the Unreal bundle uses centimeters with Y inversion for its 2D plane. Target exporters consume these profiles instead of embedding conversion constants.

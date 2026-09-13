@@ -104,6 +104,16 @@ export function showPortability(model: EditorModel): void {
           );
         }),
       );
+    if (report.target === 'unreal')
+      section.append(
+        button('Export Unreal project', async () => {
+          const { exportUnreal } = await import('@protomake/interchange/unreal');
+          downloadArchive(
+            `${model.project.name.replace(/[^a-z0-9_-]/gi, '_')}-unreal.zip`,
+            zipFiles(exportUnreal(interchange)),
+          );
+        }),
+      );
     dialog.append(section);
   }
   actions.append(

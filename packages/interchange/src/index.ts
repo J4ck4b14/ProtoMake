@@ -120,12 +120,12 @@ const componentCapabilities: Readonly<
   'protomake.camera-follow': {
     godot: manual('Follow settings retained for target-side implementation'),
     unity: approximate('Generated follow component'),
-    unreal: approximate('Generated component'),
+    unreal: manual('Follow settings retained for target-side implementation'),
   },
   'protomake.camera-zone': {
     godot: manual('Zone settings retained for target-side implementation'),
     unity: approximate('Generated trigger/component'),
-    unreal: approximate('Generated volume/component'),
+    unreal: manual('Zone settings retained for target-side implementation'),
   },
   'protomake.rigidbody': {
     godot: full('Body2D type'),
@@ -135,7 +135,7 @@ const componentCapabilities: Readonly<
   'protomake.character-body': {
     godot: full('CharacterBody2D'),
     unity: approximate('Rigidbody2D controller'),
-    unreal: approximate('Pawn movement component'),
+    unreal: manual('Character settings retained for target-side Pawn movement'),
   },
   'protomake.box-collider': {
     godot: full('RectangleShape2D'),
@@ -157,7 +157,9 @@ const componentCapabilities: Readonly<
     unity: manual(
       'Light settings retained; install and configure a 2D render pipeline',
     ),
-    unreal: approximate('2D/orthographic light approximation'),
+    unreal: manual(
+      'Light settings retained for target-side 2D rendering setup',
+    ),
   },
   'protomake.shadow-caster': {
     godot: manual('Occluder bounds retained for target-side implementation'),
@@ -176,77 +178,83 @@ const componentCapabilities: Readonly<
     unity: approximate(
       'AudioSource; custom buses and polyphony need target-side setup',
     ),
-    unreal: full('Audio component'),
+    unreal: approximate(
+      'Audio component; mixer routing and attenuation need review',
+    ),
   },
   'protomake.tilemap': {
     godot: manual('Tile map data retained for target-side reconstruction'),
     unity: manual('Tile map data retained for target-side reconstruction'),
-    unreal: approximate('Paper2D tile map'),
+    unreal: manual(
+      'Tile map data retained for target-side Paper2D reconstruction',
+    ),
   },
   'protomake.particle-emitter': {
     godot: manual('Emitter settings retained for target-side reconstruction'),
     unity: approximate('ParticleSystem'),
-    unreal: approximate('Niagara/Paper2D emitter setup'),
+    unreal: manual('Emitter settings retained for target-side Niagara setup'),
   },
   'protomake.ui-layout': {
     godot: manual('Layout data retained for target-side reconstruction'),
     unity: manual('Layout data retained for target-side reconstruction'),
-    unreal: approximate('UMG hierarchy via importer'),
+    unreal: manual('Layout data retained for target-side UMG reconstruction'),
   },
   'protomake.ui-root': {
     godot: manual('UI root data retained for target-side reconstruction'),
     unity: manual('UI root data retained for target-side reconstruction'),
-    unreal: approximate('UMG widget root'),
+    unreal: manual('UI root data retained for target-side UMG reconstruction'),
   },
   'protomake.ui-panel': {
     godot: manual('Panel data retained for target-side reconstruction'),
     unity: manual('Panel data retained for target-side reconstruction'),
-    unreal: approximate('UMG Border'),
+    unreal: manual('Panel data retained for target-side UMG reconstruction'),
   },
   'protomake.ui-text': {
     godot: manual('Text data retained for target-side reconstruction'),
     unity: manual('Text data retained for target-side reconstruction'),
-    unreal: approximate('UMG TextBlock'),
+    unreal: manual('Text data retained for target-side UMG reconstruction'),
   },
   'protomake.ui-image': {
     godot: manual('Image data retained for target-side reconstruction'),
     unity: manual('Image data retained for target-side reconstruction'),
-    unreal: approximate('UMG Image'),
+    unreal: manual('Image data retained for target-side UMG reconstruction'),
   },
   'protomake.ui-button': {
     godot: manual('Button data retained for target-side reconstruction'),
     unity: manual('Button data retained for target-side reconstruction'),
-    unreal: approximate('UMG Button'),
+    unreal: manual('Button data retained for target-side UMG reconstruction'),
   },
   'protomake.ui-progress': {
     godot: manual('Progress data retained for target-side reconstruction'),
     unity: manual('Progress data retained for target-side reconstruction'),
-    unreal: approximate('UMG ProgressBar'),
+    unreal: manual('Progress data retained for target-side UMG reconstruction'),
   },
   'protomake.ui-slider': {
     godot: manual('Slider data retained for target-side reconstruction'),
     unity: manual('Slider data retained for target-side reconstruction'),
-    unreal: approximate('UMG Slider'),
+    unreal: manual('Slider data retained for target-side UMG reconstruction'),
   },
   'protomake.ui-toggle': {
     godot: manual('Toggle data retained for target-side reconstruction'),
     unity: manual('Toggle data retained for target-side reconstruction'),
-    unreal: approximate('UMG CheckBox'),
+    unreal: manual('Toggle data retained for target-side UMG reconstruction'),
   },
   'protomake.ui-input': {
     godot: manual('Input data retained for target-side reconstruction'),
     unity: manual('Input data retained for target-side reconstruction'),
-    unreal: approximate('UMG EditableText'),
+    unreal: manual('Input data retained for target-side UMG reconstruction'),
   },
   'protomake.ui-text-input': {
     godot: manual('Text-input data retained for target-side reconstruction'),
     unity: manual('Text-input data retained for target-side reconstruction'),
-    unreal: approximate('UMG EditableText'),
+    unreal: manual(
+      'Text-input data retained for target-side UMG reconstruction',
+    ),
   },
   'protomake.ui-scroll': {
     godot: manual('Scroll data retained for target-side reconstruction'),
     unity: manual('Scroll data retained for target-side reconstruction'),
-    unreal: approximate('UMG ScrollBox'),
+    unreal: manual('Scroll data retained for target-side UMG reconstruction'),
   },
   'protomake.perception': {
     godot: manual('Gameplay perception requires target-side behaviour'),
@@ -260,7 +268,9 @@ const componentCapabilities: Readonly<
     unity: manual(
       'Source prefab metadata retained; scene instances are expanded',
     ),
-    unreal: approximate('Blueprint/actor source metadata'),
+    unreal: manual(
+      'Source prefab metadata retained; scene instances are expanded',
+    ),
   },
   'editor.note': {
     godot: manual('Editor note retained in manifest'),
@@ -425,9 +435,9 @@ function assetCapability(
           'State machine reconstructed through generated target code',
         );
   if (asset.mime === 'application/x-protomake-sprite-region')
-    return target === 'unity'
+    return target === 'unity' || target === 'unreal'
       ? approximate(
-          'Source atlas is assigned; slice rectangle and pivot require importer review',
+          'Source atlas is assigned; slice rectangle and pivot require target review',
         )
       : full('Atlas rectangle and pivot retained');
   if (asset.mime === 'application/x-protomake-tileset')
@@ -435,17 +445,11 @@ function assetCapability(
       ? manual('TileSet source retained for target-side reconstruction')
       : target === 'unity'
         ? manual('TileSet source retained for target-side reconstruction')
-        : approximate('Target tile tooling reconstructs supported cells');
+        : manual('TileSet source retained for target-side reconstruction');
   if (asset.mime === 'application/x-protomake-prefab')
-    return target === 'unreal'
-      ? approximate('Importer reconstructs actor source hierarchy')
-      : target === 'godot'
-        ? manual(
-            'Prefab source retained; exported scenes contain expanded instances',
-          )
-        : manual(
-            'Prefab source retained; exported scenes contain expanded instances',
-          );
+    return manual(
+      'Prefab source retained; exported scenes contain expanded instances',
+    );
   return unsupported(`No ${target} mapping for asset MIME ${asset.mime}`);
 }
 
@@ -530,7 +534,11 @@ export function analyzePortability(
   items.push({
     ...(target === 'godot'
       ? full('Audio bus layout generated')
-      : approximate('Mixer values reconstructed by target importer')),
+      : target === 'unity'
+        ? approximate('Mixer values reconstructed by target importer')
+        : manual(
+            'Mixer data retained for target-side Sound Class/Submix setup',
+          )),
     feature: 'project:mixer',
     sourceId: interchange.source.project,
     path: `${interchange.source.name}/Audio`,

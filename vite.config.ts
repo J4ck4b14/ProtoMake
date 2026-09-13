@@ -38,6 +38,9 @@ export default defineConfig({
       '@protomake/interchange/unity': fileURLToPath(
         new URL('./packages/interchange/src/unity.ts', import.meta.url),
       ),
+      '@protomake/interchange/unreal': fileURLToPath(
+        new URL('./packages/interchange/src/unreal.ts', import.meta.url),
+      ),
       ...Object.fromEntries(
         [
           'player',

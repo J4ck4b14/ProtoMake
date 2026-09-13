@@ -1,8 +1,8 @@
-# ProtoMake 0.16.2
+# ProtoMake 0.16.3
 
 A reusable, browser-native 2D engine and visual editor for human-authored projects.
 
-**Milestones 0–7 and ProtoMake 0.9–0.16.2 are implemented.** ProtoMake 0.16.2 adds deterministic Unity project generation through a supported Editor importer. It reconstructs scenes/hierarchy, central-profile transforms, copied media, sprites, 2D physics/layers, cameras, audio, particles, Input System actions, AnimationClips/AnimatorControllers, and the portable Behaviour Graph runtime without using undocumented Unity scene YAML as its primary mechanism. Godot 4 export remains available from 0.16.1.
+**Milestones 0–7 and ProtoMake 0.9–0.16.3 are implemented.** ProtoMake 0.16.3 completes the portability series with a deterministic Unreal Engine 5 project and C++ plugin. Its Editor module imports source media, maps, actors/components, Paper2D sprites/flipbooks, 2D-plane physics, cameras, audio and Enhanced Input assets through supported engine facilities; its Runtime module executes the declared portable Behaviour Graph subset. ProtoMake never synthesizes `.uasset` files and does not use Unreal Python as a gameplay runtime. Godot 4 and Unity exports remain available from 0.16.1 and 0.16.2.
 
 ## Three prototype workshop
 
@@ -60,6 +60,7 @@ Start testing with [TESTING-CHECKLIST.md](TESTING-CHECKLIST.md). Save your test 
 | 0.16      | Public release documentation, deterministic Interchange IR, target capability metadata, portability analysis, stable ID maps, coordinate conversion, manifests and diagnostics                                                                           |
 | 0.16.1    | Deterministic Godot 4 project/scene generation, source media copying, input/audio setup, core 2D component reconstruction, portable Graph runtime and editor ZIP export                                                                                  |
 | 0.16.2    | Unity 2022.3+ project output, supported Editor API importer, copied media, scenes, 2D physics, Input System actions, sprite animation/controllers, particles, Graph runtime and editor ZIP export                                                        |
+| 0.16.3    | Unreal Engine 5 project/plugin source bundle, AssetTools/Paper2D/Enhanced Input importer, generated maps/actors/components, C++ Graph runtime, diagnostics, and no synthesized `.uasset` files                                                           |
 
 ## Editor Quality polish
 
@@ -93,7 +94,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 134 automated tests, with actual Rapier simulation, execution of compiled project modules, and deterministic Interchange/portability/Godot/Unity-generation checks. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, target-engine import, audio behavior and input feel remain part of the manual acceptance checklist.
+The suite includes 135 automated tests, with actual Rapier simulation, execution of compiled project modules, and deterministic Interchange/portability/Godot/Unity/Unreal-generation checks. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, target-engine import/compilation, audio behavior and input feel remain part of the manual acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 
