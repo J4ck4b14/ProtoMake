@@ -57,6 +57,9 @@ Physics events call onCollisionEnter/onCollisionExit or onTriggerEnter/onTrigger
 | `ctx.prefabs.instantiate/destroy`                              | Runtime prefab creation and safe hierarchy destruction                                    |
 | `ctx.pointer.screenPosition/worldPosition/delta/wheel`         | Pointer state in screen and active-camera world coordinates                               |
 | `ctx.camera.screenToWorld/worldToScreen`                       | Explicit active-camera coordinate conversion                                              |
+| `ctx.camera.shake/kick/zoomPulse`                              | Composable impact camera effects                                                          |
+| `ctx.particles.emit(entity?, count?)`                          | Bounded burst from a Particle Emitter 2D                                                  |
+| `ctx.body.velocity/setVelocity/impulse/teleport`               | Concise rigid-body controls without adapter handles                                       |
 | `ctx.input.getVector/getAxis/isPressed/wasPressed/wasReleased` | Named input actions                                                                       |
 | `ctx.physics.velocity/setVelocity/impulse/teleport/raycast`    | ProtoMake physics API; no Rapier handles                                                      |
 | `ctx.loadScene(idOrName)`                                      | Queue a validated scene transition after the current frame                                |
@@ -71,7 +74,7 @@ The browser compiler reports syntax, metadata and module-link errors; it does **
 
 Project code runs only when Play loads modules. The same-origin iframe gives a separate runtime world, globals and teardown context. It is not a security sandbox: trusted project code has browser capabilities, can access the parent origin, and may block the tab if it loops indefinitely. Only run trusted projects. Importing JSON and inspecting metadata does not execute project source.
 
-Rebuild workflow is Stop → edit/save → Play. Each Play starts a fresh module graph and runtime. Stateful hot reload and external-package bundling are deferred.
+During Play, scripts may be edited and saved, then **Recompile** validates a fresh module graph and restarts the active scene. Stateful in-place class replacement and external-package bundling are deferred.
 
 ## Animation and audio services (Milestone 6)
 

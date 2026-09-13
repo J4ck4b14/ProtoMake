@@ -95,6 +95,46 @@ export const SCRIPT_CONTEXT_API: readonly ScriptApiEntry[] = [
     description: 'Convert coordinates through the active camera.',
   },
   {
+    name: 'camera.shake',
+    signature: 'ctx.camera.shake(camera, intensity, duration)',
+    description: 'Apply decaying camera shake.',
+  },
+  {
+    name: 'camera.kick',
+    signature: 'ctx.camera.kick(camera, x, y, duration)',
+    description: 'Apply a directional impact kick.',
+  },
+  {
+    name: 'camera.zoomPulse',
+    signature: 'ctx.camera.zoomPulse(camera, amount, duration)',
+    description: 'Pulse camera zoom with a smooth attack and release.',
+  },
+  {
+    name: 'particles.emit',
+    signature: 'ctx.particles.emit(entity?, count?)',
+    description: 'Emit a bounded particle burst from an emitter.',
+  },
+  {
+    name: 'body.velocity',
+    signature: 'ctx.body.velocity(entity?)',
+    description: 'Read rigid-body linear velocity.',
+  },
+  {
+    name: 'body.setVelocity',
+    signature: 'ctx.body.setVelocity(x, y, entity?)',
+    description: 'Set rigid-body linear velocity.',
+  },
+  {
+    name: 'body.impulse',
+    signature: 'ctx.body.impulse(x, y, entity?)',
+    description: 'Apply an instantaneous rigid-body impulse.',
+  },
+  {
+    name: 'body.teleport',
+    signature: 'ctx.body.teleport(x, y, entity?)',
+    description: 'Teleport a rigid body and wake it.',
+  },
+  {
     name: 'loadScene',
     signature: 'ctx.loadScene(idOrName)',
     description: 'Load another project scene.',

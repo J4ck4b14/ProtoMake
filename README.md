@@ -1,8 +1,8 @@
-# ProtoMake 0.14.0
+# ProtoMake 0.15.0
 
 A reusable, browser-native 2D engine and visual editor for human-authored projects.
 
-**Milestones 0–7 and ProtoMake 0.9–0.14 are implemented.** ProtoMake 0.14.0 adds live runtime hierarchy and property inspection, safe authoring Apply, Play From Here, scene restart, script recompile/restart, graph values, and per-system profiling. Existing projects migrate on load. It remains a development release with the documented scope below.
+**Milestones 0–7 and ProtoMake 0.9–0.15 are implemented.** ProtoMake 0.15.0 adds authored particle emitters, animation events and cross-fades, bounded polyphonic and spatial audio, impact camera effects, and concise rigid-body scripting helpers. Existing projects migrate on load. It remains a development release with the documented scope below.
 
 ## Three prototype workshop
 
@@ -56,6 +56,7 @@ Start testing with [TESTING-CHECKLIST.md](TESTING-CHECKLIST.md). Save your test 
 | 0.12      | DOM-backed runtime UI, flexible layout, text/image/controls, UI signals, named save profiles and slots, save migrations, integrity checks, autosave, achievements and persistent services                                                                |
 | 0.13      | Sprite slicing and reusable regions, tile set/palette authoring, sparse layered tilemaps, animation/rules, chunked collision, Character Body 2D, camera follow/zones and shake                                                                           |
 | 0.14      | Runtime hierarchy and property tuning, safe authoring Apply, Play From Here, scene restart, script recompile/restart, graph value inspection and per-system profiling                                                                                    |
+| 0.15      | Particle emitters, animation events/cross-fades, bounded polyphonic and spatial audio, camera kick/zoom pulse, and rigid-body scripting conveniences                                                                                                     |
 
 ## Editor Quality polish
 
@@ -89,7 +90,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 125 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, audio behavior and input feel remain part of the browser acceptance checklist.
+The suite includes 129 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, audio behavior and input feel remain part of the browser acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 
@@ -105,6 +106,6 @@ The suite includes 125 automated tests, with actual Rapier simulation and execut
 - JSON exports embed asset bytes. Imports are capped at 20 MiB per file; browser quotas apply. Undo retains up to 100 project snapshots. This is intended for small-to-medium authoring sessions until profiled further.
 - The highest-priority enabled camera renders; simultaneous multi-camera composition is deferred. Scene selection markers for non-rendering entities appear only in the editor.
 
-Prefabs do not yet support nested relationships or structural overrides. Animation transitions are immediate cuts; audio is non-spatial with one voice per source. Export conservatively includes every project scene/asset. Detailed contracts are in [prefabs](docs/prefabs.md) and [animation/audio](docs/animation-audio.md).
+Prefabs do not yet support nested relationships or structural overrides. Animation remains sprite-based rather than skeletal; spatial audio is a lightweight 2D attenuation/pan model rather than HRTF. Export conservatively includes every project scene/asset. Detailed contracts are in [prefabs](docs/prefabs.md) and [animation/audio](docs/animation-audio.md).
 
-See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [scripting guide](docs/scripting.md), [Developer Velocity 0.10](docs/developer-velocity-0.10.md), [Visual Logic 0.11](docs/visual-logic-0.11.md), [Game UI & Persistence 0.12](docs/game-ui-persistence-0.12.md), [2D Authoring 0.13](docs/authoring-2d-0.13.md), [Live Iteration 0.14](docs/live-iteration-0.14.md), [lighting](docs/lighting.md), [account continuity](docs/account-sync.md), [0.9.3 launch pass](docs/launch-0.9.3.md), [GitHub Pages deployment](docs/github-pages.md), [project history](HISTORY.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).
+See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [scripting guide](docs/scripting.md), [Developer Velocity 0.10](docs/developer-velocity-0.10.md), [Visual Logic 0.11](docs/visual-logic-0.11.md), [Game UI & Persistence 0.12](docs/game-ui-persistence-0.12.md), [2D Authoring 0.13](docs/authoring-2d-0.13.md), [Live Iteration 0.14](docs/live-iteration-0.14.md), [Game Feel 0.15](docs/game-feel-0.15.md), [lighting](docs/lighting.md), [account continuity](docs/account-sync.md), [0.9.3 launch pass](docs/launch-0.9.3.md), [GitHub Pages deployment](docs/github-pages.md), [project history](HISTORY.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).

@@ -35,6 +35,7 @@ export function editMedia(
           name: 'New clip',
           loop: true,
           speed: 1,
+          events: [],
           frames: images.map((a) => ({ texture: a.id, duration: 1 / 12 })),
         }
       : {
@@ -53,6 +54,7 @@ export function editMedia(
                     from: 'State 1',
                     to: 'State 2',
                     exitTime: null,
+                    blend: 0.1,
                     conditions: [
                       { parameter: 'moving', operator: '==', value: true },
                     ],
@@ -61,6 +63,7 @@ export function editMedia(
                     from: 'State 2',
                     to: 'State 1',
                     exitTime: null,
+                    blend: 0.1,
                     conditions: [
                       { parameter: 'moving', operator: '==', value: false },
                     ],

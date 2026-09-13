@@ -163,3 +163,99 @@ it('rejects missing states and inconsistent condition types', () => {
     }),
   ).toThrow();
 });
+
+it('emits timed clip events and exposes a cross-fade during transitions', () => {
+  const model = new EditorModel(),
+    entity = model.createEntity('Animated'),
+    restTexture = guid(),
+    hitTexture = guid(),
+    restClip = guid(),
+    hitClip = guid(),
+    controller = guid(),
+    events: string[] = [];
+  const assets: AssetData[] = [
+    image(restTexture),
+    image(hitTexture),
+    {
+      id: restClip,
+      path: 'rest.animation',
+      kind: 'text',
+      mime: CLIP_MIME,
+      data: JSON.stringify({
+        version: 1,
+        name: 'Rest',
+        loop: true,
+        speed: 1,
+        events: [{ time: 0.01, name: 'footstep' }],
+        frames: [{ texture: restTexture, duration: 0.2 }],
+      }),
+      width: 0,
+      height: 0,
+    },
+    {
+      id: hitClip,
+      path: 'hit.animation',
+      kind: 'text',
+      mime: CLIP_MIME,
+      data: JSON.stringify({
+        version: 1,
+        name: 'Hit',
+        loop: false,
+        speed: 1,
+        events: [],
+        frames: [{ texture: hitTexture, duration: 0.2 }],
+      }),
+      width: 0,
+      height: 0,
+    },
+    {
+      id: controller,
+      path: 'controller.animator',
+      kind: 'text',
+      mime: CONTROLLER_MIME,
+      data: JSON.stringify({
+        version: 1,
+        initial: 'Rest',
+        parameters: { hit: { type: 'trigger', default: false } },
+        states: [
+          { name: 'Rest', clip: restClip, speed: 1 },
+          { name: 'Hit', clip: hitClip, speed: 1 },
+        ],
+        transitions: [
+          {
+            from: 'Rest',
+            to: 'Hit',
+            exitTime: null,
+            blend: 0.2,
+            conditions: [{ parameter: 'hit', operator: '==', value: true }],
+          },
+        ],
+      }),
+      width: 0,
+      height: 0,
+    },
+  ];
+  model.change('Animation', () => {
+    model.project.assets = assets;
+    model.world.add(model.entity(entity), SpriteRenderer.type);
+    model.world.add(model.entity(entity), Animator.type, {
+      controller,
+      speed: 1,
+    });
+  });
+  const animation = new AnimationSystem(model.world, assets, (event) =>
+      events.push(event.name),
+    ),
+    engine = new Engine(model.world);
+  engine.addSystem(animation);
+  engine.start();
+  animation.trigger(entity, 'hit');
+  engine.tick(0.02);
+  const sprite = model.world.read(model.entity(entity), SpriteRenderer)!;
+  expect(events).toContain('footstep');
+  expect(sprite.texture).toBe(hitTexture);
+  expect(sprite.secondaryTexture).toBe(restTexture);
+  expect(sprite.blend).toBeGreaterThan(0);
+  expect(sprite.blend).toBeLessThan(1);
+  engine.stop();
+});

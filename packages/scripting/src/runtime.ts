@@ -81,6 +81,11 @@ export interface RuntimeScriptServices {
   };
   readonly cameraEffects?: {
     shake(camera: Guid, intensity: number, duration: number): void;
+    kick(camera: Guid, x: number, y: number, duration: number): void;
+    zoomPulse(camera: Guid, amount: number, duration: number): void;
+  };
+  readonly particles?: {
+    emit(entity: Guid, count?: number): void;
   };
 }
 export interface ScriptContext {
@@ -155,6 +160,17 @@ export interface ScriptContext {
       position: readonly [number, number],
     ): readonly [number, number];
     shake(camera: Guid, intensity: number, duration: number): void;
+    kick(camera: Guid, x: number, y: number, duration: number): void;
+    zoomPulse(camera: Guid, amount: number, duration: number): void;
+  };
+  readonly particles: {
+    emit(entity?: Guid, count?: number): void;
+  };
+  readonly body: {
+    velocity(entity?: Guid): readonly [number, number];
+    setVelocity(x: number, y: number, entity?: Guid): void;
+    impulse(x: number, y: number, entity?: Guid): void;
+    teleport(x: number, y: number, entity?: Guid): void;
   };
   readonly character: {
     moveAndSlide(
@@ -574,6 +590,30 @@ export class ScriptSystem implements System {
           if (!effects) return unavailable('Camera effects');
           effects.shake(camera, intensity, duration);
         },
+        kick: (camera, x, y, duration) => {
+          const effects = this.services.cameraEffects;
+          if (!effects) return unavailable('Camera effects');
+          effects.kick(camera, x, y, duration);
+        },
+        zoomPulse: (camera, amount, duration) => {
+          const effects = this.services.cameraEffects;
+          if (!effects) return unavailable('Camera effects');
+          effects.zoomPulse(camera, amount, duration);
+        },
+      },
+      particles: {
+        emit: (stable = id, count = 1) => {
+          const particles = this.services.particles;
+          if (!particles) return unavailable('Particles');
+          particles.emit(stable, count);
+        },
+      },
+      body: {
+        velocity: (stable = id) => this.physics.velocity(stable),
+        setVelocity: (x, y, stable = id) =>
+          this.physics.setVelocity(stable, x, y),
+        impulse: (x, y, stable = id) => this.physics.impulse(stable, x, y),
+        teleport: (x, y, stable = id) => this.physics.teleport(stable, x, y),
       },
       character: {
         moveAndSlide: (velocity, delta = clock().delta, stable = id) =>

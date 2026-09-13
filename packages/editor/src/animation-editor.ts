@@ -86,6 +86,7 @@ export function animationEditor(
       }),
       fps.row,
       uniform,
+      node('h3', '', 'Frames'),
     );
     for (const [i, frame] of c.frames.entries()) {
       const row = node('div', 'animation-row'),
@@ -127,6 +128,39 @@ export function animationEditor(
         c.frames.push({ texture: images[0]?.id ?? '', duration: 1 / 12 });
         render();
       }),
+      node('h3', '', 'Events'),
+    );
+    for (const [index, event] of c.events.entries()) {
+      const row = node('div', 'animation-row'),
+        eventName = input('Event name', event.name),
+        payload = input(
+          'Payload',
+          event.payload === undefined ? '' : String(event.payload),
+        );
+      eventName.input.onchange = () => {
+        event.name = eventName.input.value;
+      };
+      payload.input.onchange = () => {
+        event.payload = payload.input.value || undefined;
+      };
+      row.append(
+        number('Time', event.time, (value) => {
+          event.time = value;
+        }),
+        eventName.row,
+        payload.row,
+        button('Remove event', () => {
+          c.events.splice(index, 1);
+          render();
+        }),
+      );
+      body.append(row);
+    }
+    body.append(
+      button('+ Event', () => {
+        c.events.push({ time: 0, name: 'event' });
+        render();
+      }),
     );
   }
   function renderController(c: AnimatorController): void {
@@ -148,7 +182,13 @@ export function animationEditor(
           .querySelector(`[data-transition-index="${i}"]`)
           ?.scrollIntoView?.({ block: 'nearest' }),
       (from, to) => {
-        c.transitions.push({ from, to, exitTime: 1, conditions: [] });
+        c.transitions.push({
+          from,
+          to,
+          exitTime: 1,
+          blend: 0.1,
+          conditions: [],
+        });
         render();
       },
     );
@@ -324,6 +364,9 @@ export function animationEditor(
           t.to = v;
         }),
         exit.row,
+        number('Blend seconds', t.blend, (value) => {
+          t.blend = value;
+        }),
         button('Earlier rule', () => {
           if (i > 0) {
             [c.transitions[i - 1], c.transitions[i]] = [
@@ -419,6 +462,7 @@ export function animationEditor(
           from: first,
           to: c.states[1]?.name ?? first,
           exitTime: null,
+          blend: 0.1,
           conditions: [],
         });
         render();

@@ -10,15 +10,15 @@
 | `@protomake/runtime`       | Core                                                                  | Time, ordered lifecycle, signals, timers and tweens                              |
 | `@protomake/tilemap`       | Core, Zod                                                             | Tile-set and sparse layered tilemap data contracts                               |
 | `@protomake/physics2d`     | Core, assets, runtime/tilemap types, Zod, Rapier adapter              | Physics, Character Body 2D and chunked tile collision                            |
-| `@protomake/renderer`      | Core, assets, runtime/tilemap types, Zod, Pixi adapter                | Sprite-region/tile/camera data and rendering contract                            |
+| `@protomake/renderer`      | Core, assets, runtime/tilemap types, Zod, Pixi adapter                | Sprite-region/tile/camera/particle data and rendering contract                   |
 | `@protomake/serialization` | Core, assets, physics/input/prefab/animation/audio/graph schemas, Zod | Strict project/scene validation and migrations                                   |
 | `@protomake/scripting`     | Core, runtime, assets, input/physics types, TypeScript compiler, Zod  | Script data, compilation/linking and behavior lifecycle                          |
 | `@protomake/graphs`        | Core, assets, scripting/physics types, Zod                            | Behaviour Graph schema, typed node registry and shared-context execution         |
 | `@protomake/ui`            | Core, assets, runtime signals, Zod                                    | Accessible DOM runtime UI components, layout and interaction                     |
 | `@protomake/persistence`   | Zod                                                                   | Save profiles/slots, migrations, integrity, autosave and achievements            |
 | `@protomake/prefabs`       | Core, Zod                                                             | Linked hierarchy identity, property patches and propagation                      |
-| `@protomake/animation`     | Core, assets, runtime types, renderer, Zod                            | Clips, controllers, parameter evaluation and playback                            |
-| `@protomake/audio`         | Core, assets, runtime types, Zod                                      | AudioSource, decoded buffers and Web Audio bus routing                           |
+| `@protomake/animation`     | Core, assets, runtime types, renderer, Zod                            | Clips, events, controllers, cross-fades and parameter evaluation                 |
+| `@protomake/audio`         | Core, assets, runtime types, Zod                                      | Polyphonic/spatial AudioSource, decoded buffers and Web Audio routing            |
 | `@protomake/player`        | Runtime engine packages                                               | Shared GameSession composition and standalone player                             |
 | `@protomake/editor`        | Public engine packages                                                | Authoring model, viewport, Inspector, persistence, project scripts and Play host |
 

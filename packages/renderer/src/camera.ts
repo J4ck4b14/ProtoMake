@@ -13,10 +13,23 @@ interface Shake {
   remaining: number;
   duration: number;
 }
+interface Kick {
+  x: number;
+  y: number;
+  remaining: number;
+  duration: number;
+}
+interface ZoomPulse {
+  amount: number;
+  remaining: number;
+  duration: number;
+}
 export class CameraBehaviourSystem implements System {
   readonly id = 'protomake.camera-behaviours';
   private readonly previousTargets = new Map<Guid, readonly [number, number]>();
   private readonly shakes = new Map<Guid, Shake>();
+  private readonly kicks = new Map<Guid, Kick>();
+  private readonly zoomPulses = new Map<Guid, ZoomPulse>();
   private readonly baseZoom = new Map<Guid, number>();
   private readonly lastOffsets = new Map<Guid, readonly [number, number]>();
   constructor(private readonly world: World) {}
@@ -31,6 +44,25 @@ export class CameraBehaviourSystem implements System {
     if (this.world.find(camera) === undefined)
       throw new Error(`Missing camera ${camera}`);
     this.shakes.set(camera, { intensity, remaining: duration, duration });
+  }
+  kick(camera: Guid, x: number, y: number, duration: number): void {
+    if (
+      !Number.isFinite(x) ||
+      !Number.isFinite(y) ||
+      !Number.isFinite(duration) ||
+      duration < 0
+    )
+      throw new Error('Camera kick must be finite with non-negative duration');
+    if (this.world.find(camera) === undefined)
+      throw new Error(`Missing camera ${camera}`);
+    this.kicks.set(camera, { x, y, remaining: duration, duration });
+  }
+  zoomPulse(camera: Guid, amount: number, duration: number): void {
+    if (!Number.isFinite(amount) || !Number.isFinite(duration) || duration < 0)
+      throw new Error('Camera zoom pulse must be finite');
+    if (this.world.find(camera) === undefined)
+      throw new Error(`Missing camera ${camera}`);
+    this.zoomPulses.set(camera, { amount, remaining: duration, duration });
   }
   lateUpdate(context: EngineContext): void {
     const present = new Set<Guid>();
@@ -76,7 +108,9 @@ export class CameraBehaviourSystem implements System {
           follow.smoothing === 0
             ? 1
             : 1 - Math.exp(-follow.smoothing * context.time.delta),
-        offset = this.shakeOffset(stable, context);
+        shake = this.shakeOffset(stable, context),
+        kick = this.kickOffset(stable, context),
+        offset = [shake[0] + kick[0], shake[1] + kick[1]] as const;
       this.writeWorld(
         id,
         current[0] + (desiredX - current[0]) * alpha + offset[0],
@@ -96,7 +130,9 @@ export class CameraBehaviourSystem implements System {
           );
         })
         .sort((a, b) => b.data.priority - a.data.priority)[0];
-      const targetZoom = zone?.data.zoom ?? this.baseZoom.get(stable)!;
+      const targetZoom =
+        (zone?.data.zoom ?? this.baseZoom.get(stable)!) +
+        this.zoomOffset(stable, context);
       if (Math.abs(camera.zoom - targetZoom) > 1e-6) {
         const speed = zone?.data.blendSpeed ?? follow.smoothing,
           blend = speed === 0 ? 1 : 1 - Math.exp(-speed * context.time.delta);
@@ -108,6 +144,30 @@ export class CameraBehaviourSystem implements System {
     }
     for (const id of this.previousTargets.keys())
       if (!present.has(id)) this.previousTargets.delete(id);
+  }
+  private kickOffset(
+    camera: Guid,
+    context: EngineContext,
+  ): readonly [number, number] {
+    const kick = this.kicks.get(camera);
+    if (!kick) return [0, 0];
+    kick.remaining -= context.time.delta;
+    const strength =
+      kick.duration > 0 ? Math.max(0, kick.remaining / kick.duration) : 0;
+    if (kick.remaining <= 0) this.kicks.delete(camera);
+    return [kick.x * strength, kick.y * strength];
+  }
+  private zoomOffset(camera: Guid, context: EngineContext): number {
+    const pulse = this.zoomPulses.get(camera);
+    if (!pulse) return 0;
+    pulse.remaining -= context.time.delta;
+    const progress =
+        pulse.duration > 0
+          ? 1 - Math.max(0, pulse.remaining / pulse.duration)
+          : 1,
+      envelope = Math.sin(progress * Math.PI);
+    if (pulse.remaining <= 0) this.zoomPulses.delete(camera);
+    return pulse.amount * envelope;
   }
   private shakeOffset(
     camera: Guid,
@@ -146,6 +206,8 @@ export class CameraBehaviourSystem implements System {
   stop(): void {
     this.previousTargets.clear();
     this.shakes.clear();
+    this.kicks.clear();
+    this.zoomPulses.clear();
     this.baseZoom.clear();
     this.lastOffsets.clear();
   }

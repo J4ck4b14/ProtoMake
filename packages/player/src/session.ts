@@ -24,7 +24,7 @@ import { runtimeRegistry } from './registry';
 import { RuntimePrefabs } from './prefabs';
 import { GraphRuntime } from '@protomake/graphs';
 import { RuntimeUiSystem } from '@protomake/ui';
-import { CameraBehaviourSystem } from '@protomake/renderer';
+import { CameraBehaviourSystem, ParticleSystem } from '@protomake/renderer';
 import {
   createPersistentServices,
   type PersistentGameServices,
@@ -112,8 +112,10 @@ export class GameSession {
       );
       input = new InputService(project.input);
       input.attach(window);
-      const animation = new AnimationSystem(world, project.assets),
-        signals = new SignalService(),
+      const signals = new SignalService(),
+        animation = new AnimationSystem(world, project.assets, (event) =>
+          signals.emit(event.name, event),
+        ),
         timers = new TimerService(),
         tweens = new TweenService(world),
         prefabs = new RuntimePrefabs(world, registry, project.assets),
@@ -143,7 +145,8 @@ export class GameSession {
           project.assets,
           signals,
         ),
-        cameraEffects = new CameraBehaviourSystem(world);
+        cameraEffects = new CameraBehaviourSystem(world),
+        particles = new ParticleSystem(world);
       audio = await loadStage(
         'Decoding audio',
         () => AudioSystem.create(world, project.assets, project.mixer),
@@ -162,6 +165,7 @@ export class GameSession {
       engine.addSystem(tweens);
       engine.addSystem(ui);
       engine.addSystem(cameraEffects);
+      engine.addSystem(particles);
       const scriptSystem = new ScriptSystem(
         world,
         input,
@@ -182,6 +186,7 @@ export class GameSession {
           save: persistent.save,
           achievements: persistent.achievements,
           cameraEffects,
+          particles,
         },
       );
       engine.addSystem(scriptSystem);

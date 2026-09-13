@@ -34,7 +34,7 @@ import {
   validateScene,
 } from './scene';
 import { MigrationChain } from './migrations';
-export const PROJECT_SCHEMA_VERSION = 9;
+export const PROJECT_SCHEMA_VERSION = 10;
 export const ProjectSchema = z.strictObject({
   schemaVersion: z.literal(PROJECT_SCHEMA_VERSION),
   id: GuidSchema,
@@ -178,12 +178,17 @@ projectMigrations.register(8, (input) => ({
   schemaVersion: 9,
   engineVersion: '0.14.0',
 }));
+projectMigrations.register(9, (input) => ({
+  ...(input as object),
+  schemaVersion: 10,
+  engineVersion: '0.15.0',
+}));
 export function createProject(name: string): ProjectData {
   return ProjectSchema.parse({
     schemaVersion: PROJECT_SCHEMA_VERSION,
     id: guid(),
     name,
-    engineVersion: '0.14.0',
+    engineVersion: '0.15.0',
     startupScene: null,
     scenes: [],
     assets: [],
@@ -330,6 +335,7 @@ export function validateProject(
           );
         if (
           (type === 'protomake.sprite' ||
+            type === 'protomake.particle-emitter' ||
             type === 'protomake.ui-image' ||
             type === 'protomake.behaviours') &&
           data &&
@@ -352,7 +358,9 @@ export function validateProject(
               const asset = project.assets.find((a) => a.id === reference.id);
               if (
                 asset &&
-                (((type === 'protomake.sprite' || type === 'protomake.ui-image') &&
+                (((type === 'protomake.sprite' ||
+                  type === 'protomake.particle-emitter' ||
+                  type === 'protomake.ui-image') &&
                   asset.kind !== 'image' &&
                   asset.mime !== SPRITE_REGION_MIME) ||
                   (type === 'protomake.behaviours' &&

@@ -35,6 +35,8 @@ export function channelEnabled(
 
 const SpriteSchema = z.strictObject({
   texture: z.string(),
+  secondaryTexture: z.string().default(''),
+  blend: finite.min(0).max(1).default(1),
   lit: z.boolean().default(true),
   castShadow: z.boolean().default(false),
   lightingChannel: z.enum(LIGHTING_CHANNELS).default('World'),
@@ -58,6 +60,8 @@ export const SpriteRenderer: ComponentDefinition<SpriteData> = {
   schema: SpriteSchema,
   defaults: () => ({
     texture: '',
+    secondaryTexture: '',
+    blend: 1,
     lit: true,
     castShadow: false,
     lightingChannel: 'World',

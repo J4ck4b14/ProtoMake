@@ -177,3 +177,63 @@ it('reports decode errors and frees the failed context', async () => {
     MixerSchema.parse([{ name: 'SFX', volume: 1, muted: false }]),
   ).toThrow();
 });
+
+it('overlaps bounded one-shots and updates spatial pan and attenuation', async () => {
+  const m = new EditorModel(),
+    source = m.createEntity('Source'),
+    listener = m.createEntity('Camera'),
+    clip = guid(),
+    { ctx, sources } = context(),
+    panners: {
+      pan: { value: number };
+      connect: ReturnType<typeof vi.fn>;
+      disconnect: ReturnType<typeof vi.fn>;
+    }[] = [];
+  Object.assign(ctx, {
+    createStereoPanner: () => {
+      const panner = {
+        pan: { value: 0 },
+        connect: vi.fn(),
+        disconnect: vi.fn(),
+      };
+      panners.push(panner);
+      return panner;
+    },
+  });
+  m.change('Spatial audio', () => {
+    m.project.assets.push({
+      id: clip,
+      path: 'Assets/hit.wav',
+      mime: 'audio/wav',
+      kind: 'audio',
+      data: 'data:audio/wav;base64,AA==',
+      width: 0,
+      height: 0,
+    });
+    m.world.add(m.entity(listener), 'protomake.camera');
+    m.world.setLocalMatrix(m.entity(source), [1, 0, 0, 1, 400, 0]);
+    m.world.add(m.entity(source), AudioSource.type, {
+      ...AudioSource.defaults(),
+      clip,
+      spatial: true,
+      minDistance: 0,
+      maxDistance: 800,
+      polyphony: 2,
+    });
+  });
+  const audio = await AudioSystem.create(
+    m.world,
+    m.project.assets,
+    defaultMixer(),
+    ctx as unknown as AudioContext,
+  );
+  audio.play(source);
+  audio.play(source);
+  expect(sources).toHaveLength(2);
+  expect(sources[0]!.stop).not.toHaveBeenCalled();
+  audio.play(source);
+  expect(sources[0]!.stop).toHaveBeenCalledOnce();
+  audio.update();
+  expect(panners.at(-1)!.pan.value).toBeGreaterThan(0);
+  audio.stop();
+});

@@ -8,7 +8,9 @@ Create **+ Animator** after at least one clip exists. Its form edits named state
 
 **Reopen and edit:** double-click an existing clip or Animator in Assets, or select it and choose **Edit animation**. The Animator section in the entity Inspector also provides **Edit controller** and **Edit clip** shortcuts. Saving updates the same asset ID, preserving references; Undo restores the previous edit. Stop Play before authoring.
 
-Parameters support bool, float, int and trigger. Transition conditions are ANDed. Rules are evaluated in authored order; the first matching rule wins, at most once per rendered engine update. `Any state` matches every state. Blank exit time allows an immediate transition; a numeric value waits for that many clip cycles. Referenced triggers are consumed only by a taken transition. Transitions cut to the first frame of their destination. There is no cross-fade/blend tree, skeletal animation, atlas slicing or skeletal timeline editor in this checkpoint.
+Parameters support bool, float, int and trigger. Transition conditions are ANDed. Rules are evaluated in authored order; the first matching rule wins, at most once per rendered engine update. `Any state` matches every state. Blank exit time allows an immediate transition; a numeric value waits for that many clip cycles. Referenced triggers are consumed only by a taken transition. Each transition has a blend duration that cross-fades source and destination sprite frames. This is sprite blending, not a skeletal blend tree.
+
+Clip events have a time, name, and optional scalar payload. The animation runtime emits the name through the shared signal service with entity/state metadata, so behaviour code can subscribe with `ctx.events.on('footstep', handler)`. Looping clips fire their events once per crossed cycle; large catch-up ranges are bounded.
 
 The effective speed is Animator × state × clip speed. Disabling the entity suspends its animation; re-enabling retains playback state. Stop destroys runtime playback state. Animations run after script update, so a parameter written by a script can affect that frame.
 
@@ -24,12 +26,12 @@ The optional final argument selects another entity for `setParameter`, `trigger`
 
 ## Audio authoring
 
-Import WAV, MP3 or OGG. Actual codec decoding depends on the browser; invalid/unsupported files produce an error naming the asset during runtime loading. Select a clip and **Attach media**, or add **Audio Source** and assign the clip. Configure loop, volume (0–1), playback rate (0.01–4), output bus and Play on awake.
+Import WAV, MP3 or OGG. Actual codec decoding depends on the browser; invalid/unsupported files produce an error naming the asset during runtime loading. Select a clip and **Attach media**, or add **Audio Source** and assign the clip. Configure loop, volume (0–1), playback rate (0.01–4), output bus, Play on awake, one-shot polyphony, and optional 2D spatial settings.
 
 **Mixer** provides Master, Music, SFX, UI and Ambience, per-bus volume/mute, and custom buses. Every non-Master bus routes into Master. Missing buses are rejected. Mixer changes are authored project settings and support Undo. During Play, scripts may change runtime bus gains.
 
 ```ts
-ctx.playAudio(); // Restart this entity's one voice.
+ctx.playAudio(); // Add a bounded one-shot voice; looping sources restart.
 ctx.pauseAudio();
 ctx.playAudio(ctx.entity, true); // Resume its saved offset.
 ctx.stopAudio();
@@ -37,7 +39,7 @@ ctx.setBus('Music', 0.4);
 ctx.setBus('SFX', 1, true); // Mute SFX.
 ```
 
-Click the game viewport in editor Play to enable sound. Exported games have a Start button. Engine Pause suspends the audio context; Step advances the simulation while audio remains suspended. Stop, disabled/destroyed sources and scene changes release their voices. Source playback rate changes pitch as well as speed. This is non-spatial mono/stereo playback with one voice per AudioSource; spatial listeners/attenuation, streaming and effects processing are deferred.
+Click the game viewport in editor Play to enable sound. Exported games have a Start button. Engine Pause suspends the audio context; Step advances the simulation while audio remains suspended. Stop, disabled/destroyed sources and scene changes release every voice. Source playback rate changes pitch as well as speed. One-shot voices overlap up to the authored polyphony cap, evicting the oldest voice at capacity. Spatial sources use distance attenuation and stereo pan relative to the highest-priority active Camera 2D; HRTF, streaming and effects processing are deferred.
 
 The adapter reuses decoded buffers and creates a fresh source node for each play/resume, as required by [AudioBufferSourceNode's one-shot lifecycle](https://developer.mozilla.org/en-US/docs/Web/API/AudioBufferSourceNode). It resumes suspended contexts through [AudioContext.resume](https://developer.mozilla.org/en-US/docs/Web/API/AudioContext/resume).
 

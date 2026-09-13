@@ -3,7 +3,7 @@ import { PrefabLink } from '@protomake/prefabs';
 import { Animator } from '@protomake/animation';
 import { AudioSource } from '@protomake/audio';
 import { registerPhysics } from '@protomake/physics2d';
-import { registerRendering } from '@protomake/renderer';
+import { ParticleEmitter2D, registerRendering } from '@protomake/renderer';
 import { registerUi } from '@protomake/ui';
 import { registerTilemap } from '@protomake/tilemap';
 import {
@@ -33,6 +33,7 @@ export function runtimeRegistry(): ComponentRegistry {
   const registry = createRegistry();
   registry.register(NoteComponent);
   registerRendering(registry);
+  registry.register(ParticleEmitter2D);
   registerPhysics(registry);
   registerUi(registry);
   registerTilemap(registry);

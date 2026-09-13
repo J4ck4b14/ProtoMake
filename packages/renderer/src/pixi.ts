@@ -161,6 +161,7 @@ export class PixiRenderer implements Renderer2D {
   private readonly debugLines = new Graphics();
   private readonly mask = new Graphics();
   private readonly sprites = new Map<string, Sprite>();
+  private readonly blendSprites = new Map<string, Sprite>();
   private readonly tileSprites = new Map<string, Sprite>();
   private readonly textures = new Map<
     string,
@@ -892,6 +893,25 @@ export class PixiRenderer implements Renderer2D {
       }
     for (const { id, guid, data } of ordered) {
       seen.add(guid);
+      let blendSprite = this.blendSprites.get(guid);
+      if (data.secondaryTexture && data.blend < 1) {
+        if (!blendSprite) {
+          blendSprite = new Sprite();
+          this.blendSprites.set(guid, blendSprite);
+          this.root.addChild(blendSprite);
+        }
+        blendSprite.texture =
+          this.textures.get(data.secondaryTexture)?.texture ?? Texture.WHITE;
+        blendSprite.visible = world.isActive(id) && data.visible;
+        blendSprite.tint = this.textures.has(data.secondaryTexture)
+          ? data.tint
+          : 0xff00ff;
+        blendSprite.alpha = data.opacity * (1 - data.blend);
+      } else if (blendSprite) {
+        blendSprite.destroy();
+        this.blendSprites.delete(guid);
+        blendSprite = undefined;
+      }
       let sprite = this.sprites.get(guid);
       if (!sprite) {
         sprite = new Sprite();
@@ -904,7 +924,7 @@ export class PixiRenderer implements Renderer2D {
       sprite.visible = world.isActive(id) && data.visible;
       sprite.tint =
         data.texture && !this.textures.has(data.texture) ? 0xff00ff : data.tint;
-      sprite.alpha = data.opacity;
+      sprite.alpha = data.opacity * (data.secondaryTexture ? data.blend : 1);
       const texture = this.textures.get(data.texture);
       sprite.anchor.set(
         data.useTexturePivot && texture?.pivot
@@ -920,12 +940,35 @@ export class PixiRenderer implements Renderer2D {
       sprite.setFromMatrix(
         new Matrix(m[0] * sx, m[1] * sx, m[2] * sy, m[3] * sy, m[4], m[5]),
       );
+      if (blendSprite) {
+        blendSprite.anchor.copyFrom(sprite.anchor);
+        const blendSx =
+            (data.width / blendSprite.texture.width) * (data.flipX ? -1 : 1),
+          blendSy =
+            (data.height / blendSprite.texture.height) * (data.flipY ? -1 : 1);
+        blendSprite.setFromMatrix(
+          new Matrix(
+            m[0] * blendSx,
+            m[1] * blendSx,
+            m[2] * blendSy,
+            m[3] * blendSy,
+            m[4],
+            m[5],
+          ),
+        );
+        this.root.setChildIndex(blendSprite, this.root.children.length - 1);
+      }
       this.root.setChildIndex(sprite, this.root.children.length - 1);
     }
     for (const [id, sprite] of this.sprites)
       if (!seen.has(id)) {
         sprite.destroy();
         this.sprites.delete(id);
+      }
+    for (const [id, sprite] of this.blendSprites)
+      if (!seen.has(id)) {
+        sprite.destroy();
+        this.blendSprites.delete(id);
       }
     this.root.setChildIndex(this.debugLines, this.root.children.length - 1);
     this.app.render();
@@ -960,6 +1003,7 @@ export class PixiRenderer implements Renderer2D {
     for (const cached of this.textures.values()) cached.texture.destroy(true);
     this.textures.clear();
     this.sprites.clear();
+    this.blendSprites.clear();
     this.tileSprites.clear();
   }
 }
