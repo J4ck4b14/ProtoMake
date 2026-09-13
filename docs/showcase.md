@@ -8,7 +8,7 @@ The Black Gate teaches melee combat under the player's short carried light. Its 
 
 The run includes:
 
-- zero-intensity static ambient lights that force unlit space to pure black;
+- zero-intensity static ambient lights plus an explicit radial blackout mask that guarantees pure black beyond the player's short reveal radius;
 - a 152-pixel dynamic lantern parented to the player;
 - a lantern tradeoff: opening it increases sentinel acquisition range, while shuttering it sacrifices sight for stealth;
 - no more than three tiny authored lights in any room;
@@ -16,13 +16,15 @@ The run includes:
 - weak point and spot hints, dynamic ward lights and a reward-state area light;
 - layered, visibly lit masonry, arches, chains, water details, world surfaces and platforms;
 - shadow-casting floors, columns, arches and ceiling geometry;
-- melee hitboxes, ranged and hostile projectile pools, solid-geometry impacts, health and ammunition;
+- melee hitboxes, assisted ranged aiming, friendly and hostile projectile pools, hostile solid-geometry impacts, health and ammunition;
 - telegraphed sentinel attacks and a three-shot Warden volley;
 - multiweapon inventory, one-use pickups and explicit room/objective UI;
 - jump buffering, coyote time, hazards and staged platforming;
 - sprite animation, pooled particles, eight distinct synthesized effects, camera shake, kick and zoom feedback;
 - faded bidirectional scene traversal with volatile run state that survives scene loads;
 - a `vaultbreaker` achievement for completing all three rooms.
+
+The acceptance suite also finishes the complete three-room route with mapped movement, jumping and attacks against real collision geometry; it does not teleport the player between objectives.
 
 Nothing in the engine recognizes this dungeon specially. Its rules are the ordinary editable `Assets/Scripts/Showcase.ts` behaviour embedded in `examples/prototypes/showcase/showcase.protomake.json`; all three scenes use standard ProtoMake entities and components. The general-purpose `ctx.session` service shares structured-cloned state between scene instances and is cleared when Play ends.
 

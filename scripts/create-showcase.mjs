@@ -158,6 +158,16 @@ try {
     component(id, 'protomake.shadow-caster', { width, height });
     return id;
   };
+  const shadowShape = (name, x, y, width, height, tint = '#526969') => {
+    const id = entity(name, x, y, width, height, tint, '', {
+      lit: true,
+      castShadow: true,
+      lightingChannel: 'World',
+      layer: -1,
+    });
+    component(id, 'protomake.shadow-caster', { width, height });
+    return id;
+  };
   const decor = (
     name,
     x,
@@ -565,10 +575,29 @@ try {
     m.world.setLocalMatrix(lantern, [1, 0, 0, 1, 8, -7]);
     const flame = entity('Lantern flame', 0, 0, 7, 9, '#ffe7a8', '', {
       lit: false,
-      layer: 7,
+      layer: 24,
     });
     m.world.setParent(flame, player);
     m.world.setLocalMatrix(flame, [1, 0, 0, 1, 8, -8]);
+    const darkness = entity(
+      'Lantern darkness',
+      0,
+      0,
+      1800,
+      1800,
+      '#ffffff',
+      assetIds['Images/DarknessMask.png'],
+      { lit: false, layer: 20 },
+    );
+    m.world.setParent(darkness, player);
+    m.world.setLocalMatrix(darkness, [1, 0, 0, 1, 0, 0]);
+    const shutter = entity('Lantern shutter', 0, 0, 460, 460, '#000000', '', {
+      lit: false,
+      visible: false,
+      layer: 21,
+    });
+    m.world.setParent(shutter, player);
+    m.world.setLocalMatrix(shutter, [1, 0, 0, 1, 0, 0]);
 
     emitter('Gold impact', {
       startColor: '#fff1b5',
@@ -611,14 +640,14 @@ try {
     entity('Slash', 0, 0, 58, 16, '#fff2b0', '', {
       visible: false,
       lit: false,
-      layer: 8,
+      layer: 24,
       opacity: 0.9,
     });
     for (let index = 1; index <= 8; index++) {
       entity(`Player bolt ${index}`, 0, 0, 18, 6, '#74eaff', '', {
         visible: false,
         lit: false,
-        layer: 8,
+        layer: 24,
       });
       light(`Player bolt glow ${index}`, 'point', 'dynamic', 0, 0, {
         color: '#55dfff',
@@ -631,7 +660,7 @@ try {
       entity(`Enemy bolt ${index}`, 0, 0, 10, 10, '#ff456b', '', {
         visible: false,
         lit: false,
-        layer: 8,
+        layer: 24,
       });
       light(`Enemy bolt glow ${index}`, 'point', 'dynamic', 0, 0, {
         color: '#ff204f',
@@ -715,7 +744,7 @@ try {
     entity(`Enemy tell ${index}`, x, y, 8, 8, '#ff3158', '', {
       lit: false,
       visible: false,
-      layer: 9,
+      layer: 24,
       opacity: 0.9,
     });
     return id;
@@ -724,7 +753,7 @@ try {
     entity(`${name} ember`, x, y, 4, 4, color, '', {
       lit: false,
       opacity: 0.85,
-      layer: 5,
+      layer: 24,
     });
     return light(name, kind, mobility, x, y, {
       color,
@@ -777,15 +806,15 @@ try {
     );
     chain('Gate chain', -268, -202, 8);
     platform('West threshold', -320, 205, 160);
-    platform('Broken nave', -100, 205, 190);
+    platform('Broken nave', -110, 205, 230);
     platform('East threshold', 250, 205, 300);
-    platform('West shelf', -210, 126, 105);
-    platform('Central shelf', -35, 73, 105);
-    platform('East shelf', 145, 128, 120);
-    wall('West buttress', -246, 42, 26, 145);
-    wall('Central column', 52, -34, 30, 168);
-    wall('Ceiling lintel', 235, -188, 290, 22);
-    wall('East arch', 326, 52, 24, 166);
+    platform('West shelf', -170, 140, 130);
+    platform('Central shelf', -25, 95, 130);
+    platform('East shelf', 120, 140, 130);
+    shadowShape('West buttress', -246, 42, 26, 145);
+    shadowShape('Central column', 52, -34, 30, 168);
+    shadowShape('Ceiling lintel', 235, -188, 290, 22);
+    shadowShape('East arch', 326, 52, 24, 166);
     sentinel('Sentinel 1', -86, 166);
     sentinel('Sentinel 2', 205, 166);
     entity(
@@ -833,10 +862,10 @@ try {
     platform('Second ascent', 151, 68, 105);
     platform('Ward bridge', 267, -4, 112, false);
     platform('East landing', 359, -52, 82);
-    wall('Drowned pillar', -187, 70, 28, 188);
-    wall('Broken pier', 92, -35, 25, 130);
+    shadowShape('Drowned pillar', -187, 70, 28, 188);
+    shadowShape('Broken pier', 92, -35, 25, 130);
     wall('East seal', 318, -118, 20, 156);
-    wall('Gallery ceiling', -240, -211, 300, 20);
+    shadowShape('Gallery ceiling', -240, -211, 300, 20);
     sentinel('Sentinel 1', -82, 166);
     sentinel('Sentinel 2', 150, 29);
     entity('Arc Caster pickup', -276, 165, 34, 12, '#74eaff', '', {
@@ -858,6 +887,11 @@ try {
         assetIds['Images/Coin.png'],
         { lit: true, lightingChannel: 'World', layer: 5 },
       );
+      entity(`Ward beacon ${index}`, x, y, 4, 4, '#9af5ff', '', {
+        lit: false,
+        visible: false,
+        layer: 24,
+      });
       light(`Ward light ${index}`, 'point', 'dynamic', x, y, {
         color: '#6be9ff',
         intensity: 0.03,
@@ -939,14 +973,14 @@ try {
     chain('Reliquary chain west', -244, -208, 9);
     chain('Reliquary chain east', 270, -208, 10);
     platform('West reliquary floor', -300, 205, 200);
-    platform('Arena floor', -42, 205, 270);
+    platform('Arena floor', -16, 205, 322);
     platform('East reliquary floor', 270, 205, 250);
     platform('Warden dais', 82, 119, 125);
     platform('West balcony', -205, 72, 110);
     platform('East balcony', 263, 55, 116);
-    wall('Reliquary tooth west', -286, -15, 28, 160);
-    wall('Reliquary tooth east', 232, -35, 28, 165);
-    wall('Reliquary crown', 0, -207, 310, 22);
+    shadowShape('Reliquary tooth west', -286, -15, 28, 160);
+    shadowShape('Reliquary tooth east', 232, -35, 28, 165);
+    shadowShape('Reliquary crown', 0, -207, 310, 22);
     sentinel('Sentinel 1', -160, 166);
     sentinel('Sentinel 2', 258, 166);
     sentinel('Sentinel 3', -202, 33);
@@ -954,7 +988,7 @@ try {
     entity(
       'Vault Key',
       82,
-      77,
+      166,
       18,
       28,
       '#ffe2a0',
@@ -963,7 +997,7 @@ try {
         lit: true,
         lightingChannel: 'World',
         visible: false,
-        layer: 6,
+        layer: 24,
       },
     );
     entity('Exit sigil', 385, 130, 20, 120, '#caefff', '', {
@@ -971,10 +1005,10 @@ try {
       lightingChannel: 'World',
       visible: false,
       opacity: 0.68,
-      layer: 5,
+      layer: 24,
     });
     microLight('Reliquary pin west', 'point', 'static', -330, 100, '#6d8791');
-    light('Relic glimmer', 'point', 'dynamic', 82, 77, {
+    light('Relic glimmer', 'point', 'dynamic', 82, 166, {
       color: '#ffe1a1',
       intensity: 0,
       range: 44,

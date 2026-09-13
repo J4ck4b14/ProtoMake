@@ -9,6 +9,7 @@
   "Flag.png": [20, 36],
   "Goal.png": [32, 48],
   "Backdrop.png": [800, 500],
+  "DarknessMask.png": [1800, 1800],
   "Instructions.png": [760, 44],
   "Victory.png": [520, 120],
   "Defeat.png": [520, 120]

@@ -174,6 +174,7 @@ export default class Showcase {
       intensity: this.state.lantern ? 1.05 : 0,
     });
     this.setVisibleByName(c, 'Lantern flame', this.state.lantern);
+    this.setVisibleByName(c, 'Lantern shutter', !this.state.lantern);
     this.setVisibleByName(c, 'Slash', false);
     this.setVisibleByName(c, 'Victory', false);
     this.setVisibleByName(c, 'Defeat', false);
@@ -268,6 +269,7 @@ export default class Showcase {
         intensity: this.state.lantern ? 1.05 : 0,
       });
       this.setVisibleByName(c, 'Lantern flame', this.state.lantern);
+      this.setVisibleByName(c, 'Lantern shutter', !this.state.lantern);
       this.say(
         c,
         this.state.lantern
@@ -386,7 +388,8 @@ export default class Showcase {
           const [x, y] = c.position();
           this.state.ammo--;
           this.attackTime = 0.2;
-          this.launch(c, shot, x + this.facing * 24, y, this.facing * 600, 0);
+          const [aimX, aimY] = this.rangedAim(c, x, y);
+          this.launch(c, shot, x + this.facing * 24, y, aimX * 600, aimY * 600);
           this.sound(c, 'Caster audio');
           this.effect(c, 'Cyan impact', x + this.facing * 25, y, 6);
           c.camera.kick(c.find('Camera')!, -this.facing * 4, 0, 0.08);
@@ -496,25 +499,10 @@ export default class Showcase {
   private updateShots(c: ScriptContext, dt: number): void {
     for (const shot of this.shots) {
       if (!shot.alive) continue;
-      const previousX = shot.x,
-        previousY = shot.y;
+      const previousX = shot.x;
       shot.x += shot.vx * dt;
       shot.y += shot.vy * dt;
       this.positionShot(c, shot);
-      const travel = Math.hypot(shot.x - previousX, shot.y - previousY),
-        worldHit = travel
-          ? c.physics.raycast(
-              [previousX, previousY],
-              [shot.x - previousX, shot.y - previousY],
-              travel,
-              c.entity,
-            )
-          : null;
-      if (worldHit) {
-        this.effect(c, 'Cyan impact', worldHit.point[0], worldHit.point[1], 7);
-        this.hideShot(c, shot);
-        continue;
-      }
       if (this.room === 'gallery') {
         for (let index = 0; index < 2; index++) {
           if (this.state.wards[index]) continue;
@@ -578,6 +566,48 @@ export default class Showcase {
       } else if (Math.abs(shot.x) > 440 || Math.abs(shot.y) > 290)
         this.hideShot(c, shot);
     }
+  }
+
+  private rangedAim(
+    c: ScriptContext,
+    x: number,
+    y: number,
+  ): readonly [number, number] {
+    const candidates: { x: number; y: number; ward: boolean }[] = [];
+    for (const enemy of this.enemies) {
+      if (!enemy.alive) continue;
+      const [targetX, targetY] = c.position(enemy.id);
+      candidates.push({ x: targetX, y: targetY, ward: false });
+    }
+    if (this.room === 'gallery')
+      for (let index = 0; index < 2; index++) {
+        if (this.state.wards[index]) continue;
+        const ward = c.find(`Ward crystal ${index + 1}`);
+        if (!ward) continue;
+        const [targetX, targetY] = c.position(ward);
+        candidates.push({ x: targetX, y: targetY, ward: true });
+      }
+    const target = candidates
+      .map((candidate) => {
+        const dx = candidate.x - x,
+          dy = candidate.y - y,
+          distance = Math.hypot(dx, dy),
+          forward = dx * this.facing,
+          angle = Math.abs(Math.atan2(dy, Math.max(1, forward)));
+        return {
+          ...candidate,
+          dx,
+          dy,
+          distance,
+          score: angle * 260 + distance - (candidate.ward ? 45 : 0),
+          valid: forward > -4 && distance < 390 && angle < 1.15,
+        };
+      })
+      .filter((candidate) => candidate.valid)
+      .sort((a, b) => a.score - b.score)[0];
+    if (!target) return [this.facing, 0];
+    const length = target.distance || 1;
+    return [target.dx / length, target.dy / length];
   }
 
   private launch(
@@ -687,26 +717,26 @@ export default class Showcase {
       near('Arc Caster pickup')
     ) {
       this.state.hasCaster = true;
-      this.state.ammo = 10;
+      this.state.ammo = 24;
       this.state.weapon = 'Arc Caster';
       this.setVisibleByName(c, 'Arc Caster pickup', false);
       this.sound(c, 'Pickup audio');
       this.effect(c, 'Cyan impact', x, y, 15);
       this.say(
         c,
-        'ARC CASTER ACQUIRED — cyan bolts reveal what steel cannot.',
+        'ARC CASTER ACQUIRED — face a ward ring and fire. Bolts bend toward nearby targets.',
         3,
       );
     }
     for (let index = 1; index <= 2; index++) {
       const name = `Energy cell ${index}`;
       if (near(name)) {
-        this.state.ammo += 5;
+        this.state.ammo += 8;
         this.state.collected.push(`gallery.cell-${index}`);
         this.setVisibleByName(c, name, false);
         this.sound(c, 'Pickup audio');
         this.effect(c, 'Cyan impact', x, y, 9);
-        this.say(c, '+5 Arc Caster cells.', 1.4);
+        this.say(c, '+8 Arc Caster cells.', 1.4);
       }
     }
     if (this.room === 'reliquary' && !this.state.hasKey && near('Vault Key')) {
@@ -730,6 +760,7 @@ export default class Showcase {
     this.state.wards[index] = active;
     const ward = c.find(`Ward crystal ${index + 1}`);
     if (ward) sprite(c, ward, { tint: active ? '#d8ffff' : '#33485a' });
+    this.setVisibleByName(c, `Ward beacon ${index + 1}`, active);
     this.setLight(c, `Ward light ${index + 1}`, {
       intensity: active ? 0.34 : 0.03,
     });
@@ -745,7 +776,7 @@ export default class Showcase {
       if (announce)
         this.say(c, 'BOTH WARDS ANSWER — the eastern passage opens.', 3);
     } else if (announce)
-      this.say(c, 'One ward answers. Find the second in the dark.', 2.2);
+      this.say(c, 'One ward answers. Climb and face the second ring.', 2.2);
   }
 
   private checkRoom(c: ScriptContext): void {
@@ -856,7 +887,7 @@ export default class Showcase {
           : this.room === 'gallery' && !this.state.hasCaster
             ? 'Recover the Arc Caster below'
             : this.room === 'gallery' && !this.state.wards.every(Boolean)
-              ? 'Wake both ward crystals with cyan bolts'
+              ? 'Face each ward ring and fire the Arc Caster'
               : this.room === 'gallery'
                 ? 'Climb through the eastern seal'
                 : !this.enemies.every((enemy) => !enemy.alive)

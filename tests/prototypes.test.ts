@@ -197,6 +197,23 @@ it('showcase carries combat, inventory and puzzle state through three bidirectio
       mobility: 'dynamic',
       range: 152,
     });
+    const darknessAsset = g.model.project.assets.find(
+      (asset) => asset.path === 'Assets/Images/DarknessMask.png',
+    );
+    expect(darknessAsset).toMatchObject({
+      kind: 'image',
+      mime: 'image/png',
+      width: 1800,
+      height: 1800,
+    });
+    expect(g.sprite('Lantern darkness')).toMatchObject({
+      texture: darknessAsset?.id,
+      lit: false,
+      layer: 20,
+      width: 1800,
+      height: 1800,
+    });
+    expect(g.position('Lantern darkness')).toEqual(g.position('Player'));
     expect(
       sampleLighting(g.model.world, 0, 230, undefined, 'World').intensity,
     ).toBe(0);
@@ -345,7 +362,7 @@ it('showcase carries combat, inventory and puzzle state through three bidirectio
       expect(g.sprite(name).visible, `${name} should be defeated`).toBe(false);
     }
     expect(g.sprite('Vault Key').visible).toBe(true);
-    g.place('Player', 82, 77);
+    g.place('Player', 82, 166);
     g.physics.setVelocity(g.id('Player'), 0, 0);
     g.tick();
     expect(g.sprite('Vault Key').visible).toBe(false);
@@ -370,6 +387,7 @@ it('showcase lantern trades visibility for stealth before a telegraphed attack',
     g.key('KeyL', false);
     g.tick(90);
     expect(g.text('Inventory')).toContain('LIGHT SHUTTERED');
+    expect(g.sprite('Lantern shutter').visible).toBe(true);
     expect(g.sounds).not.toContain(g.id('Enemy audio'));
     expect(g.sprite('Enemy tell 1').visible).toBe(false);
 
@@ -378,11 +396,138 @@ it('showcase lantern trades visibility for stealth before a telegraphed attack',
     g.key('KeyL', false);
     g.tick(70);
     expect(g.text('Inventory')).toContain('LIGHT OPEN');
+    expect(g.sprite('Lantern shutter').visible).toBe(false);
     expect(g.sounds).toContain(g.id('Enemy audio'));
   } finally {
     g.close();
   }
 });
+
+it('showcase can cross the Black Gate with mapped input and real collisions', async () => {
+  const g = await game('showcase', 'The Black Gate'),
+    tap = (code: string) => {
+      g.key(code, true);
+      g.tick();
+      g.key(code, false);
+      g.tick();
+    };
+  try {
+    tap('KeyL');
+    g.key('KeyD', true);
+    for (let frame = 0; frame < 480 && !g.transitions.length; frame++) {
+      if (frame % 10 === 0) g.key('Space', true);
+      if (frame % 10 === 2) g.key('Space', false);
+      g.tick();
+    }
+    g.key('KeyD', false);
+    g.key('Space', false);
+    expect(
+      g.transitions,
+      `player stopped at ${g.position('Player').join(', ')}`,
+    ).toEqual(['The Drowned Gallery']);
+  } finally {
+    g.close();
+  }
+});
+
+it('showcase can finish all three rooms using only mapped controls', async () => {
+  const session = new SessionStateService(),
+    tap = (g: Awaited<ReturnType<typeof game>>, code: string, settle = 2) => {
+      g.key(code, true);
+      g.tick();
+      g.key(code, false);
+      g.tick(settle);
+    },
+    drive = (
+      g: Awaited<ReturnType<typeof game>>,
+      code: 'KeyA' | 'KeyD',
+      frames: number,
+      stop?: () => boolean,
+      jump = true,
+    ) => {
+      g.key(code, true);
+      for (let frame = 0; frame < frames && !stop?.(); frame++) {
+        if (jump && frame % 10 === 0) g.key('Space', true);
+        if (jump && frame % 10 === 2) g.key('Space', false);
+        g.tick();
+      }
+      g.key(code, false);
+      g.key('Space', false);
+      g.tick();
+    };
+
+  let g = await game('showcase', 'The Black Gate', session);
+  try {
+    tap(g, 'KeyL');
+    drive(g, 'KeyD', 480, () => g.transitions.length > 0);
+    expect(
+      g.transitions,
+      `Black Gate stopped at ${g.position('Player').join(', ')}`,
+    ).toEqual(['The Drowned Gallery']);
+  } finally {
+    g.close();
+  }
+
+  g = await game('showcase', 'The Drowned Gallery', session);
+  try {
+    drive(g, 'KeyD', 34, undefined, false);
+    expect(g.text('Inventory')).toContain('CASTER ✓');
+
+    tap(g, 'KeyJ', 24);
+    expect(g.light('Ward light 1').intensity).toBeCloseTo(0.34);
+
+    drive(
+      g,
+      'KeyD',
+      420,
+      () => g.position('Player')[0] > 105 && g.position('Player')[1] < 90,
+    );
+    tap(g, 'KeyJ', 24);
+    expect(g.light('Ward light 2').intensity).toBeCloseTo(0.34);
+    expect(g.model.world.isActive(g.model.entity(g.id('Ward bridge')))).toBe(
+      true,
+    );
+
+    drive(g, 'KeyD', 480, () => g.transitions.length > 0);
+    expect(
+      g.transitions,
+      `Drowned Gallery stopped at ${g.position('Player').join(', ')}`,
+    ).toEqual(['The Reliquary']);
+  } finally {
+    g.close();
+  }
+
+  g = await game('showcase', 'The Reliquary', session);
+  try {
+    drive(g, 'KeyD', 16);
+    for (let shot = 0; shot < 9; shot++) tap(g, 'KeyJ', 15);
+    expect(g.sprite('Sentinel 1').visible).toBe(false);
+    expect(g.sprite('Sentinel 3').visible).toBe(false);
+
+    drive(g, 'KeyD', 66);
+    for (let shot = 0; shot < 15; shot++) tap(g, 'KeyJ', 15);
+    for (const name of ['Sentinel 2', 'Warden'])
+      expect(g.sprite(name).visible, `${name} should be defeated`).toBe(false);
+    expect(
+      g.sprite('Vault Key').visible,
+      `key missing after combat at ${g.position('Player').join(', ')}`,
+    ).toBe(true);
+
+    drive(g, 'KeyD', 180, () => g.text('Inventory').includes('KEY ✓'), false);
+    expect(
+      g.text('Inventory'),
+      `key route stopped at ${g.position('Player').join(', ')} with ${JSON.stringify(session.get('luminous-vault.run'))}`,
+    ).toContain('KEY ✓');
+    drive(g, 'KeyD', 360, () => g.sprite('Victory').visible);
+    expect(
+      g.sprite('Victory').visible,
+      `Reliquary stopped at ${g.position('Player').join(', ')}`,
+    ).toBe(true);
+    expect(g.achievements.has('vaultbreaker')).toBe(true);
+  } finally {
+    g.close();
+  }
+}, 20_000);
 it('shooter destroys six prefab drones with pooled swept projectiles and restarts a won game', async () => {
   const g = await game('shooter');
   try {

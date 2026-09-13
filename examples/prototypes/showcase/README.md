@@ -16,7 +16,7 @@ Cross the Black Gate, recover the Arc Caster in the Drowned Gallery, wake both w
 
 ## What it demonstrates
 
-- exactly zero ambient illumination and pure black beyond active light range;
+- exactly zero ambient illumination and a player-following radial mask that guarantees pure black beyond the reveal radius;
 - a short dynamic lantern parented to the player;
 - three or fewer tiny environmental lights in each room;
 - emissive enemy shots with small transient red glows;
