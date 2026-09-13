@@ -154,27 +154,33 @@ const componentCapabilities: Readonly<
   },
   'protomake.light': {
     godot: approximate('PointLight2D radial-light reconstruction'),
-    unity: approximate('URP 2D Light when installed'),
+    unity: manual(
+      'Light settings retained; install and configure a 2D render pipeline',
+    ),
     unreal: approximate('2D/orthographic light approximation'),
   },
   'protomake.shadow-caster': {
     godot: manual('Occluder bounds retained for target-side implementation'),
-    unity: approximate('URP ShadowCaster2D when installed'),
+    unity: manual('Shadow bounds retained; configure a 2D render pipeline'),
     unreal: unsupported('No reliable Paper2D shadow equivalent'),
   },
   'protomake.animator': {
     godot: manual('Animator metadata retained for target-side implementation'),
-    unity: full('AnimatorController via importer'),
+    unity: approximate(
+      'AnimatorController and clips generated; advanced conditions require review',
+    ),
     unreal: approximate('Flipbook state component'),
   },
   'protomake.audio-source': {
     godot: full('AudioStreamPlayer2D'),
-    unity: full('AudioSource'),
+    unity: approximate(
+      'AudioSource; custom buses and polyphony need target-side setup',
+    ),
     unreal: full('Audio component'),
   },
   'protomake.tilemap': {
     godot: manual('Tile map data retained for target-side reconstruction'),
-    unity: approximate('Tilemap package importer'),
+    unity: manual('Tile map data retained for target-side reconstruction'),
     unreal: approximate('Paper2D tile map'),
   },
   'protomake.particle-emitter': {
@@ -184,62 +190,62 @@ const componentCapabilities: Readonly<
   },
   'protomake.ui-layout': {
     godot: manual('Layout data retained for target-side reconstruction'),
-    unity: full('UGUI hierarchy'),
+    unity: manual('Layout data retained for target-side reconstruction'),
     unreal: approximate('UMG hierarchy via importer'),
   },
   'protomake.ui-root': {
     godot: manual('UI root data retained for target-side reconstruction'),
-    unity: full('Canvas root'),
+    unity: manual('UI root data retained for target-side reconstruction'),
     unreal: approximate('UMG widget root'),
   },
   'protomake.ui-panel': {
     godot: manual('Panel data retained for target-side reconstruction'),
-    unity: full('UGUI Image panel'),
+    unity: manual('Panel data retained for target-side reconstruction'),
     unreal: approximate('UMG Border'),
   },
   'protomake.ui-text': {
     godot: manual('Text data retained for target-side reconstruction'),
-    unity: approximate('UGUI Text'),
+    unity: manual('Text data retained for target-side reconstruction'),
     unreal: approximate('UMG TextBlock'),
   },
   'protomake.ui-image': {
     godot: manual('Image data retained for target-side reconstruction'),
-    unity: full('UGUI Image'),
+    unity: manual('Image data retained for target-side reconstruction'),
     unreal: approximate('UMG Image'),
   },
   'protomake.ui-button': {
     godot: manual('Button data retained for target-side reconstruction'),
-    unity: full('UGUI Button'),
+    unity: manual('Button data retained for target-side reconstruction'),
     unreal: approximate('UMG Button'),
   },
   'protomake.ui-progress': {
     godot: manual('Progress data retained for target-side reconstruction'),
-    unity: full('UGUI Slider/Image'),
+    unity: manual('Progress data retained for target-side reconstruction'),
     unreal: approximate('UMG ProgressBar'),
   },
   'protomake.ui-slider': {
     godot: manual('Slider data retained for target-side reconstruction'),
-    unity: full('UGUI Slider'),
+    unity: manual('Slider data retained for target-side reconstruction'),
     unreal: approximate('UMG Slider'),
   },
   'protomake.ui-toggle': {
     godot: manual('Toggle data retained for target-side reconstruction'),
-    unity: full('UGUI Toggle'),
+    unity: manual('Toggle data retained for target-side reconstruction'),
     unreal: approximate('UMG CheckBox'),
   },
   'protomake.ui-input': {
     godot: manual('Input data retained for target-side reconstruction'),
-    unity: approximate('UGUI InputField'),
+    unity: manual('Input data retained for target-side reconstruction'),
     unreal: approximate('UMG EditableText'),
   },
   'protomake.ui-text-input': {
     godot: manual('Text-input data retained for target-side reconstruction'),
-    unity: approximate('UGUI InputField'),
+    unity: manual('Text-input data retained for target-side reconstruction'),
     unreal: approximate('UMG EditableText'),
   },
   'protomake.ui-scroll': {
     godot: manual('Scroll data retained for target-side reconstruction'),
-    unity: full('UGUI ScrollRect'),
+    unity: manual('Scroll data retained for target-side reconstruction'),
     unreal: approximate('UMG ScrollBox'),
   },
   'protomake.perception': {
@@ -251,7 +257,9 @@ const componentCapabilities: Readonly<
     godot: manual(
       'Source prefab metadata retained; scene instances are expanded',
     ),
-    unity: full('Prefab metadata'),
+    unity: manual(
+      'Source prefab metadata retained; scene instances are expanded',
+    ),
     unreal: approximate('Blueprint/actor source metadata'),
   },
   'editor.note': {
@@ -404,20 +412,30 @@ function assetCapability(
   }
   if (asset.mime === 'application/x-protomake-animation')
     return target === 'unity'
-      ? full('AnimationClip generated through importer')
+      ? approximate(
+          'AnimationClip and events generated; atlas slicing requires review',
+        )
       : approximate('Sprite animation reconstructed through target runtime');
   if (asset.mime === 'application/x-protomake-animator')
     return target === 'unity'
-      ? full('AnimatorController generated through importer')
+      ? approximate(
+          'AnimatorController generated; exact threshold semantics require review',
+        )
       : approximate(
           'State machine reconstructed through generated target code',
         );
   if (asset.mime === 'application/x-protomake-sprite-region')
-    return full('Atlas rectangle and pivot retained');
+    return target === 'unity'
+      ? approximate(
+          'Source atlas is assigned; slice rectangle and pivot require importer review',
+        )
+      : full('Atlas rectangle and pivot retained');
   if (asset.mime === 'application/x-protomake-tileset')
     return target === 'godot'
       ? manual('TileSet source retained for target-side reconstruction')
-      : approximate('Target tile tooling reconstructs supported cells');
+      : target === 'unity'
+        ? manual('TileSet source retained for target-side reconstruction')
+        : approximate('Target tile tooling reconstructs supported cells');
   if (asset.mime === 'application/x-protomake-prefab')
     return target === 'unreal'
       ? approximate('Importer reconstructs actor source hierarchy')
@@ -425,7 +443,9 @@ function assetCapability(
         ? manual(
             'Prefab source retained; exported scenes contain expanded instances',
           )
-        : full('Reusable hierarchy reconstructed');
+        : manual(
+            'Prefab source retained; exported scenes contain expanded instances',
+          );
   return unsupported(`No ${target} mapping for asset MIME ${asset.mime}`);
 }
 
@@ -458,6 +478,15 @@ function behaviourItems(
   });
 }
 
+function affineShear(value: InterchangeEntity['transform']): number {
+  const scaleX = Math.hypot(value[0], value[1]),
+    determinant = value[0] * value[3] - value[1] * value[2],
+    scaleY = scaleX < 1e-12 ? 0 : determinant / scaleX;
+  return scaleX < 1e-12 || Math.abs(scaleY) < 1e-12
+    ? 0
+    : (value[0] * value[2] + value[1] * value[3]) / (scaleX * scaleY);
+}
+
 export function analyzePortability(
   interchange: ProtoMakeInterchange,
   target: ExportTarget,
@@ -475,21 +504,29 @@ export function analyzePortability(
     sourceId: interchange.source.project,
     path: interchange.source.name,
   });
-  for (const action of interchange.input)
+  for (const action of interchange.input) {
+    const unityNeedsProcessor =
+      target === 'unity' &&
+      (action.sensitivity !== 1 || action.invertX || action.invertY);
     items.push({
-      ...(target === 'unreal'
+      ...(unityNeedsProcessor
         ? approximate(
-            'Input Mapping Context reconstruction requires importer review',
+            'Bindings are generated; sensitivity/inversion needs an Input System processor review',
           )
-        : full(
-            target === 'godot'
-              ? 'InputMap actions generated at startup'
-              : 'Input actions generated through the editor importer',
-          )),
+        : target === 'unreal'
+          ? approximate(
+              'Input Mapping Context reconstruction requires importer review',
+            )
+          : full(
+              target === 'godot'
+                ? 'InputMap actions generated at startup'
+                : 'Input actions generated through the editor importer',
+            )),
       feature: `input:${action.kind}`,
       sourceId: action.name,
       path: `${interchange.source.name}/Input/${action.map}/${action.name}`,
     });
+  }
   items.push({
     ...(target === 'godot'
       ? full('Audio bus layout generated')
@@ -519,9 +556,13 @@ export function analyzePortability(
   for (const scene of interchange.scenes)
     for (const entity of scene.entities) {
       items.push({
-        ...full(
-          'Hierarchy and affine transform lowered through the central coordinate profile',
-        ),
+        ...(target !== 'godot' && Math.abs(affineShear(entity.transform)) > 1e-6
+          ? approximate(
+              'Hierarchy is preserved; affine shear is reduced to target TRS',
+            )
+          : full(
+              'Hierarchy and affine transform lowered through the central coordinate profile',
+            )),
         feature: 'entity',
         sourceId: entity.id,
         path: `${scene.name}/${entity.name}`,
@@ -559,6 +600,31 @@ export function analyzePortability(
         )
           capability = approximate(
             'Primary Sprite2D is generated; active cross-fade needs target-side animation work',
+          );
+        if (target === 'unity' && component.type === 'protomake.sprite') {
+          const texture = interchange.assets.find(
+            (asset) => asset.id === data.texture,
+          );
+          if (
+            texture?.mime === 'application/x-protomake-sprite-region' ||
+            data.secondaryTexture ||
+            data.anchorX !== 0.5 ||
+            data.anchorY !== 0.5
+          )
+            capability = approximate(
+              'Sprite is generated; atlas pivot, custom anchor or active cross-fade requires review',
+            );
+        }
+        if (
+          target === 'unity' &&
+          component.type === 'protomake.camera' &&
+          (data.viewportX !== 0 ||
+            data.viewportY !== 0 ||
+            data.viewportWidth !== 1 ||
+            data.viewportHeight !== 1)
+        )
+          capability = approximate(
+            'Camera is generated; non-default viewport composition requires review',
           );
         if (
           target === 'godot' &&
@@ -656,4 +722,3 @@ export function serializeReport(report: PortabilityReport): string {
 }
 
 export * from './files';
-export * from './godot';

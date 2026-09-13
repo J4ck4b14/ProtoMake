@@ -1,6 +1,5 @@
 import {
   analyzePortability,
-  exportGodot,
   lowerProject,
   serializeInterchange,
   serializeReport,
@@ -87,12 +86,23 @@ export function showPortability(model: EditorModel): void {
     );
     if (report.target === 'godot')
       section.append(
-        button('Export Godot project', () =>
+        button('Export Godot project', async () => {
+          const { exportGodot } = await import('@protomake/interchange/godot');
           downloadArchive(
             `${model.project.name.replace(/[^a-z0-9_-]/gi, '_')}-godot.zip`,
             zipFiles(exportGodot(interchange)),
-          ),
-        ),
+          );
+        }),
+      );
+    if (report.target === 'unity')
+      section.append(
+        button('Export Unity project', async () => {
+          const { exportUnity } = await import('@protomake/interchange/unity');
+          downloadArchive(
+            `${model.project.name.replace(/[^a-z0-9_-]/gi, '_')}-unity.zip`,
+            zipFiles(exportUnity(interchange)),
+          );
+        }),
       );
     dialog.append(section);
   }

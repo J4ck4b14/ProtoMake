@@ -32,6 +32,12 @@ export default defineConfig({
       '@protomake/renderer/pixi': fileURLToPath(
         new URL('./packages/renderer/src/pixi.ts', import.meta.url),
       ),
+      '@protomake/interchange/godot': fileURLToPath(
+        new URL('./packages/interchange/src/godot.ts', import.meta.url),
+      ),
+      '@protomake/interchange/unity': fileURLToPath(
+        new URL('./packages/interchange/src/unity.ts', import.meta.url),
+      ),
       ...Object.fromEntries(
         [
           'player',

@@ -19,6 +19,14 @@ Generated scenes retain hierarchy and stable ProtoMake identity metadata. Media 
 
 Keep custom Godot work outside `Generated/ProtoMake`. Re-export may replace that directory and the generated scene files. ProtoMake TypeScript, UI, tilemaps, prefab source assets, advanced animation/state behavior, sensors/one-way collision details and target-specific platform services remain explicitly classified for manual work or review rather than being silently omitted.
 
+## Unity export
+
+ProtoMake 0.16.2 generates a Unity 2022.3+ project. Open the exported directory in Unity; after package and script compilation, the importer runs once for each source fingerprint. **Tools → ProtoMake → Reimport** provides an explicit rerun.
+
+The bundle intentionally contains no generated `.unity`, `.prefab`, `.anim`, `.controller` or `.meta` serialization. The importer creates those through `EditorSceneManager`, `AssetDatabase`, `AnimationUtility`, `AnimatorController` and Input System APIs. It reconstructs hierarchy/TRS, source media and sprite references, Rigidbody2D/colliders and layer collision rules, cameras, audio, particles, input actions, sprite animation/state controllers, and portable Behaviour Graph components.
+
+Generated assets live in `Assets/Generated/ProtoMake`; keep target-side code and content elsewhere. Affine shear, atlas-region slicing, exact animation threshold semantics, custom audio buses/polyphony, UI, render-pipeline-specific 2D lighting, prefab authoring assets, arbitrary TypeScript and platform services are retained and explicitly reported for review or manual work.
+
 ## Coordinate contract
 
 ProtoMake uses pixels, +X right, +Y down, and clockwise radians. Conversion is centralized in `@protomake/interchange`: Godot retains pixel/Y-down coordinates, Unity uses 100 pixels per unit with Y inversion, and the Unreal bundle uses centimeters with Y inversion for its 2D plane. Target exporters consume these profiles instead of embedding conversion constants.

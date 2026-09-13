@@ -1,8 +1,8 @@
-# ProtoMake 0.16.1
+# ProtoMake 0.16.2
 
 A reusable, browser-native 2D engine and visual editor for human-authored projects.
 
-**Milestones 0–7 and ProtoMake 0.9–0.16.1 are implemented.** ProtoMake 0.16.1 adds deterministic Godot 4 project generation to the Interchange foundation: scenes and hierarchy, transforms, copied media, sprites, physics shapes/bodies, cameras, radial 2D lights, spatial/non-spatial audio, input actions, audio buses, portable Behaviour Graph execution, stable IDs, manifests, and explicit fidelity diagnostics.
+**Milestones 0–7 and ProtoMake 0.9–0.16.2 are implemented.** ProtoMake 0.16.2 adds deterministic Unity project generation through a supported Editor importer. It reconstructs scenes/hierarchy, central-profile transforms, copied media, sprites, 2D physics/layers, cameras, audio, particles, Input System actions, AnimationClips/AnimatorControllers, and the portable Behaviour Graph runtime without using undocumented Unity scene YAML as its primary mechanism. Godot 4 export remains available from 0.16.1.
 
 ## Three prototype workshop
 
@@ -59,6 +59,7 @@ Start testing with [TESTING-CHECKLIST.md](TESTING-CHECKLIST.md). Save your test 
 | 0.15      | Particle emitters, animation events/cross-fades, bounded polyphonic and spatial audio, camera kick/zoom pulse, and rigid-body scripting conveniences                                                                                                     |
 | 0.16      | Public release documentation, deterministic Interchange IR, target capability metadata, portability analysis, stable ID maps, coordinate conversion, manifests and diagnostics                                                                           |
 | 0.16.1    | Deterministic Godot 4 project/scene generation, source media copying, input/audio setup, core 2D component reconstruction, portable Graph runtime and editor ZIP export                                                                                  |
+| 0.16.2    | Unity 2022.3+ project output, supported Editor API importer, copied media, scenes, 2D physics, Input System actions, sprite animation/controllers, particles, Graph runtime and editor ZIP export                                                        |
 
 ## Editor Quality polish
 
@@ -92,7 +93,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 133 automated tests, with actual Rapier simulation, execution of compiled project modules, and deterministic Interchange/portability/Godot-generation checks. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, target-engine import, audio behavior and input feel remain part of the manual acceptance checklist.
+The suite includes 134 automated tests, with actual Rapier simulation, execution of compiled project modules, and deterministic Interchange/portability/Godot/Unity-generation checks. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, target-engine import, audio behavior and input feel remain part of the manual acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 

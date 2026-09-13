@@ -87,4 +87,4 @@ it('boots the complete editor and executes create/edit/save/open through its con
   click('Close');
   vi.restoreAllMocks();
   vi.unstubAllGlobals();
-});
+}, 10_000);

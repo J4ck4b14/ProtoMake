@@ -37,15 +37,6 @@ function component(entity: InterchangeEntity, type: string): Data | undefined {
   return found ? record(found.data) : undefined;
 }
 
-function decompose(
-  transform: InterchangeEntity['transform'],
-): readonly [number, number, number, number, number] {
-  const [a, b, c, d, x, y] = transform,
-    scaleX = Math.hypot(a, b);
-  if (scaleX < 1e-12) return [x, y, Math.atan2(-c, d), 0, Math.hypot(c, d)];
-  return [x, y, Math.atan2(b, a), scaleX, (a * d - b * c) / scaleX];
-}
-
 function color(value: string, alpha = 1): string {
   const match = /^#([0-9a-f]{2})([0-9a-f]{2})([0-9a-f]{2})$/i.exec(value);
   if (!match) return `Color(1, 1, 1, ${alpha})`;
@@ -244,7 +235,7 @@ function sceneFile(
     const fullPath = ordered.paths.get(entity.id)!,
       name = fullPath.split('/').at(-1)!,
       parentPath = entity.parent ? ordered.paths.get(entity.parent)! : '.',
-      [x, y, rotation, scaleX, scaleY] = decompose(entity.transform),
+      [a, b, c, d, x, y] = entity.transform,
       body = component(entity, 'protomake.rigidbody'),
       firstCollider = entity.components.find((candidate) =>
         [
@@ -266,9 +257,7 @@ function sceneFile(
     nodes.push(
       '',
       `[node name=${godotString(name)} type=${godotString(mainNodeType(entity))} parent=${godotString(parentPath)}${groupSuffix}]`,
-      `position = Vector2(${x}, ${y})`,
-      `rotation = ${rotation}`,
-      `scale = Vector2(${scaleX}, ${scaleY})`,
+      `transform = Transform2D(${a}, ${b}, ${c}, ${d}, ${x}, ${y})`,
       `visible = ${entity.enabled}`,
       `metadata/protomake_id = ${godotString(entity.id)}`,
       `metadata/protomake_components = ${godotString(json(entity.components))}`,
@@ -522,10 +511,22 @@ static func _action(name: String) -> StringName: return StringName("protomake_" 
 static func _direction(name: String, suffix: String) -> StringName: return StringName(str(_action(name)) + "_" + suffix)
 
 static func axis(name: String) -> float:
-\treturn Input.get_action_strength(_direction(name, "px")) - Input.get_action_strength(_direction(name, "nx"))
+\tvar action = _definition(name)
+\tvar value = Input.get_action_strength(_direction(name, "px")) - Input.get_action_strength(_direction(name, "nx"))
+\treturn value * float(action.get("sensitivity", 1.0)) * (-1.0 if action.get("invertX", false) else 1.0)
 
 static func vector(name: String) -> Vector2:
-\treturn Input.get_vector(_direction(name, "nx"), _direction(name, "px"), _direction(name, "ny"), _direction(name, "py"))
+\tvar action = _definition(name)
+\tvar value = Input.get_vector(_direction(name, "nx"), _direction(name, "px"), _direction(name, "ny"), _direction(name, "py"))
+\tvalue *= float(action.get("sensitivity", 1.0))
+\tvalue.x *= -1.0 if action.get("invertX", false) else 1.0
+\tvalue.y *= -1.0 if action.get("invertY", false) else 1.0
+\treturn value.limit_length(1.0)
+
+static func _definition(name: String) -> Dictionary:
+\tfor action in ACTIONS:
+\t\tif action.get("name") == name: return action
+\treturn {}
 `;
 }
 

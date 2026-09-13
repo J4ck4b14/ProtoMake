@@ -37,7 +37,9 @@
       "@protomake/audio": ["./packages/audio/src/index.ts"],
       "@protomake/player": ["./packages/player/src/index.ts"],
       "@protomake/player/session": ["./packages/player/src/session.ts"],
-      "@protomake/interchange": ["./packages/interchange/src/index.ts"]
+      "@protomake/interchange": ["./packages/interchange/src/index.ts"],
+      "@protomake/interchange/godot": ["./packages/interchange/src/godot.ts"],
+      "@protomake/interchange/unity": ["./packages/interchange/src/unity.ts"]
     }
   },
   "include": ["packages", "examples", "tests", "vite.config.ts"]

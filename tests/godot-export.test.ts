@@ -2,7 +2,8 @@ import { expect, it } from 'vitest';
 import { compose, guid } from '@protomake/core';
 import { EditorModel } from '@protomake/editor';
 import { GRAPH_MIME } from '@protomake/graphs';
-import { exportGodot, lowerProject } from '@protomake/interchange';
+import { lowerProject } from '@protomake/interchange';
+import { exportGodot } from '@protomake/interchange/godot';
 
 const decoded = (data: Uint8Array): string => new TextDecoder().decode(data);
 
@@ -109,7 +110,8 @@ it('generates a deterministic Godot 4 project with scenes, assets and graphs', (
   const scenePath = [...files.keys()].find((path) => path.endsWith('.tscn'))!,
     scene = decoded(files.get(scenePath)!);
   expect(scene).toContain('type="RigidBody2D"');
-  expect(scene).toContain('position = Vector2(120, 80)');
+  expect(scene).toContain('transform = Transform2D(');
+  expect(scene).toContain(', 120, 80)');
   expect(scene).toContain('type="Sprite2D"');
   expect(scene).toContain('type="CollisionShape2D"');
   expect(scene).toContain('type="Camera2D"');
