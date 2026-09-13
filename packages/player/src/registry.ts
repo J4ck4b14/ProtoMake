@@ -4,6 +4,7 @@ import { Animator } from '@protomake/animation';
 import { AudioSource } from '@protomake/audio';
 import { registerPhysics } from '@protomake/physics2d';
 import { registerRendering } from '@protomake/renderer';
+import { registerUi } from '@protomake/ui';
 import {
   createRegistry,
   type ComponentRegistry,
@@ -32,6 +33,7 @@ export function runtimeRegistry(): ComponentRegistry {
   registry.register(NoteComponent);
   registerRendering(registry);
   registerPhysics(registry);
+  registerUi(registry);
   registry.register(Behaviours);
   registry.register(Perception2D);
   registry.register(PrefabLink);

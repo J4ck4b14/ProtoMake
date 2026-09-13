@@ -447,5 +447,118 @@ export function coreNodeRegistry(): NodeRegistry {
         return 'out';
       },
     });
+  registry
+    .register({
+      type: 'ui.setText',
+      title: 'Set UI Text',
+      category: 'UI',
+      ports: [
+        flowIn,
+        input('entity', 'Entity', 'entity'),
+        input('text', 'Text', 'string'),
+        flowOut,
+      ],
+      execute: (run) => {
+        run.context.ui.setText(
+          entity(run.input('entity'), run.context.entity),
+          String(run.input('text') ?? ''),
+        );
+        return 'out';
+      },
+    })
+    .register({
+      type: 'ui.setVisible',
+      title: 'Set UI Visible',
+      category: 'UI',
+      ports: [
+        flowIn,
+        input('entity', 'Entity', 'entity'),
+        input('visible', 'Visible', 'boolean'),
+        flowOut,
+      ],
+      execute: (run) => {
+        run.context.ui.setVisible(
+          entity(run.input('entity'), run.context.entity),
+          Boolean(run.input('visible')),
+        );
+        return 'out';
+      },
+    })
+    .register({
+      type: 'ui.setValue',
+      title: 'Set UI Value',
+      category: 'UI',
+      ports: [
+        flowIn,
+        input('entity', 'Entity', 'entity'),
+        input('value', 'Value', 'any'),
+        flowOut,
+      ],
+      execute: (run) => {
+        const value = run.input('value');
+        if (
+          typeof value !== 'number' &&
+          typeof value !== 'boolean' &&
+          typeof value !== 'string'
+        )
+          throw new Error('UI value must be a number, boolean or string');
+        run.context.ui.setValue(
+          entity(run.input('entity'), run.context.entity),
+          value,
+        );
+        return 'out';
+      },
+    })
+    .register({
+      type: 'save.write',
+      title: 'Save Game',
+      category: 'Persistence',
+      ports: [flowIn, flowOut],
+      properties: [
+        { id: 'profile', label: 'Profile', type: 'string', default: 'default' },
+        { id: 'slot', label: 'Slot', type: 'string', default: 'manual' },
+      ],
+      execute: (run) => {
+        void run.context.save
+          .save(
+            String(run.node.properties.profile ?? 'default'),
+            String(run.node.properties.slot ?? 'manual'),
+          )
+          .catch((error) => run.context.log(String(error)));
+        return 'out';
+      },
+    })
+    .register({
+      type: 'save.load',
+      title: 'Load Game',
+      category: 'Persistence',
+      ports: [flowIn, flowOut],
+      properties: [
+        { id: 'profile', label: 'Profile', type: 'string', default: 'default' },
+        { id: 'slot', label: 'Slot', type: 'string', default: 'manual' },
+      ],
+      execute: (run) => {
+        void run.context.save
+          .load(
+            String(run.node.properties.profile ?? 'default'),
+            String(run.node.properties.slot ?? 'manual'),
+          )
+          .catch((error) => run.context.log(String(error)));
+        return 'out';
+      },
+    })
+    .register({
+      type: 'achievement.unlock',
+      title: 'Unlock Achievement',
+      category: 'Persistence',
+      ports: [flowIn, flowOut],
+      properties: [
+        { id: 'id', label: 'Achievement', type: 'string', default: '' },
+      ],
+      execute: (run) => {
+        run.context.achievements.unlock(String(run.node.properties.id ?? ''));
+        return 'out';
+      },
+    });
   return registry;
 }

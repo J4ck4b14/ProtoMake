@@ -3,6 +3,7 @@ import { validateProject } from '@protomake/serialization';
 import type { ScriptModule, ScriptFields } from '@protomake/scripting';
 import { runtimeRegistry } from './registry';
 import { GameSession } from './session';
+import { createPersistentServices } from '@protomake/persistence';
 const overlay = document.getElementById('overlay')!,
   start = document.getElementById('start') as HTMLButtonElement,
   status = document.getElementById('status')!,
@@ -49,6 +50,10 @@ async function boot(): Promise<void> {
       runtimeRegistry(),
     );
     document.title = project.name;
+    const persistent = createPersistentServices(
+      project.id,
+      project.persistence,
+    );
     const indexResponse = await loadStage(
       'Loading scripts',
       () => fetch('./scripts.json'),
@@ -100,6 +105,7 @@ async function boot(): Promise<void> {
           pending = id;
         },
         progress,
+        persistent,
       );
       if (failed) {
         created.destroy();

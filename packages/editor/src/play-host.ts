@@ -10,6 +10,10 @@ import {
   compileProjectScripts,
   moduleSources,
 } from '@protomake/scripting/compiler';
+import {
+  createPersistentServices,
+  type PersistentGameServices,
+} from '@protomake/persistence';
 const token = location.hash.slice(1),
   status = document.getElementById('status')!,
   host = document.getElementById('game')!;
@@ -19,6 +23,7 @@ let session: GameSession | undefined,
   loading = false,
   debug = false,
   pendingScene: string | undefined;
+let persistent: PersistentGameServices | undefined;
 let urls = new Map<string, string>();
 document.body.style.cssText =
   'margin:0;background:#10161d;color:#dce5ed;font:11px system-ui;overflow:hidden';
@@ -84,6 +89,8 @@ async function loadScene(scene: SceneData): Promise<void> {
       (id) => {
         pendingScene = id;
       },
+      () => {},
+      persistent,
     );
     session.resize(innerWidth, innerHeight);
     last = performance.now();
@@ -111,6 +118,7 @@ window.addEventListener('message', (event) => {
     if (data.kind === 'load') {
       if (loading) return;
       project = validateProject(data.project, runtimeRegistry());
+      persistent = createPersistentServices(project.id, project.persistence);
       const scene = project.scenes.find((s) => s.id === data.scene?.id);
       if (!scene) throw new Error('Play scene missing');
       await loadScene(scene);

@@ -13,6 +13,8 @@
 | `@protomake/serialization` | Core, assets, physics/input/prefab/animation/audio/graph schemas, Zod | Strict project/scene validation and migrations                                   |
 | `@protomake/scripting`     | Core, runtime, assets, input/physics types, TypeScript compiler, Zod  | Script data, compilation/linking and behavior lifecycle                          |
 | `@protomake/graphs`        | Core, assets, scripting/physics types, Zod                            | Behaviour Graph schema, typed node registry and shared-context execution         |
+| `@protomake/ui`            | Core, assets, runtime signals, Zod                                    | Accessible DOM runtime UI components, layout and interaction                     |
+| `@protomake/persistence`   | Zod                                                                   | Save profiles/slots, migrations, integrity, autosave and achievements            |
 | `@protomake/prefabs`       | Core, Zod                                                             | Linked hierarchy identity, property patches and propagation                      |
 | `@protomake/animation`     | Core, assets, runtime types, renderer, Zod                            | Clips, controllers, parameter evaluation and playback                            |
 | `@protomake/audio`         | Core, assets, runtime types, Zod                                      | AudioSource, decoded buffers and Web Audio bus routing                           |
@@ -52,6 +54,8 @@ Project TS source and Behaviour Graph data stay in authored assets and execute o
 EditorModel owns authored project/world state, selection and command history. History stores before/after snapshots for transactions; pointer gestures mutate only the working world until committed as one command. Invalid operations restore the prior snapshot. Asset bytes are serialized only on authoring/storage operations, never as part of the runtime frame loop.
 
 SceneViewport owns camera navigation, selection geometry and gizmos. Inspector derives ordinary controls from component metadata and provides specialized TRS, tag and multi-behaviour authoring. ProjectStorage owns IndexedDB transactions and separate active-scene metadata. PlayMode exchanges cloned project data with an iframe; removing it discards runtime changes.
+
+Runtime UI is authored as ordinary scene components but rendered into a game-owned DOM overlay, never into editor chrome. UI controls emit through the same runtime signal service used by scripts and graphs. Save and achievement services are project-scoped and may survive scene-session replacement; behaviour-owned state registrations are removed during lifecycle cleanup.
 
 ## Production boundary
 

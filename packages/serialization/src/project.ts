@@ -10,6 +10,10 @@ import { PhysicsSettingsSchema, defaultPhysics } from '@protomake/physics2d';
 import { InputMapSchema, defaultInput } from '@protomake/input';
 import { AssetSchema, AssetDatabase, assetReferences } from '@protomake/assets';
 import { z } from 'zod';
+import {
+  PersistenceSettingsSchema,
+  defaultPersistence,
+} from '@protomake/persistence';
 import { guid, type ComponentRegistry } from '@protomake/core';
 import {
   BehaviourGraphSchema,
@@ -23,7 +27,7 @@ import {
   validateScene,
 } from './scene';
 import { MigrationChain } from './migrations';
-export const PROJECT_SCHEMA_VERSION = 6;
+export const PROJECT_SCHEMA_VERSION = 7;
 export const ProjectSchema = z.strictObject({
   schemaVersion: z.literal(PROJECT_SCHEMA_VERSION),
   id: GuidSchema,
@@ -37,6 +41,7 @@ export const ProjectSchema = z.strictObject({
   mixer: MixerSchema,
   folders: z.array(z.string()),
   sceneFolders: z.record(z.string(), z.string()),
+  persistence: PersistenceSettingsSchema,
 });
 export type ProjectData = z.infer<typeof ProjectSchema>;
 export const projectMigrations = new MigrationChain(PROJECT_SCHEMA_VERSION);
@@ -150,12 +155,18 @@ projectMigrations.register(5, (input) => ({
   schemaVersion: 6,
   engineVersion: '0.11.0',
 }));
+projectMigrations.register(6, (input) => ({
+  ...(input as object),
+  schemaVersion: 7,
+  engineVersion: '0.12.0',
+  persistence: defaultPersistence(),
+}));
 export function createProject(name: string): ProjectData {
   return ProjectSchema.parse({
     schemaVersion: PROJECT_SCHEMA_VERSION,
     id: guid(),
     name,
-    engineVersion: '0.11.0',
+    engineVersion: '0.12.0',
     startupScene: null,
     scenes: [],
     assets: [],
@@ -164,6 +175,7 @@ export function createProject(name: string): ProjectData {
     mixer: defaultMixer(),
     folders: ['Assets', 'Scenes'],
     sceneFolders: {},
+    persistence: defaultPersistence(),
   });
 }
 export function validateProject(
@@ -173,6 +185,14 @@ export function validateProject(
   const project = ProjectSchema.parse(projectMigrations.run(input)),
     ids = new Set<string>();
   validateFolders(project);
+  for (const achievement of project.persistence.achievements)
+    if (
+      achievement.icon &&
+      !project.assets.some(
+        (asset) => asset.id === achievement.icon && asset.kind === 'image',
+      )
+    )
+      throw new Error(`Achievement ${achievement.id}: invalid icon asset`);
   animationAssets(project.assets);
   const graphRegistry = coreNodeRegistry();
   for (const asset of project.assets)
@@ -260,7 +280,9 @@ export function validateProject(
             `${scene.name}/${entity.name}: physics layer ${data.layer} is not defined`,
           );
         if (
-          (type === 'protomake.sprite' || type === 'protomake.behaviours') &&
+          (type === 'protomake.sprite' ||
+            type === 'protomake.ui-image' ||
+            type === 'protomake.behaviours') &&
           data &&
           typeof data === 'object'
         ) {
@@ -281,7 +303,8 @@ export function validateProject(
               const asset = project.assets.find((a) => a.id === reference.id);
               if (
                 asset &&
-                ((type === 'protomake.sprite' && asset.kind !== 'image') ||
+                (((type === 'protomake.sprite' || type === 'protomake.ui-image') &&
+                  asset.kind !== 'image') ||
                   (type === 'protomake.behaviours' &&
                     asset.mime !== reference.mime))
               )

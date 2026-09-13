@@ -3,6 +3,10 @@ import type { EditorModel } from './model';
 import { node, button, input } from './dom';
 import { applyAppearance, loadAppearance } from './appearance';
 import { createInputActionsEditor } from './input-actions-editor';
+import {
+  PersistenceSettingsSchema,
+  type AchievementDefinition,
+} from '@protomake/persistence';
 export function showSettings(
   model: EditorModel,
   report: (message: string, error?: boolean) => void,
@@ -16,6 +20,10 @@ export function showSettings(
     names = input('Layer names', physics.layers.join(', ')),
     matrixHost = node('div', 'matrix'),
     inputActions = createInputActionsEditor(model.project.input),
+    persistence = structuredClone(model.project.persistence),
+    saveVersion = input('Save version', String(persistence.version), 'number'),
+    autosave = input('Autosave', '', 'checkbox'),
+    achievementHost = node('div', 'achievement-settings'),
     error = node('p', 'error'),
     appearance = loadAppearance(),
     accent = input('UI accent', appearance.accent, 'color'),
@@ -25,6 +33,49 @@ export function showSettings(
       'settings-note',
       'Text and focus colours are chosen automatically for readable contrast.',
     );
+  autosave.input.checked = persistence.autosave;
+  function renderAchievements(): void {
+    achievementHost.replaceChildren();
+    persistence.achievements.forEach((achievement, index) => {
+      const row = node('section', 'component'),
+        achievementId = input('ID', achievement.id),
+        achievementName = input('Name', achievement.name),
+        description = input('Description', achievement.description),
+        icon = input('Icon asset ID', achievement.icon),
+        hidden = input('Hidden', '', 'checkbox');
+      hidden.input.checked = achievement.hidden;
+      const update = () => {
+        persistence.achievements[index] = {
+          id: achievementId.input.value,
+          name: achievementName.input.value,
+          description: description.input.value,
+          icon: icon.input.value,
+          hidden: hidden.input.checked,
+        };
+      };
+      for (const control of [
+        achievementId.input,
+        achievementName.input,
+        description.input,
+        icon.input,
+        hidden.input,
+      ])
+        control.onchange = update;
+      row.append(
+        achievementId.row,
+        achievementName.row,
+        description.row,
+        icon.row,
+        hidden.row,
+        button('Remove achievement', () => {
+          persistence.achievements.splice(index, 1);
+          renderAchievements();
+        }),
+      );
+      achievementHost.append(row);
+    });
+  }
+  renderAchievements();
   function renderMatrix(): void {
     matrixHost.replaceChildren();
     const table = node('table');
@@ -87,10 +138,16 @@ export function showSettings(
         physics.gravityX = gx.input.valueAsNumber;
         physics.gravityY = gy.input.valueAsNumber;
         const settings = PhysicsSettingsSchema.parse(physics),
-          inputMap = inputActions.value();
+          inputMap = inputActions.value(),
+          persistenceSettings = PersistenceSettingsSchema.parse({
+            ...persistence,
+            version: saveVersion.input.valueAsNumber,
+            autosave: autosave.input.checked,
+          });
         model.change('Project settings', () => {
           model.project.physics = settings;
           model.project.input = inputMap;
+          model.project.persistence = persistenceSettings;
         });
         applyAppearance({
           accent: accent.input.value,
@@ -121,6 +178,21 @@ export function showSettings(
       'Create action maps and edit keyboard, mouse and gamepad bindings without raw project JSON.',
     ),
     inputActions.host,
+    node('h3', '', 'Save game and achievements'),
+    saveVersion.row,
+    autosave.row,
+    achievementHost,
+    button('+ Achievement', () => {
+      const achievement: AchievementDefinition = {
+        id: `achievement_${persistence.achievements.length + 1}`,
+        name: 'New achievement',
+        description: '',
+        icon: '',
+        hidden: false,
+      };
+      persistence.achievements.push(achievement);
+      renderAchievements();
+    }),
     error,
     actions,
   );

@@ -1,8 +1,8 @@
-# ProtoMake 0.11.0
+# ProtoMake 0.12.0
 
 A reusable, browser-native 2D engine and visual editor for human-authored projects.
 
-**Milestones 0–7, Editor Quality, Developer Velocity and Visual Logic are implemented.** ProtoMake 0.11.0 adds versioned Behaviour Graph assets, a registered typed-node runtime, searchable visual authoring, shared TypeScript/Graph services and Play Mode execution highlighting. Existing projects migrate on load. It remains a development release with the documented scope below.
+**Milestones 0–7, Editor Quality, Developer Velocity, Visual Logic, and Game UI & Persistence are implemented.** ProtoMake 0.12.0 adds accessible DOM-backed runtime UI, flexible screen layout, project-scoped save profiles and slots, migrations, autosave, achievements, and persistent game services. Existing projects migrate on load. It remains a development release with the documented scope below.
 
 ## Three prototype workshop
 
@@ -53,6 +53,7 @@ Start testing with [TESTING-CHECKLIST.md](TESTING-CHECKLIST.md). Save your test 
 | 7         | Separate production player, compiled project JS modules, dependency report, Build ZIP, standalone production preview and static-hosting instructions                                                                                                     |
 | 0.10      | Multiple independently enabled script behaviours, friendly transforms, tags/queries, runtime prefab lifecycle, signals, timers, tweens, pointer/camera conversion and visual input authoring                                                             |
 | 0.11      | Versioned Behaviour Graph assets, registered node definitions, typed ports, visual authoring, graph variables, shared runtime services and Play Mode execution highlighting                                                                              |
+| 0.12      | DOM-backed runtime UI, flexible layout, text/image/controls, UI signals, named save profiles and slots, save migrations, integrity checks, autosave, achievements and persistent services                                                                |
 
 ## Editor Quality polish
 
@@ -86,7 +87,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 114 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector, graph workspace and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, audio behavior and input feel remain part of the browser acceptance checklist.
+The suite includes 117 automated tests, with actual Rapier simulation and execution of compiled project modules. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, audio behavior and input feel remain part of the browser acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 
@@ -104,4 +105,4 @@ The suite includes 114 automated tests, with actual Rapier simulation and execut
 
 Prefabs do not yet support nested relationships or structural overrides. Animation transitions are immediate cuts; audio is non-spatial with one voice per source. Export conservatively includes every project scene/asset. Detailed contracts are in [prefabs](docs/prefabs.md) and [animation/audio](docs/animation-audio.md).
 
-See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [scripting guide](docs/scripting.md), [Developer Velocity 0.10](docs/developer-velocity-0.10.md), [Visual Logic 0.11](docs/visual-logic-0.11.md), [lighting](docs/lighting.md), [account continuity](docs/account-sync.md), [0.9.3 launch pass](docs/launch-0.9.3.md), [GitHub Pages deployment](docs/github-pages.md), [project history](HISTORY.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).
+See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [scripting guide](docs/scripting.md), [Developer Velocity 0.10](docs/developer-velocity-0.10.md), [Visual Logic 0.11](docs/visual-logic-0.11.md), [Game UI & Persistence 0.12](docs/game-ui-persistence-0.12.md), [lighting](docs/lighting.md), [account continuity](docs/account-sync.md), [0.9.3 launch pass](docs/launch-0.9.3.md), [GitHub Pages deployment](docs/github-pages.md), [project history](HISTORY.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), and [contributing](CONTRIBUTING.md).

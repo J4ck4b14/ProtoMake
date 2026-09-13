@@ -47,6 +47,8 @@ export default defineConfig({
           'input',
           'scripting',
           'graphs',
+          'ui',
+          'persistence',
           'renderer',
         ].map((name) => [
           `@protomake/${name}`,

@@ -23,6 +23,11 @@ import {
 import { runtimeRegistry } from './registry';
 import { RuntimePrefabs } from './prefabs';
 import { GraphRuntime } from '@protomake/graphs';
+import { RuntimeUiSystem } from '@protomake/ui';
+import {
+  createPersistentServices,
+  type PersistentGameServices,
+} from '@protomake/persistence';
 /** Shared runtime composition for editor Play and exported games. Hosts own scheduling and UI. */
 export class GameSession {
   private constructor(
@@ -31,6 +36,7 @@ export class GameSession {
     readonly physics: Physics2D,
     readonly input: InputService,
     readonly audio: AudioSystem,
+    private readonly persistent: PersistentGameServices,
   ) {}
   static async create(
     canvas: HTMLCanvasElement,
@@ -41,6 +47,10 @@ export class GameSession {
     log: (message: string) => void,
     loadScene: (id: string) => void,
     progress: (stage: string) => void = () => {},
+    persistent: PersistentGameServices = createPersistentServices(
+      project.id,
+      project.persistence,
+    ),
   ): Promise<GameSession> {
     const registry = runtimeRegistry(),
       { world } = instantiateScene(scene, registry);
@@ -91,7 +101,13 @@ export class GameSession {
             window.dispatchEvent(
               new CustomEvent('protomake-graph-trace', { detail: event }),
             ),
-        });
+        }),
+        ui = new RuntimeUiSystem(
+          world,
+          canvas.parentElement ?? canvas,
+          project.assets,
+          signals,
+        );
       audio = await loadStage(
         'Decoding audio',
         () => AudioSystem.create(world, project.assets, project.mixer),
@@ -108,6 +124,7 @@ export class GameSession {
       engine.addSystem({ id: 'signal-lifetime', stop: () => signals.clear() });
       engine.addSystem(timers);
       engine.addSystem(tweens);
+      engine.addSystem(ui);
       engine.addSystem(
         new ScriptSystem(
           world,
@@ -118,7 +135,17 @@ export class GameSession {
           log,
           loadScene,
           { animation, audio },
-          { signals, timers, tweens, prefabs, coordinates, graphs },
+          {
+            signals,
+            timers,
+            tweens,
+            prefabs,
+            coordinates,
+            graphs,
+            ui,
+            save: persistent.save,
+            achievements: persistent.achievements,
+          },
         ),
       );
       engine.addSystem(animation);
@@ -126,7 +153,14 @@ export class GameSession {
         id: 'physics-step',
         fixedUpdate: (context) => physicsService.fixedUpdate(context),
       });
-      const session = new GameSession(engine, renderer, physics, input, audio);
+      const session = new GameSession(
+        engine,
+        renderer,
+        physics,
+        input,
+        audio,
+        persistent,
+      );
       progress('Starting scene');
       engine.start();
       return session;
@@ -149,6 +183,7 @@ export class GameSession {
     if (this.engine.state === 'running') {
       this.input.sample(navigator.getGamepads?.() ?? []);
       this.engine.tick(delta);
+      this.persistent.autosave?.tick(delta);
       this.input.endFrame();
     }
     if (debug) {

@@ -1,0 +1,13 @@
+{
+  "name": "@protomake/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": "./src/index.ts",
+  "dependencies": {
+    "@protomake/assets": "0.2.0",
+    "@protomake/core": "0.1.0",
+    "@protomake/runtime": "0.1.0",
+    "zod": "4.3.6"
+  }
+}

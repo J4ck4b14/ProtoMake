@@ -58,6 +58,27 @@ export interface RuntimeScriptServices {
   readonly graphs?: {
     create(graph: string, values: Readonly<Record<string, unknown>>): Behaviour;
   };
+  readonly ui?: {
+    setText(entity: Guid, text: string): void;
+    setVisible(entity: Guid, visible: boolean): void;
+    setValue(entity: Guid, value: number | boolean | string): void;
+  };
+  readonly save?: {
+    register(
+      owner: string,
+      key: string,
+      registration: { capture(): unknown; restore(value: unknown): void },
+    ): () => void;
+    clearOwner(owner: string): void;
+    save(profile?: string, slot?: string): Promise<unknown>;
+    load(profile?: string, slot?: string): Promise<unknown>;
+    list(profile?: string): Promise<readonly unknown[]>;
+    delete(profile: string, slot: string): Promise<void>;
+  };
+  readonly achievements?: {
+    unlock(id: string): boolean;
+    isUnlocked(id: string): boolean;
+  };
 }
 export interface ScriptContext {
   setParameter(name: string, value: boolean | number, entity?: Guid): void;
@@ -130,6 +151,26 @@ export interface ScriptContext {
     worldToScreen(
       position: readonly [number, number],
     ): readonly [number, number];
+  };
+  readonly ui: {
+    setText(entity: Guid, text: string): void;
+    setVisible(entity: Guid, visible: boolean): void;
+    setValue(entity: Guid, value: number | boolean | string): void;
+  };
+  readonly save: {
+    register(
+      key: string,
+      capture: () => unknown,
+      restore: (value: unknown) => void,
+    ): () => void;
+    save(profile?: string, slot?: string): Promise<unknown>;
+    load(profile?: string, slot?: string): Promise<unknown>;
+    list(profile?: string): Promise<readonly unknown[]>;
+    delete(profile: string, slot: string): Promise<void>;
+  };
+  readonly achievements: {
+    unlock(id: string): boolean;
+    isUnlocked(id: string): boolean;
   };
   loadScene(idOrName: string): void;
   log(message: string): void;
@@ -380,6 +421,54 @@ export class ScriptSystem implements System {
         worldToScreen: (position) =>
           coordinates?.worldToScreen(position) ?? position,
       },
+      ui: {
+        setText: (stable, text) => {
+          if (!this.services.ui) return unavailable('UI');
+          this.services.ui.setText(stable, text);
+        },
+        setVisible: (stable, visible) => {
+          if (!this.services.ui) return unavailable('UI');
+          this.services.ui.setVisible(stable, visible);
+        },
+        setValue: (stable, value) => {
+          if (!this.services.ui) return unavailable('UI');
+          this.services.ui.setValue(stable, value);
+        },
+      },
+      save: {
+        register: (key, capture, restore) => {
+          const save = this.services.save;
+          if (!save) return unavailable('Save');
+          return save.register(owner, `${id}.${behaviourId}.${key}`, {
+            capture,
+            restore,
+          });
+        },
+        save: (profile, slot) =>
+          this.services.save?.save(profile, slot) ??
+          Promise.reject(new Error('Save service unavailable')),
+        load: (profile, slot) =>
+          this.services.save?.load(profile, slot) ??
+          Promise.reject(new Error('Save service unavailable')),
+        list: (profile) =>
+          this.services.save?.list(profile) ??
+          Promise.reject(new Error('Save service unavailable')),
+        delete: (profile, slot) =>
+          this.services.save?.delete(profile, slot) ??
+          Promise.reject(new Error('Save service unavailable')),
+      },
+      achievements: {
+        unlock: (achievement) => {
+          const service = this.services.achievements;
+          if (!service) return unavailable('Achievement');
+          return service.unlock(achievement);
+        },
+        isUnlocked: (achievement) => {
+          const service = this.services.achievements;
+          if (!service) return unavailable('Achievement');
+          return service.isUnlocked(achievement);
+        },
+      },
       loadScene: this.loadScene,
       log: (message) => this.log(`[${id}] ${message}`),
     };
@@ -399,6 +488,7 @@ export class ScriptSystem implements System {
       this.services.signals?.clearOwner(instance.owner);
       this.services.timers?.cancelOwner(instance.owner);
       this.services.tweens?.cancelOwner(instance.owner);
+      this.services.save?.clearOwner(instance.owner);
       this.instances.delete(instance.owner);
     }
     if (errors.length)

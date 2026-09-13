@@ -100,6 +100,41 @@ export const SCRIPT_CONTEXT_API: readonly ScriptApiEntry[] = [
     description: 'Load another project scene.',
   },
   {
+    name: 'ui.setText',
+    signature: 'ctx.ui.setText(entity, text)',
+    description: 'Update a runtime UI Text entity.',
+  },
+  {
+    name: 'ui.setVisible',
+    signature: 'ctx.ui.setVisible(entity, visible)',
+    description: 'Show or hide a runtime UI entity.',
+  },
+  {
+    name: 'ui.setValue',
+    signature: 'ctx.ui.setValue(entity, value)',
+    description: 'Update progress, slider, toggle or text-input state.',
+  },
+  {
+    name: 'save.register',
+    signature: 'ctx.save.register(key, capture, restore)',
+    description: 'Register behaviour-owned state for save and load.',
+  },
+  {
+    name: 'save.save',
+    signature: "await ctx.save.save('profile', 'slot')",
+    description: 'Capture registered state into a named profile and slot.',
+  },
+  {
+    name: 'save.load',
+    signature: "await ctx.save.load('profile', 'slot')",
+    description: 'Restore a versioned named save slot.',
+  },
+  {
+    name: 'achievements.unlock',
+    signature: "ctx.achievements.unlock('first_step')",
+    description: 'Unlock a project-defined, vendor-neutral achievement.',
+  },
+  {
     name: 'log',
     signature: 'ctx.log(message)',
     description: 'Write a message to the ProtoMake runtime console.',
