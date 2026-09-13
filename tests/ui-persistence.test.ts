@@ -16,6 +16,7 @@ import {
   AchievementService,
   MemorySaveBackend,
   SaveService,
+  SessionStateService,
   createPersistentServices,
 } from '@protomake/persistence';
 
@@ -91,6 +92,22 @@ describe('runtime UI', () => {
 });
 
 describe('game persistence', () => {
+  it('shares cloned run state between scenes without writing a save slot', () => {
+    const session = new SessionStateService(),
+      inventory = { weapon: 'caster', keys: ['gallery'] };
+    session.set('vault.run', inventory);
+    inventory.keys.push('outside');
+    const restored = session.get<typeof inventory>('vault.run')!;
+    expect(restored).toEqual({ weapon: 'caster', keys: ['gallery'] });
+    restored.keys.push('mutated-copy');
+    expect(session.get<typeof inventory>('vault.run')!.keys).toEqual([
+      'gallery',
+    ]);
+    expect(session.has('vault.run')).toBe(true);
+    expect(session.delete('vault.run')).toBe(true);
+    expect(session.has('vault.run')).toBe(false);
+  });
+
   it('supports profiles, slots, registered state, migration and integrity checks', async () => {
     const backend = new MemorySaveBackend();
     let score = 12;

@@ -26,5 +26,6 @@ This file summarizes the development milestones represented by the Git commit gr
 | ProtoMake 0.16.1         | Deterministic Godot 4 project/scene export, copied media, core 2D reconstruction, generated input/audio configuration and portable Behaviour Graph runtime                                                |
 | ProtoMake 0.16.2         | Unity project output with a supported Editor API importer for media, scenes, physics, Input System actions, sprite animation/controllers, particles and portable Graphs                                   |
 | ProtoMake 0.16.3         | Unreal Engine 5 project/plugin bundle with AssetTools, Paper2D and Enhanced Input reconstruction, C++ portable Graph runtime and no synthesized binary assets                                             |
+| Blackward showcase   | Run-scoped cross-scene state plus a three-room flagship with pure-black lighting, backtracking, persistent combat/inventory/puzzle state and a tested completion route                                    |
 
 For the difference between published commits and local reflogs, see [docs/git-history.md](docs/git-history.md).

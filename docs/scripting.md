@@ -63,6 +63,7 @@ Physics events call onCollisionEnter/onCollisionExit or onTriggerEnter/onTrigger
 | `ctx.input.getVector/getAxis/isPressed/wasPressed/wasReleased` | Named input actions                                                                       |
 | `ctx.physics.velocity/setVelocity/impulse/teleport/raycast`    | ProtoMake physics API; no Rapier handles                                                      |
 | `ctx.loadScene(idOrName)`                                      | Queue a validated scene transition after the current frame                                |
+| `ctx.session.get/set/has/delete/clear`                         | Share cloned, volatile run state across scene transitions; cleared when Play ends         |
 | `ctx.log(text)`                                                | Contextual editor Console log                                                             |
 | `ctx.delta` / `ctx.elapsed`                                    | Seconds for the current fixed or variable phase                                           |
 

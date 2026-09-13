@@ -1,25 +1,28 @@
 # Flagship showcase
 
-## The Luminous Vault
+## The Luminous Vault: Blackward
 
-The Luminous Vault is ProtoMake's complete vertical slice: a short action-platforming dungeon in which lighting, combat, inventory and traversal are parts of one progression rather than separate demonstrations.
+Blackward is ProtoMake's complete vertical slice: a three-room action-platforming dungeon in which darkness, combat, inventory and traversal form one continuous run.
 
-The player starts with a melee Sunblade. The first combat space awards a ranged Arc Caster and ammunition. Its bolts activate two remote sun crystals; the pair retracts a physical seal, reveals a bridge and exposes the Vault Key. Taking the key powers the exit's rectangular area light. The player then crosses a platforming ascent while fighting sentinels that patrol and fire pooled projectiles.
+The Black Gate teaches melee combat under the player's short carried light. Its eastern threshold loads the Drowned Gallery, where the Arc Caster and two remote wards open a vertical route. The Reliquary combines both weapons against three sentinels and a Warden; clearing it reveals the Vault Key and powers the final aperture. Every threshold can be crossed in reverse, with the player returning at the correct side.
 
-The same scene includes:
+The run includes:
 
-- static ambient and spot lighting;
-- mixed point fixtures with live shadow casters;
-- a dynamic lantern parented to the player;
-- dynamic crystal lights and a game-state-driven area exit light;
+- zero-intensity static ambient lights that force unlit space to pure black;
+- a 152-pixel dynamic lantern parented to the player;
+- no more than three tiny authored lights in any room;
+- emissive enemy shots with 48-pixel transient red glows;
+- weak point and spot hints, dynamic ward lights and a reward-state area light;
 - visibly lit background, world surfaces and platforms;
+- shadow-casting floors, columns, arches and ceiling geometry;
 - melee hitboxes, ranged and hostile projectile pools, health and ammunition;
-- multiweapon inventory, a restorative pickup and explicit objective UI;
+- multiweapon inventory, one-use pickups and explicit room/objective UI;
 - jump buffering, coyote time, hazards and staged platforming;
 - sprite animation, sound, camera shake, kick and zoom feedback;
-- a persistent `vaultbreaker` achievement.
+- bidirectional scene traversal with volatile run state that survives scene loads;
+- a `vaultbreaker` achievement for completing all three rooms.
 
-Nothing in the engine recognizes this level specially. Its rules are the ordinary editable `Assets/Scripts/Showcase.ts` behaviour embedded in `examples/prototypes/showcase/showcase.protomake.json`; its scene uses standard ProtoMake entities and components.
+Nothing in the engine recognizes this dungeon specially. Its rules are the ordinary editable `Assets/Scripts/Showcase.ts` behaviour embedded in `examples/prototypes/showcase/showcase.protomake.json`; all three scenes use standard ProtoMake entities and components. The general-purpose `ctx.session` service shares structured-cloned state between scene instances and is cleared when Play ends.
 
 ## Run and inspect
 

@@ -6,7 +6,7 @@ A reusable, browser-native 2D engine and visual editor for human-authored projec
 
 ## Flagship showcase
 
-**The Luminous Vault** is a complete action-platforming vertical slice: static, mixed and dynamic ambient/point/spot/area lighting; melee and ranged combat; weapon inventory; hostile and friendly projectile pools; a two-stage crystal puzzle; platforming; pickups; UI; audio; animation; camera feedback; and an achievement. Every rule is an ordinary editable project script—there are no showcase-specific engine shortcuts.
+**The Luminous Vault: Blackward** is a three-room action-platforming vertical slice built around constrained visibility. Ambient contribution is exactly zero: the dungeon is black outside the player's short carried light, three or fewer weak authored lights per room, and tiny transient projectile glows. Bidirectional thresholds preserve health, weapons, ammunition, pickups, defeated enemies and puzzle state through the new run-scoped session API. Melee/ranged combat, a two-ward puzzle, platforming, UI, audio, animation, camera feedback and an achievement are ordinary editable project systems—there are no showcase-specific engine shortcuts.
 
 After installing dependencies, run `npm run dev`, then choose **Play showcase** to launch the game immediately or **Edit showcase** to inspect the project before pressing **Play**. `npm run build` also includes a standalone version at `/showcase/` for GitHub Pages.
 
@@ -100,7 +100,7 @@ npm run build
 npm run preview
 ```
 
-The suite includes 137 automated tests, with actual Rapier simulation, execution of compiled project modules, and deterministic Interchange/portability/Godot/Unity/Unreal-generation checks. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, target-engine import/compilation, audio behavior and input feel remain part of the manual acceptance checklist.
+The suite includes 138 automated tests, with actual Rapier simulation, execution of compiled project modules, and deterministic Interchange/portability/Godot/Unity/Unreal-generation checks. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, target-engine import/compilation, audio behavior and input feel remain part of the manual acceptance checklist.
 
 `npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
 

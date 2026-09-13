@@ -285,9 +285,35 @@ export class AchievementService {
   }
 }
 
+/** Volatile state shared by every scene in one play session. */
+export class SessionStateService {
+  private readonly values = new Map<string, unknown>();
+  has(key: string): boolean {
+    id.parse(key);
+    return this.values.has(key);
+  }
+  get<T = unknown>(key: string): T | undefined {
+    id.parse(key);
+    const value = this.values.get(key);
+    return value === undefined ? undefined : structuredClone(value as T);
+  }
+  set(key: string, value: unknown): void {
+    id.parse(key);
+    this.values.set(key, structuredClone(value));
+  }
+  delete(key: string): boolean {
+    id.parse(key);
+    return this.values.delete(key);
+  }
+  clear(): void {
+    this.values.clear();
+  }
+}
+
 export interface PersistentGameServices {
   readonly save: SaveService;
   readonly achievements: AchievementService;
+  readonly session: SessionStateService;
   readonly autosave?: { tick(deltaSeconds: number): void };
 }
 export function createPersistentServices(
@@ -297,17 +323,19 @@ export function createPersistentServices(
 ): PersistentGameServices {
   const validated = PersistenceSettingsSchema.parse(settings),
     save = new SaveService(project, validated.version, backend),
-    achievements = new AchievementService(validated.achievements);
+    achievements = new AchievementService(validated.achievements),
+    session = new SessionStateService();
   save.register('protomake', 'protomake.achievements', {
     capture: () => achievements.capture(),
     restore: (value) => achievements.restore(value),
   });
-  if (!validated.autosave) return { save, achievements };
+  if (!validated.autosave) return { save, achievements, session };
   let elapsed = 0,
     pending = false;
   return {
     save,
     achievements,
+    session,
     autosave: {
       tick: (deltaSeconds) => {
         elapsed += deltaSeconds;

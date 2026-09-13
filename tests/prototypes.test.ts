@@ -9,16 +9,30 @@ import { ScriptSystem, type ScriptModule } from '@protomake/scripting';
 import { Physics2D } from '@protomake/physics2d/rapier';
 import { InputService } from '@protomake/input';
 import { AnimationSystem } from '@protomake/animation';
-import { Light2D, SpriteRenderer } from '@protomake/renderer';
+import {
+  Light2D,
+  SpriteRenderer,
+  sampleLighting,
+  type LightData,
+} from '@protomake/renderer';
 import { UiText } from '@protomake/ui';
 import { Engine } from '@protomake/runtime';
-async function game(name: string) {
+import { SessionStateService } from '@protomake/persistence';
+async function game(
+  name: string,
+  sceneName?: string,
+  session = new SessionStateService(),
+) {
   const model = new EditorModel();
   model.load(
     JSON.parse(
       await readFile(`examples/prototypes/${name}/${name}.protomake.json`, 'utf8'),
     ),
   );
+  if (sceneName) {
+    const scene = model.project.scenes.find((item) => item.name === sceneName)!;
+    model.switchScene(scene.id);
+  }
   const compiled = compileProjectScripts(model.project.assets);
   const urls = moduleSources(
     compiled,
@@ -34,6 +48,7 @@ async function game(name: string) {
     engine = new Engine(model.world);
   const sounds: string[] = [];
   const achievements = new Set<string>();
+  const transitions: string[] = [];
   engine.addSystem(
     new ScriptSystem(
       model.world,
@@ -42,7 +57,7 @@ async function game(name: string) {
       modules,
       new Map(compiled.map((s) => [s.id, s.fields])),
       () => {},
-      () => {},
+      (scene) => transitions.push(scene),
       {
         animation,
         audio: {
@@ -74,6 +89,7 @@ async function game(name: string) {
           },
           isUnlocked: (id) => achievements.has(id),
         },
+        session,
         cameraEffects: {
           shake: () => {},
           kick: () => {},
@@ -122,6 +138,8 @@ async function game(name: string) {
     key,
     sounds,
     achievements,
+    session,
+    transitions,
     close: () => {
       engine.stop();
       physics.destroy();
@@ -129,62 +147,191 @@ async function game(name: string) {
   };
 }
 
-it('showcase combines readable lighting, both combat styles, inventory and a multi-stage vault puzzle', async () => {
-  const g = await game('showcase');
-  try {
-    const lights = [...g.model.world.query(Light2D.type)].map(([id]) =>
-      g.model.world.read(id, Light2D),
-    );
-    expect(new Set(lights.map((light) => light?.kind))).toEqual(
-      new Set(['ambient', 'point', 'spot', 'area']),
-    );
-    expect(new Set(lights.map((light) => light?.mobility))).toEqual(
-      new Set(['static', 'mixed', 'dynamic']),
-    );
-    expect(g.sprite('Lit vault backdrop').lit).toBe(true);
-
-    const press = (code: string, frames = 2) => {
+it('showcase carries combat, inventory and puzzle state through three bidirectional rooms', async () => {
+  const session = new SessionStateService(),
+    press = (g: Awaited<ReturnType<typeof game>>, code: string, frames = 2) => {
       g.key(code, true);
       g.tick();
       g.key(code, false);
       g.tick(frames);
+    },
+    walk = (g: Awaited<ReturnType<typeof game>>, code: string, frames = 20) => {
+      g.key(code, true);
+      g.tick(frames);
+      g.key(code, false);
     };
+  let g = await game('showcase', 'The Black Gate', session);
+  try {
+    expect(g.model.project.scenes.map((scene) => scene.name)).toEqual([
+      'The Black Gate',
+      'The Drowned Gallery',
+      'The Reliquary',
+    ]);
+    expect(g.sprite('Black stone backdrop').lit).toBe(true);
+    expect(g.light('Absolute black')).toMatchObject({
+      kind: 'ambient',
+      intensity: 0,
+      mobility: 'static',
+    });
+    expect(g.light('Player lantern')).toMatchObject({
+      kind: 'point',
+      mobility: 'dynamic',
+      range: 152,
+    });
+    expect(
+      sampleLighting(g.model.world, 0, 230, undefined, 'World').intensity,
+    ).toBe(0);
+    expect(
+      sampleLighting(g.model.world, -350, 166, g.id('Player'), 'Characters')
+        .intensity,
+    ).toBeGreaterThan(0.75);
+    const projectLights = g.model.project.scenes.flatMap((scene) =>
+      scene.entities.flatMap((entity) => {
+        const value = entity.components[Light2D.type];
+        return value && typeof value === 'object'
+          ? [value as { kind: string; mobility: string }]
+          : [];
+      }),
+    );
+    expect(new Set(projectLights.map((light) => light.kind))).toEqual(
+      new Set(['ambient', 'point', 'spot', 'area']),
+    );
+    expect(new Set(projectLights.map((light) => light.mobility))).toEqual(
+      new Set(['static', 'mixed', 'dynamic']),
+    );
+    for (const scene of g.model.project.scenes) {
+      const lights = scene.entities.flatMap((entity) => {
+          const value = entity.components[Light2D.type];
+          return value && typeof value === 'object'
+            ? [{ name: entity.name, ...(value as LightData) }]
+            : [];
+        }),
+        environment = lights.filter(
+          (light) =>
+            light.name !== 'Absolute black' &&
+            light.name !== 'Player lantern' &&
+            !light.name.includes('bolt glow'),
+        );
+      expect(
+        lights.find((light) => light.name === 'Absolute black')?.intensity,
+        `${scene.name} must have no ambient fill`,
+      ).toBe(0);
+      expect(
+        environment.length,
+        `${scene.name} environmental light budget`,
+      ).toBeLessThanOrEqual(3);
+    }
+    const authored = [...g.model.world.query(Light2D.type)].filter(([id]) => {
+      const name = g.model.world.get(id).name;
+      return (
+        name !== 'Absolute black' &&
+        name !== 'Player lantern' &&
+        !name.includes('bolt glow')
+      );
+    });
+    expect(authored).toHaveLength(3);
+    expect(
+      authored.every(([id]) => g.model.world.read(id, Light2D)!.range <= 52),
+    ).toBe(true);
 
-    g.place('Player', -118, 166);
+    g.place('Player', -128, 166);
     g.physics.setVelocity(g.id('Player'), 0, 0);
-    press('KeyJ', 20);
-    press('KeyJ', 20);
+    press(g, 'KeyJ', 20);
+    g.place('Player', -128, 166);
+    press(g, 'KeyJ', 20);
     expect(g.sprite('Sentinel 1').visible).toBe(false);
+    g.place('Player', 350, 166);
+    g.physics.setVelocity(g.id('Player'), 0, 0);
+    g.tick(2);
+    walk(g, 'KeyD');
+    expect(g.transitions).toEqual(['The Drowned Gallery']);
+  } finally {
+    g.close();
+  }
 
-    g.place('Player', -277, 163);
+  g = await game('showcase', 'The Drowned Gallery', session);
+  try {
+    expect(g.position('Player')[0]).toBeCloseTo(-350);
+    g.place('Player', -276, 165);
     g.physics.setVelocity(g.id('Player'), 0, 0);
     g.tick(2);
     expect(g.sprite('Arc Caster pickup').visible).toBe(false);
-    expect(g.text('Inventory')).toContain('Caster ✓');
+    expect(g.text('Inventory')).toContain('CASTER ✓');
 
-    g.place('Player', -158, 161);
+    g.place('Player', -176, 164);
     g.physics.setVelocity(g.id('Player'), 0, 0);
-    press('KeyJ', 12);
-    expect(g.light('Crystal light 1').intensity).toBeGreaterThan(1);
+    press(g, 'KeyJ', 10);
+    expect(g.light('Ward light 1').intensity).toBeCloseTo(0.34);
+    g.place('Player', 110, 28);
+    g.physics.setVelocity(g.id('Player'), 0, 0);
+    press(g, 'KeyJ', 10);
+    expect(g.light('Ward light 2').intensity).toBeCloseTo(0.34);
+    expect(g.model.world.isActive(g.model.entity(g.id('Ward bridge')))).toBe(
+      true,
+    );
+    expect(g.model.world.isActive(g.model.entity(g.id('East seal')))).toBe(
+      false,
+    );
+    g.place('Player', 350, -82);
+    g.physics.setVelocity(g.id('Player'), 0, 0);
+    g.tick(2);
+    walk(g, 'KeyD');
+    expect(g.transitions).toEqual(['The Reliquary']);
+  } finally {
+    g.close();
+  }
 
-    g.place('Player', -42, 82);
+  g = await game('showcase', 'The Reliquary', session);
+  try {
+    expect(g.text('Inventory')).toContain('CASTER ✓');
+    g.place('Player', -350, 166);
     g.physics.setVelocity(g.id('Player'), 0, 0);
-    press('KeyJ', 12);
-    expect(g.light('Crystal light 2').intensity).toBeGreaterThan(1);
-    expect(g.sprite('Seal barrier').visible).toBe(false);
-    expect(g.sprite('Bridge').visible).toBe(true);
+    g.tick(2);
+    walk(g, 'KeyA');
+    expect(g.transitions).toEqual(['The Drowned Gallery']);
+  } finally {
+    g.close();
+  }
+
+  g = await game('showcase', 'The Drowned Gallery', session);
+  try {
+    expect(g.position('Player')).toEqual([342, -82]);
+    expect(g.text('Inventory')).toContain('WARDS 2/2');
+    g.place('Player', 350, -82);
+    g.physics.setVelocity(g.id('Player'), 0, 0);
+    g.tick(2);
+    walk(g, 'KeyD');
+  } finally {
+    g.close();
+  }
+
+  g = await game('showcase', 'The Reliquary', session);
+  try {
+    press(g, 'Digit1');
+    for (const [name, hits] of [
+      ['Sentinel 1', 2],
+      ['Sentinel 2', 2],
+      ['Sentinel 3', 2],
+      ['Warden', 4],
+    ] as const) {
+      for (let hit = 0; hit < hits; hit++) {
+        const [x, y] = g.position(name);
+        g.place('Player', x - 42, y);
+        g.physics.setVelocity(g.id('Player'), 0, 0);
+        press(g, 'KeyJ', 20);
+      }
+      expect(g.sprite(name).visible, `${name} should be defeated`).toBe(false);
+    }
     expect(g.sprite('Vault Key').visible).toBe(true);
-
-    g.place('Player', 177, 162);
+    g.place('Player', 82, 77);
     g.physics.setVelocity(g.id('Player'), 0, 0);
-    g.tick(2);
+    g.tick();
     expect(g.sprite('Vault Key').visible).toBe(false);
-    expect(g.light('Exit area light').intensity).toBeCloseTo(0.92);
-    expect(g.text('Objective')).toContain('illuminated exit');
-
-    g.place('Player', 330, -61);
+    expect(g.light('Exit area light').intensity).toBeCloseTo(0.62);
+    g.place('Player', 350, 166);
     g.physics.setVelocity(g.id('Player'), 0, 0);
     g.tick(2);
+    walk(g, 'KeyD');
     expect(g.sprite('Victory').visible).toBe(true);
     expect(g.achievements.has('vaultbreaker')).toBe(true);
   } finally {

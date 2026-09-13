@@ -1,26 +1,51 @@
 import type { ScriptContext } from '@protomake/scripting';
 import type { LightData, SpriteData } from '@protomake/renderer';
-import { clamp, show, sprite } from './Helpers';
+import { clamp, sprite } from './Helpers';
+
+type Room = 'gate' | 'gallery' | 'reliquary';
+type Weapon = 'Sunblade' | 'Arc Caster';
+type Entry = 'west' | 'east';
 
 export const fields = {
-  speed: { type: 'number', default: 225 },
+  room: {
+    type: 'string',
+    default: 'gate',
+    options: ['gate', 'gallery', 'reliquary'],
+  },
+  speed: { type: 'number', default: 220 },
   jumpSpeed: { type: 'number', default: 500 },
 } as const;
 
-type Weapon = 'Sunblade' | 'Arc Caster';
+interface RunState {
+  health: number;
+  ammo: number;
+  potions: number;
+  hasCaster: boolean;
+  hasKey: boolean;
+  lantern: boolean;
+  weapon: Weapon;
+  wards: [boolean, boolean];
+  defeated: string[];
+  collected: string[];
+}
+
 interface Enemy {
   id: string;
+  key: string;
   homeX: number;
   homeY: number;
   minX: number;
   maxX: number;
   hp: number;
+  maxHp: number;
   direction: number;
   cooldown: number;
   alive: boolean;
 }
+
 interface Shot {
   id: string;
+  glow: string | undefined;
   x: number;
   y: number;
   vx: number;
@@ -28,21 +53,31 @@ interface Shot {
   alive: boolean;
 }
 
-/**
- * A single vertical slice deliberately exercises ProtoMake systems together:
- * platforming physics, melee/ranged combat, inventory, a two-node light puzzle,
- * live UI, camera feedback, pooled projectiles, lighting and shadow gameplay.
- */
+const RUN_KEY = 'luminous-vault.run';
+const ENTRY_KEY = 'luminous-vault.entry';
+
+function freshRun(): RunState {
+  return {
+    health: 5,
+    ammo: 0,
+    potions: 0,
+    hasCaster: false,
+    hasKey: false,
+    lantern: true,
+    weapon: 'Sunblade',
+    wards: [false, false],
+    defeated: [],
+    collected: [],
+  };
+}
+
+/** One controller is used in all three rooms; ctx.session carries the run. */
 export default class Showcase {
-  speed = 225;
+  room: Room = 'gate';
+  speed = 220;
   jumpSpeed = 500;
-  private health = 5;
-  private ammo = 0;
-  private potions = 0;
-  private hasCaster = false;
-  private hasKey = false;
-  private crystals = [false, false];
-  private weapon: Weapon = 'Sunblade';
+  private state: RunState = freshRun();
+  private entry: Entry = 'west';
   private facing = 1;
   private jumpBuffer = 0;
   private coyote = 0;
@@ -52,47 +87,55 @@ export default class Showcase {
   private attackHit = new Set<string>();
   private invulnerable = 0;
   private messageTime = 0;
+  private transitioning = false;
   private done = false;
-  private lantern = true;
   private enemies: Enemy[] = [];
   private shots: Shot[] = [];
   private hostileShots: Shot[] = [];
 
   start(c: ScriptContext): void {
-    this.enemies = [
-      this.enemy(c, 'Sentinel 1', -70, 166, -150, 15),
-      this.enemy(c, 'Sentinel 2', 205, 166, 155, 270),
-      this.enemy(c, 'Sentinel 3', 285, -6, 235, 340),
-    ];
-    this.shots = this.pool(c, 'Player bolt', 10);
-    this.hostileShots = this.pool(c, 'Enemy bolt', 8);
-    this.reset(c);
+    this.state = c.session.get<RunState>(RUN_KEY) ?? freshRun();
+    this.entry = c.session.get<Entry>(ENTRY_KEY) ?? 'west';
+    this.enemies = this.readEnemies(c);
+    this.shots = this.readPool(c, 'Player bolt', 'Player bolt glow', 8);
+    this.hostileShots = this.readPool(c, 'Enemy bolt', 'Enemy bolt glow', 8);
+    this.prepareRoom(c);
   }
 
-  private enemy(
+  private readEnemies(c: ScriptContext): Enemy[] {
+    const enemies: Enemy[] = [];
+    for (let index = 1; index <= 4; index++) {
+      const name = index === 4 ? 'Warden' : `Sentinel ${index}`,
+        id = c.find(name);
+      if (!id) continue;
+      const [x, y] = c.position(id),
+        maxHp = name === 'Warden' ? 7 : 3;
+      enemies.push({
+        id,
+        key: `${this.room}.${name}`,
+        homeX: x,
+        homeY: y,
+        minX: x - (name === 'Warden' ? 72 : 54),
+        maxX: x + (name === 'Warden' ? 72 : 54),
+        hp: maxHp,
+        maxHp,
+        direction: index % 2 ? 1 : -1,
+        cooldown: 0.65 + index * 0.28,
+        alive: true,
+      });
+    }
+    return enemies;
+  }
+
+  private readPool(
     c: ScriptContext,
-    name: string,
-    x: number,
-    y: number,
-    minX: number,
-    maxX: number,
-  ): Enemy {
-    return {
-      id: c.find(name)!,
-      homeX: x,
-      homeY: y,
-      minX,
-      maxX,
-      hp: 3,
-      direction: 1,
-      cooldown: 1.2,
-      alive: true,
-    };
-  }
-
-  private pool(c: ScriptContext, prefix: string, count: number): Shot[] {
+    prefix: string,
+    glowPrefix: string,
+    count: number,
+  ): Shot[] {
     return Array.from({ length: count }, (_, index) => ({
       id: c.find(`${prefix} ${index + 1}`)!,
+      glow: c.find(`${glowPrefix} ${index + 1}`),
       x: 0,
       y: 0,
       vx: 0,
@@ -101,67 +144,92 @@ export default class Showcase {
     }));
   }
 
-  private reset(c: ScriptContext): void {
-    this.health = 5;
-    this.ammo = 0;
-    this.potions = 0;
-    this.hasCaster = false;
-    this.hasKey = false;
-    this.crystals = [false, false];
-    this.weapon = 'Sunblade';
-    this.facing = 1;
-    this.jumpBuffer = 0;
-    this.coyote = 0;
-    this.attackRequest = false;
-    this.jumpRequest = false;
-    this.attackTime = 0;
-    this.attackHit.clear();
-    this.invulnerable = 0;
+  private prepareRoom(c: ScriptContext): void {
+    this.transitioning = false;
     this.done = false;
-    this.lantern = true;
-    c.setPosition(-345, 166);
+    this.attackTime = 0;
+    this.invulnerable = 0;
+    const spawn = this.spawnPoint();
+    c.setPosition(spawn[0], spawn[1]);
     c.physics.setVelocity(c.entity, 0, 0);
     for (const enemy of this.enemies) {
-      enemy.hp = 3;
-      enemy.direction = 1;
-      enemy.cooldown = 0.8 + this.enemies.indexOf(enemy) * 0.45;
-      enemy.alive = true;
-      c.setPosition(enemy.homeX, enemy.homeY, enemy.id);
-      sprite(c, enemy.id, { visible: true, tint: '#ffffff' });
+      enemy.alive = !this.state.defeated.includes(enemy.key);
+      enemy.hp = enemy.maxHp;
+      this.setVisible(c, enemy.id, enemy.alive);
+      sprite(c, enemy.id, { tint: '#ffffff' });
     }
     for (const shot of [...this.shots, ...this.hostileShots])
       this.hideShot(c, shot);
-    for (const pickup of [
-      'Arc Caster pickup',
-      'Potion pickup',
-      'Energy cell 1',
-      'Energy cell 2',
-      'Vault Key',
-    ])
-      show(c, pickup, pickup !== 'Vault Key');
-    show(c, 'Seal barrier', true);
-    show(c, 'Bridge', false);
-    show(c, 'Exit aura', false);
-    show(c, 'Slash', false);
-    show(c, 'Victory', false);
-    show(c, 'Defeat', false);
-    for (let i = 0; i < 2; i++) this.setCrystal(c, i, false);
-    this.setLight(c, 'Player lantern', { intensity: 1.15 });
-    this.setLight(c, 'Exit area light', { intensity: 0.12 });
-    this.say(
-      c,
-      'Recover the Arc Caster. Its bolts can wake the two sun crystals.',
-      5,
-    );
+    this.applyRoomState(c);
+    this.setLight(c, 'Player lantern', {
+      intensity: this.state.lantern ? 1.05 : 0,
+    });
+    this.setVisibleByName(c, 'Lantern flame', this.state.lantern);
+    this.setVisibleByName(c, 'Slash', false);
+    this.setVisibleByName(c, 'Victory', false);
+    this.setVisibleByName(c, 'Defeat', false);
+    this.say(c, this.arrivalMessage(), 3.8);
+    this.store(c);
     this.updateUi(c);
+  }
+
+  private spawnPoint(): readonly [number, number] {
+    if (this.room === 'gallery' && this.entry === 'east') return [342, -82];
+    return [this.entry === 'west' ? -350 : 350, 166];
+  }
+
+  private arrivalMessage(): string {
+    if (this.room === 'gate')
+      return this.entry === 'east'
+        ? 'THE BLACK GATE — the western threshold remains open.'
+        : 'THE BLACK GATE — beyond your lantern, there is only black.';
+    if (this.room === 'gallery')
+      return this.entry === 'east'
+        ? 'THE DROWNED GALLERY — descend toward the western threshold.'
+        : 'THE DROWNED GALLERY — recover the weapon sleeping below.';
+    return 'THE RELIQUARY — the Warden carries the last seal.';
+  }
+
+  private applyRoomState(c: ScriptContext): void {
+    if (this.room === 'gate') {
+      this.setVisibleByName(
+        c,
+        'Potion pickup',
+        !this.state.collected.includes('gate.potion'),
+      );
+      return;
+    }
+    if (this.room === 'gallery') {
+      this.setVisibleByName(c, 'Arc Caster pickup', !this.state.hasCaster);
+      for (let index = 1; index <= 2; index++)
+        this.setVisibleByName(
+          c,
+          `Energy cell ${index}`,
+          !this.state.collected.includes(`gallery.cell-${index}`),
+        );
+      for (let index = 0; index < 2; index++)
+        this.setWard(c, index, this.state.wards[index] ?? false, false);
+      const open = this.state.wards.every(Boolean);
+      this.setEnabledByName(c, 'Ward bridge', open);
+      this.setEnabledByName(c, 'East seal', !open);
+      return;
+    }
+    const cleared = this.enemies.every((enemy) => !enemy.alive);
+    this.setVisibleByName(c, 'Vault Key', cleared && !this.state.hasKey);
+    this.setVisibleByName(c, 'Exit sigil', this.state.hasKey);
+    this.setLight(c, 'Exit area light', {
+      intensity: this.state.hasKey ? 0.62 : 0,
+    });
   }
 
   update(c: ScriptContext): void {
     if (c.input.wasPressed('Restart')) {
-      this.reset(c);
+      c.session.clear();
+      c.session.set(ENTRY_KEY, 'west');
+      c.loadScene('The Black Gate');
       return;
     }
-    if (this.done) return;
+    if (this.done || this.transitioning) return;
     if (c.input.wasPressed('Jump')) this.jumpRequest = true;
     if (c.input.wasPressed('Attack')) this.attackRequest = true;
     if (c.input.wasPressed('Sword')) this.selectWeapon(c, 'Sunblade');
@@ -169,20 +237,28 @@ export default class Showcase {
     if (c.input.wasPressed('Switch'))
       this.selectWeapon(
         c,
-        this.weapon === 'Sunblade' ? 'Arc Caster' : 'Sunblade',
+        this.state.weapon === 'Sunblade' ? 'Arc Caster' : 'Sunblade',
       );
     if (c.input.wasPressed('Potion')) this.usePotion(c);
     if (c.input.wasPressed('Lantern')) {
-      this.lantern = !this.lantern;
+      this.state.lantern = !this.state.lantern;
       this.setLight(c, 'Player lantern', {
-        intensity: this.lantern ? 1.15 : 0,
+        intensity: this.state.lantern ? 1.05 : 0,
       });
-      this.say(c, `Lantern ${this.lantern ? 'lit' : 'extinguished'}.`, 1.5);
+      this.setVisibleByName(c, 'Lantern flame', this.state.lantern);
+      this.say(
+        c,
+        this.state.lantern
+          ? 'Lantern restored.'
+          : 'Lantern extinguished. Listen for the bolts.',
+        1.8,
+      );
+      this.store(c);
     }
   }
 
   fixedUpdate(c: ScriptContext): void {
-    if (this.done) {
+    if (this.done || this.transitioning) {
       c.physics.setVelocity(c.entity, 0, 0);
       return;
     }
@@ -191,7 +267,7 @@ export default class Showcase {
       move = c.input.getAxis('Move');
     if (Math.abs(move) > 0.1) this.facing = Math.sign(move);
     const grounded =
-      Boolean(c.physics.raycast([x, y + 16], [0, 1], 9, c.entity)) &&
+      Boolean(c.physics.raycast([x, y + 17], [0, 1], 8, c.entity)) &&
       c.physics.velocity(c.entity)[1] >= 0;
     this.coyote = grounded ? 0.11 : Math.max(0, this.coyote - dt);
     if (this.jumpRequest) this.jumpBuffer = 0.13;
@@ -204,17 +280,18 @@ export default class Showcase {
       this.coyote = 0;
       c.playAudio();
     }
-    let vx = move * this.speed;
-    if (!this.crystals.every(Boolean) && x < 63 && x + vx * dt > 63) {
-      vx = 0;
-      c.setPosition(62, y);
-      this.say(c, 'The sun seal needs both crystals.', 1.2);
-    }
-    c.physics.setVelocity(c.entity, vx, vy);
+    c.physics.setVelocity(c.entity, move * this.speed, vy);
     sprite(c, c.entity, {
       flipX: this.facing < 0,
-      tint: this.invulnerable > 0 ? '#ff9b9b' : '#ffffff',
+      tint: this.invulnerable > 0 ? '#ff7f91' : '#ffffff',
     });
+    if (this.state.lantern)
+      this.setLight(c, 'Player lantern', {
+        intensity:
+          1.01 +
+          Math.sin(c.elapsed * 7.3) * 0.035 +
+          Math.sin(c.elapsed * 17) * 0.015,
+      });
     c.setParameter('active', Math.abs(move) > 0.1 || this.attackTime > 0);
 
     this.invulnerable = Math.max(0, this.invulnerable - dt);
@@ -225,25 +302,32 @@ export default class Showcase {
     this.updateEnemies(c, dt);
     this.updateShots(c, dt);
     this.collectPickups(c);
-    this.checkWorld(c);
+    this.checkRoom(c);
+    this.store(c);
     this.updateUi(c);
   }
 
   private selectWeapon(c: ScriptContext, weapon: Weapon): void {
-    if (weapon === 'Arc Caster' && !this.hasCaster) {
-      this.say(c, 'The Arc Caster is still sealed in the entrance chamber.', 2);
+    if (weapon === 'Arc Caster' && !this.state.hasCaster) {
+      this.say(c, 'The Arc Caster lies deeper in the gallery.', 1.8);
       return;
     }
-    this.weapon = weapon;
-    this.say(c, `${weapon} equipped.`, 1.2);
+    this.state.weapon = weapon;
+    this.say(c, `${weapon} equipped.`, 1.1);
   }
 
   private usePotion(c: ScriptContext): void {
-    if (!this.potions) return this.say(c, 'No restorative charges.', 1.5);
-    if (this.health === 5) return this.say(c, 'Health is already full.', 1.5);
-    this.potions--;
-    this.health = Math.min(5, this.health + 2);
-    this.say(c, 'Restorative charge consumed: +2 health.', 1.8);
+    if (!this.state.potions) {
+      this.say(c, 'No restorative charge.', 1.4);
+      return;
+    }
+    if (this.state.health === 5) {
+      this.say(c, 'Health is already full.', 1.4);
+      return;
+    }
+    this.state.potions--;
+    this.state.health = Math.min(5, this.state.health + 2);
+    this.say(c, 'Restorative consumed: +2 health.', 1.6);
     c.camera.zoomPulse(c.find('Camera')!, 0.05, 0.18);
   }
 
@@ -251,27 +335,27 @@ export default class Showcase {
     this.attackTime = Math.max(0, this.attackTime - dt);
     if (this.attackRequest && this.attackTime <= 0) {
       this.attackRequest = false;
-      if (this.weapon === 'Sunblade') {
+      if (this.state.weapon === 'Sunblade') {
         this.attackTime = 0.28;
         this.attackHit.clear();
         c.playAudio();
-        c.camera.kick(c.find('Camera')!, this.facing * 5, 0, 0.1);
-      } else if (this.ammo > 0) {
+        c.camera.kick(c.find('Camera')!, this.facing * 5, 0, 0.09);
+      } else if (this.state.ammo > 0) {
         const shot = this.shots.find((candidate) => !candidate.alive);
         if (shot) {
           const [x, y] = c.position();
-          this.ammo--;
+          this.state.ammo--;
           this.attackTime = 0.2;
-          this.launch(c, shot, x + this.facing * 24, y, this.facing * 620, 0);
+          this.launch(c, shot, x + this.facing * 24, y, this.facing * 600, 0);
           c.playAudio();
           c.camera.kick(c.find('Camera')!, -this.facing * 4, 0, 0.08);
         }
-      } else this.say(c, 'Arc Caster empty. Find an energy cell.', 1.5);
+      } else this.say(c, 'Arc Caster empty. Search for a cyan cell.', 1.6);
     }
-    const active = this.weapon === 'Sunblade' && this.attackTime > 0.12;
-    const slash = c.find('Slash')!,
+    const active = this.state.weapon === 'Sunblade' && this.attackTime > 0.12,
+      slash = c.find('Slash')!,
       [x, y] = c.position();
-    c.setPosition(x + this.facing * 33, y, slash);
+    c.setPosition(x + this.facing * 32, y, slash);
     sprite(c, slash, { visible: active, flipX: this.facing < 0 });
     if (!active) return;
     for (const enemy of this.enemies) {
@@ -279,8 +363,8 @@ export default class Showcase {
       const [ex, ey] = c.position(enemy.id);
       if (
         (ex - x) * this.facing > 0 &&
-        Math.abs(ex - x) < 67 &&
-        Math.abs(ey - y) < 48
+        Math.abs(ex - x) < 64 &&
+        Math.abs(ey - y) < 46
       ) {
         this.attackHit.add(enemy.id);
         this.damageEnemy(c, enemy, 2);
@@ -294,8 +378,7 @@ export default class Showcase {
       if (!enemy.alive) continue;
       const position = c.position(enemy.id),
         y = position[1];
-      let x = position[0];
-      x += enemy.direction * 34 * dt;
+      let x = position[0] + enemy.direction * (enemy.maxHp > 3 ? 26 : 31) * dt;
       if (x <= enemy.minX || x >= enemy.maxX) {
         enemy.direction *= -1;
         x = clamp(x, enemy.minX, enemy.maxX);
@@ -304,7 +387,7 @@ export default class Showcase {
       sprite(c, enemy.id, { flipX: enemy.direction < 0 });
       enemy.cooldown -= dt;
       const distance = Math.hypot(px - x, py - y);
-      if (distance < 285 && enemy.cooldown <= 0) {
+      if (distance < 270 && enemy.cooldown <= 0) {
         const shot = this.hostileShots.find((candidate) => !candidate.alive);
         if (shot) {
           const length = distance || 1;
@@ -313,13 +396,13 @@ export default class Showcase {
             shot,
             x,
             y,
-            ((px - x) / length) * 250,
-            ((py - y) / length) * 250,
+            ((px - x) / length) * 235,
+            ((py - y) / length) * 235,
           );
-          enemy.cooldown = 1.7 + this.enemies.indexOf(enemy) * 0.25;
+          enemy.cooldown = enemy.maxHp > 3 ? 1.15 : 1.75;
         }
       }
-      if (distance < 35) this.damagePlayer(c, 1, x);
+      if (distance < 34) this.damagePlayer(c, 1, x);
     }
   }
 
@@ -329,18 +412,22 @@ export default class Showcase {
       const previousX = shot.x;
       shot.x += shot.vx * dt;
       shot.y += shot.vy * dt;
-      c.setPosition(shot.x, shot.y, shot.id);
-      for (let i = 0; i < 2; i++) {
-        if (this.crystals[i]) continue;
-        const [cx, cy] = c.position(c.find(`Sun crystal ${i + 1}`)!);
-        if (
-          Math.min(previousX, shot.x) <= cx + 18 &&
-          Math.max(previousX, shot.x) >= cx - 18 &&
-          Math.abs(shot.y - cy) < 28
-        ) {
-          this.setCrystal(c, i, true);
-          this.hideShot(c, shot);
-          break;
+      this.positionShot(c, shot);
+      if (this.room === 'gallery') {
+        for (let index = 0; index < 2; index++) {
+          if (this.state.wards[index]) continue;
+          const ward = c.find(`Ward crystal ${index + 1}`),
+            point = ward ? c.position(ward) : undefined;
+          if (
+            point &&
+            Math.min(previousX, shot.x) <= point[0] + 18 &&
+            Math.max(previousX, shot.x) >= point[0] - 18 &&
+            Math.abs(shot.y - point[1]) < 27
+          ) {
+            this.setWard(c, index, true, true);
+            this.hideShot(c, shot);
+            break;
+          }
         }
       }
       if (!shot.alive) continue;
@@ -348,9 +435,9 @@ export default class Showcase {
         if (!enemy.alive) return false;
         const [ex, ey] = c.position(enemy.id);
         return (
-          Math.min(previousX, shot.x) <= ex + 20 &&
-          Math.max(previousX, shot.x) >= ex - 20 &&
-          Math.abs(shot.y - ey) < 26
+          Math.min(previousX, shot.x) <= ex + 21 &&
+          Math.max(previousX, shot.x) >= ex - 21 &&
+          Math.abs(shot.y - ey) < 27
         );
       });
       if (hit) {
@@ -363,9 +450,9 @@ export default class Showcase {
       if (!shot.alive) continue;
       shot.x += shot.vx * dt;
       shot.y += shot.vy * dt;
-      c.setPosition(shot.x, shot.y, shot.id);
+      this.positionShot(c, shot);
       const [px, py] = c.position();
-      if (Math.hypot(px - shot.x, py - shot.y) < 24) {
+      if (Math.hypot(px - shot.x, py - shot.y) < 23) {
         this.damagePlayer(c, 1, shot.x);
         this.hideShot(c, shot);
       } else if (Math.abs(shot.x) > 440 || Math.abs(shot.y) > 290)
@@ -382,23 +469,46 @@ export default class Showcase {
     vy: number,
   ): void {
     Object.assign(shot, { x, y, vx, vy, alive: true });
-    c.setPosition(x, y, shot.id);
+    this.positionShot(c, shot);
     sprite(c, shot.id, { visible: true, flipX: vx < 0 });
+    if (shot.glow)
+      this.setLightById(c, shot.glow, {
+        intensity: this.shots.includes(shot) ? 0.28 : 0.5,
+      });
+  }
+
+  private positionShot(c: ScriptContext, shot: Shot): void {
+    c.setPosition(shot.x, shot.y, shot.id);
+    if (shot.glow) c.setPosition(shot.x, shot.y, shot.glow);
   }
 
   private hideShot(c: ScriptContext, shot: Shot): void {
     shot.alive = false;
     sprite(c, shot.id, { visible: false });
+    if (shot.glow) this.setLightById(c, shot.glow, { intensity: 0 });
   }
 
   private damageEnemy(c: ScriptContext, enemy: Enemy, amount: number): void {
     enemy.hp = Math.max(0, enemy.hp - amount);
-    sprite(c, enemy.id, { tint: enemy.hp ? '#ff8f9b' : '#ffffff' });
-    c.camera.shake(c.find('Camera')!, 4, 0.12);
+    sprite(c, enemy.id, { tint: enemy.hp ? '#ff7089' : '#ffffff' });
+    c.camera.shake(c.find('Camera')!, enemy.maxHp > 3 ? 7 : 4, 0.12);
     if (!enemy.hp) {
       enemy.alive = false;
-      sprite(c, enemy.id, { visible: false });
-      this.say(c, 'Sentinel dispersed.', 1);
+      this.setVisible(c, enemy.id, false);
+      if (!this.state.defeated.includes(enemy.key))
+        this.state.defeated.push(enemy.key);
+      this.say(
+        c,
+        enemy.maxHp > 3 ? 'THE WARDEN IS DARK.' : 'Sentinel extinguished.',
+        1.5,
+      );
+      if (
+        this.room === 'reliquary' &&
+        this.enemies.every((item) => !item.alive)
+      ) {
+        this.setVisibleByName(c, 'Vault Key', true);
+        this.say(c, 'The last seal breaks. Take the Vault Key.', 3);
+      }
     }
   }
 
@@ -408,118 +518,155 @@ export default class Showcase {
     sourceX: number,
   ): void {
     if (this.invulnerable > 0 || this.done) return;
-    this.health = Math.max(0, this.health - amount);
-    this.invulnerable = 0.9;
+    this.state.health = Math.max(0, this.state.health - amount);
+    this.invulnerable = 0.85;
     const [x] = c.position(),
       velocity = c.physics.velocity(c.entity);
     c.physics.setVelocity(
       c.entity,
-      sourceX < x ? 180 : -180,
-      velocity[1] - 120,
+      sourceX < x ? 170 : -170,
+      velocity[1] - 110,
     );
     c.camera.shake(c.find('Camera')!, 9, 0.22);
-    this.say(c, 'The vault answers violence with violence.', 1.3);
-    if (!this.health) {
+    this.say(c, 'A red bolt finds you in the dark.', 1.3);
+    if (!this.state.health) {
       this.done = true;
-      show(c, 'Defeat', true);
+      this.setVisibleByName(c, 'Defeat', true);
     }
   }
 
   private collectPickups(c: ScriptContext): void {
-    const [x, y] = c.position();
-    const near = (name: string, radius = 34) => {
-      const point = c.position(c.find(name)!);
-      return Math.hypot(x - point[0], y - point[1]) < radius;
-    };
-    if (!this.hasCaster && near('Arc Caster pickup')) {
-      this.hasCaster = true;
-      this.ammo = 6;
-      show(c, 'Arc Caster pickup', false);
-      this.weapon = 'Arc Caster';
-      this.say(c, 'ARC CASTER ACQUIRED — press 1/2 or Q to switch.', 3);
-    }
-    if (!this.potions && near('Potion pickup')) {
-      this.potions = 1;
-      show(c, 'Potion pickup', false);
-      this.say(c, 'Restorative charge stored. Press H when wounded.', 2.5);
-    }
-    for (let i = 1; i <= 2; i++) {
-      const name = `Energy cell ${i}`;
-      if (
-        c.get<SpriteData>('protomake.sprite', c.find(name)!)?.visible &&
-        near(name)
-      ) {
-        this.ammo += 4;
-        show(c, name, false);
-        this.say(c, '+4 Arc Caster cells.', 1.5);
-      }
+    const [x, y] = c.position(),
+      near = (name: string, radius = 33) => {
+        const id = c.find(name);
+        if (!id || !c.get<SpriteData>('protomake.sprite', id)?.visible)
+          return false;
+        const point = c.position(id);
+        return Math.hypot(x - point[0], y - point[1]) < radius;
+      };
+    if (this.room === 'gate' && near('Potion pickup')) {
+      this.state.potions++;
+      this.state.collected.push('gate.potion');
+      this.setVisibleByName(c, 'Potion pickup', false);
+      this.say(c, 'Restorative stored. Press H when wounded.', 2.2);
     }
     if (
-      this.crystals.every(Boolean) &&
-      !this.hasKey &&
-      c.get<SpriteData>('protomake.sprite', c.find('Vault Key')!)?.visible &&
-      near('Vault Key')
+      this.room === 'gallery' &&
+      !this.state.hasCaster &&
+      near('Arc Caster pickup')
     ) {
-      this.hasKey = true;
-      show(c, 'Vault Key', false);
-      show(c, 'Exit aura', true);
-      this.setLight(c, 'Exit area light', { intensity: 0.92 });
-      this.say(c, 'VAULT KEY ACQUIRED — climb to the illuminated aperture.', 3);
+      this.state.hasCaster = true;
+      this.state.ammo = 10;
+      this.state.weapon = 'Arc Caster';
+      this.setVisibleByName(c, 'Arc Caster pickup', false);
+      this.say(
+        c,
+        'ARC CASTER ACQUIRED — cyan bolts reveal what steel cannot.',
+        3,
+      );
+    }
+    for (let index = 1; index <= 2; index++) {
+      const name = `Energy cell ${index}`;
+      if (near(name)) {
+        this.state.ammo += 5;
+        this.state.collected.push(`gallery.cell-${index}`);
+        this.setVisibleByName(c, name, false);
+        this.say(c, '+5 Arc Caster cells.', 1.4);
+      }
+    }
+    if (this.room === 'reliquary' && !this.state.hasKey && near('Vault Key')) {
+      this.state.hasKey = true;
+      this.setVisibleByName(c, 'Vault Key', false);
+      this.setVisibleByName(c, 'Exit sigil', true);
+      this.setLight(c, 'Exit area light', { intensity: 0.62 });
+      this.say(c, 'VAULT KEY ACQUIRED — follow the pale aperture east.', 3);
     }
   }
 
-  private checkWorld(c: ScriptContext): void {
+  private setWard(
+    c: ScriptContext,
+    index: number,
+    active: boolean,
+    announce: boolean,
+  ): void {
+    this.state.wards[index] = active;
+    const ward = c.find(`Ward crystal ${index + 1}`);
+    if (ward) sprite(c, ward, { tint: active ? '#d8ffff' : '#33485a' });
+    this.setLight(c, `Ward light ${index + 1}`, {
+      intensity: active ? 0.34 : 0.03,
+    });
+    if (!active) return;
+    c.camera.shake(c.find('Camera')!, 5, 0.16);
+    const open = this.state.wards.every(Boolean);
+    if (open) {
+      this.setEnabledByName(c, 'Ward bridge', true);
+      this.setEnabledByName(c, 'East seal', false);
+      if (announce)
+        this.say(c, 'BOTH WARDS ANSWER — the eastern passage opens.', 3);
+    } else if (announce)
+      this.say(c, 'One ward answers. Find the second in the dark.', 2.2);
+  }
+
+  private checkRoom(c: ScriptContext): void {
     let [x, y] = c.position();
-    if (y > 285 || Math.abs(x) > 430) {
-      this.health = Math.max(0, this.health - 1);
-      c.setPosition(this.crystals.every(Boolean) ? 145 : -345, 150);
+    if (y > 280) {
+      this.state.health = Math.max(0, this.state.health - 1);
+      const spawn = this.spawnPoint();
+      c.setPosition(spawn[0], spawn[1]);
       c.physics.setVelocity(c.entity, 0, 0);
       this.invulnerable = 1;
-      this.say(c, 'The abyss rejects you. One health lost.', 1.8);
-      if (!this.health) {
+      this.say(c, 'The black water takes one health.', 1.8);
+      if (!this.state.health) {
         this.done = true;
-        show(c, 'Defeat', true);
+        this.setVisibleByName(c, 'Defeat', true);
       }
       [x, y] = c.position();
     }
-    if (this.hasKey && x > 292 && y < -34) {
-      this.done = true;
-      show(c, 'Victory', true);
-      c.achievements.unlock('vaultbreaker');
-      c.camera.zoomPulse(c.find('Camera')!, 0.12, 0.5);
+    if (this.room === 'gate' && x > 382) {
+      this.travel(c, 'The Drowned Gallery', 'west');
+      return;
+    }
+    if (this.room === 'gallery') {
+      if (x < -382 && y > 112) {
+        this.travel(c, 'The Black Gate', 'east');
+        return;
+      }
+      if (x > 310 && y < 5 && !this.state.wards.every(Boolean)) {
+        c.setPosition(308, y);
+        c.physics.setVelocity(c.entity, 0, c.physics.velocity(c.entity)[1]);
+        this.say(c, 'Two ward crystals hold the eastern seal.', 1.5);
+      } else if (x > 382 && y < 5 && this.state.wards.every(Boolean)) {
+        this.travel(c, 'The Reliquary', 'west');
+        return;
+      }
+    }
+    if (this.room === 'reliquary') {
+      if (x < -382) {
+        this.travel(c, 'The Drowned Gallery', 'east');
+        return;
+      }
+      if (x > 382 && !this.state.hasKey) {
+        c.setPosition(380, y);
+        this.say(c, 'The aperture has no key and no light.', 1.4);
+      } else if (x > 382 && this.state.hasKey) {
+        this.done = true;
+        this.setVisibleByName(c, 'Victory', true);
+        c.achievements.unlock('vaultbreaker');
+        c.camera.zoomPulse(c.find('Camera')!, 0.12, 0.5);
+      }
     }
   }
 
-  private setCrystal(c: ScriptContext, index: number, active: boolean): void {
-    this.crystals[index] = active;
-    sprite(c, c.find(`Sun crystal ${index + 1}`)!, {
-      tint: active ? '#fff3a6' : '#586579',
-    });
-    this.setLight(c, `Crystal light ${index + 1}`, {
-      intensity: active ? 1.05 : 0.05,
-    });
-    if (!active) return;
-    c.camera.shake(c.find('Camera')!, 6, 0.18);
-    if (this.crystals.every(Boolean)) {
-      show(c, 'Seal barrier', false);
-      show(c, 'Bridge', true);
-      show(c, 'Vault Key', true);
-      this.say(
-        c,
-        'SUN SEAL BROKEN — bridge formed and inner vault opened.',
-        3.2,
-      );
-    } else this.say(c, 'First sun crystal awakened. One remains.', 2.2);
+  private travel(c: ScriptContext, scene: string, entry: Entry): void {
+    if (this.transitioning) return;
+    this.transitioning = true;
+    c.session.set(ENTRY_KEY, entry);
+    this.store(c);
+    c.loadScene(scene);
   }
 
-  private setLight(
-    c: ScriptContext,
-    name: string,
-    changes: Partial<LightData>,
-  ): void {
-    const id = c.find(name)!,
-      current = c.get<LightData>('protomake.light', id)!;
-    c.set('protomake.light', { ...current, ...changes }, id);
+  private store(c: ScriptContext): void {
+    c.session.set(RUN_KEY, this.state);
   }
 
   private say(c: ScriptContext, message: string, seconds: number): void {
@@ -530,22 +677,76 @@ export default class Showcase {
   private updateUi(c: ScriptContext): void {
     c.ui.setText(
       c.find('Status')!,
-      `HEALTH ${'◆'.repeat(this.health)}${'◇'.repeat(5 - this.health)}   ` +
-        `${this.weapon.toUpperCase()}${this.weapon === 'Arc Caster' ? ` • ${this.ammo}` : ''}`,
+      `HEALTH ${'◆'.repeat(this.state.health)}${'◇'.repeat(5 - this.state.health)}  ` +
+        `${this.state.weapon.toUpperCase()}${this.state.weapon === 'Arc Caster' ? ` · ${this.state.ammo}` : ''}`,
     );
     c.ui.setText(
       c.find('Inventory')!,
-      `INVENTORY  Caster ${this.hasCaster ? '✓' : '—'}  ` +
-        `Crystals ${this.crystals.filter(Boolean).length}/2  ` +
-        `Key ${this.hasKey ? '✓' : '—'}  Restorative ${this.potions}`,
+      `CASTER ${this.state.hasCaster ? '✓' : '—'}   WARDS ${this.state.wards.filter(Boolean).length}/2   ` +
+        `KEY ${this.state.hasKey ? '✓' : '—'}   RESTORE ${this.state.potions}`,
     );
-    const objective = !this.hasCaster
-      ? 'Find the Arc Caster'
-      : !this.crystals.every(Boolean)
-        ? 'Shoot both sun crystals'
-        : !this.hasKey
-          ? 'Cross the bridge and recover the Vault Key'
-          : 'Climb to the illuminated exit';
-    c.ui.setText(c.find('Objective')!, `OBJECTIVE  ${objective}`);
+    const room =
+        this.room === 'gate'
+          ? 'I · THE BLACK GATE'
+          : this.room === 'gallery'
+            ? 'II · THE DROWNED GALLERY'
+            : 'III · THE RELIQUARY',
+      objective =
+        this.room === 'gate'
+          ? 'Cross the eastern threshold'
+          : this.room === 'gallery' && !this.state.hasCaster
+            ? 'Recover the Arc Caster below'
+            : this.room === 'gallery' && !this.state.wards.every(Boolean)
+              ? 'Wake both ward crystals with cyan bolts'
+              : this.room === 'gallery'
+                ? 'Climb through the eastern seal'
+                : !this.enemies.every((enemy) => !enemy.alive)
+                  ? 'Extinguish the Reliquary guard'
+                  : !this.state.hasKey
+                    ? 'Take the Vault Key'
+                    : 'Enter the pale aperture';
+    c.ui.setText(c.find('Objective')!, `${room}\n${objective}`);
+  }
+
+  private setVisibleByName(
+    c: ScriptContext,
+    name: string,
+    visible: boolean,
+  ): void {
+    const id = c.find(name);
+    if (id) this.setVisible(c, id, visible);
+  }
+
+  private setVisible(c: ScriptContext, id: string, visible: boolean): void {
+    const current = c.get<SpriteData>('protomake.sprite', id);
+    if (current) sprite(c, id, { visible });
+  }
+
+  private setEnabledByName(
+    c: ScriptContext,
+    name: string,
+    enabled: boolean,
+  ): void {
+    const stable = c.find(name),
+      id = stable ? c.world.find(stable) : undefined;
+    if (id !== undefined) c.world.setEnabled(id, enabled);
+  }
+
+  private setLight(
+    c: ScriptContext,
+    name: string,
+    changes: Partial<LightData>,
+  ): void {
+    const id = c.find(name);
+    if (id) this.setLightById(c, id, changes);
+  }
+
+  private setLightById(
+    c: ScriptContext,
+    id: string,
+    changes: Partial<LightData>,
+  ): void {
+    const current = c.get<LightData>('protomake.light', id);
+    if (current) c.set('protomake.light', { ...current, ...changes }, id);
   }
 }

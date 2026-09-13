@@ -185,6 +185,7 @@ export class GameSession {
           ui,
           save: persistent.save,
           achievements: persistent.achievements,
+          session: persistent.session,
           cameraEffects,
           particles,
         },

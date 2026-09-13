@@ -140,6 +140,17 @@ export const SCRIPT_CONTEXT_API: readonly ScriptApiEntry[] = [
     description: 'Load another project scene.',
   },
   {
+    name: 'session.get',
+    signature: "ctx.session.get<T>('run-state')",
+    description: 'Read cloned state shared by scenes in this Play session.',
+  },
+  {
+    name: 'session.set',
+    signature: "ctx.session.set('run-state', value)",
+    description:
+      'Store cloned, volatile run state until Play ends or session.clear is called.',
+  },
+  {
     name: 'ui.setText',
     signature: 'ctx.ui.setText(entity, text)',
     description: 'Update a runtime UI Text entity.',

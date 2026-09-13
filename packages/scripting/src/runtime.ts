@@ -79,6 +79,13 @@ export interface RuntimeScriptServices {
     unlock(id: string): boolean;
     isUnlocked(id: string): boolean;
   };
+  readonly session?: {
+    has(key: string): boolean;
+    get<T = unknown>(key: string): T | undefined;
+    set(key: string, value: unknown): void;
+    delete(key: string): boolean;
+    clear(): void;
+  };
   readonly cameraEffects?: {
     shake(camera: Guid, intensity: number, duration: number): void;
     kick(camera: Guid, x: number, y: number, duration: number): void;
@@ -209,6 +216,14 @@ export interface ScriptContext {
   readonly achievements: {
     unlock(id: string): boolean;
     isUnlocked(id: string): boolean;
+  };
+  /** Volatile state shared across scene loads and cleared when Play ends. */
+  readonly session: {
+    has(key: string): boolean;
+    get<T = unknown>(key: string): T | undefined;
+    set(key: string, value: unknown): void;
+    delete(key: string): boolean;
+    clear(): void;
   };
   loadScene(idOrName: string): void;
   log(message: string): void;
@@ -666,6 +681,21 @@ export class ScriptSystem implements System {
           const service = this.services.achievements;
           if (!service) return unavailable('Achievement');
           return service.isUnlocked(achievement);
+        },
+      },
+      session: {
+        has: (key) => this.services.session?.has(key) ?? false,
+        get: <T = unknown>(key: string) => this.services.session?.get<T>(key),
+        set: (key, value) => {
+          const service = this.services.session;
+          if (!service) return unavailable('Session state');
+          service.set(key, value);
+        },
+        delete: (key) => this.services.session?.delete(key) ?? false,
+        clear: () => {
+          const service = this.services.session;
+          if (!service) return unavailable('Session state');
+          service.clear();
         },
       },
       loadScene: this.loadScene,

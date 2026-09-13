@@ -13,9 +13,9 @@ Run `npm ci`, then `npm run build:prototypes` and `npm run preview:prototypes`. 
 
 Move with **A/D** or the arrows, jump with **Space**, attack with **J** or the primary mouse button, switch weapons with **1/2** or **Q**, heal with **H**, toggle the carried lantern with **L**, and restart with **R**.
 
-Start with the Sunblade, defeat or evade sentinels, and collect the Arc Caster. Ranged bolts activate the two sun crystals. Together they remove the seal and form a bridge to the Vault Key; the key powers a dynamic rectangular exit light. The final ascent completes the level and unlocks an achievement.
+Start with the Sunblade in the Black Gate, recover the Arc Caster in the Drowned Gallery, wake both wards, then defeat the Reliquary guard and take the Vault Key. The three rooms connect in both directions and preserve inventory, health, ammunition, pickups, defeated enemies and puzzle state.
 
-The scene deliberately combines static ambient and spot lights, mixed point fixtures, dynamic crystal and lantern lights, an area exit light, lit receivers and shadow casters. All game rules live in the editable `Assets/Scripts/Showcase.ts` project asset—there are no showcase-only engine shortcuts.
+Every room forces ambient illumination to zero. A short carried light reveals lit receivers and hard architectural shadows; no room has more than three authored environmental lights. Projectile glows are tiny and transient. Across the dungeon, the project uses point, spot and area lights with static, mixed and dynamic mobility. All game rules live in the editable `Assets/Scripts/Showcase.ts` project asset—there are no showcase-only engine shortcuts.
 
 ## Builds and source assets
 
