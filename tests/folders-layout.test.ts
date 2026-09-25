@@ -54,7 +54,9 @@ it('remembers keyboard resizing and resets track sizes without editing project d
     new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }),
   );
   expect(app.style.getPropertyValue('--left-size')).toBe('240px');
-  expect(JSON.parse(localStorage.getItem('protomake.layout.v1')!).left).toBe(240);
+  expect(JSON.parse(localStorage.getItem('protomake.layout.v1')!).left).toBe(
+    240,
+  );
   reset();
   expect(app.style.getPropertyValue('--left-size')).toBe('230px');
   app.remove();

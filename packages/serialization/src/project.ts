@@ -315,7 +315,11 @@ export function validateProject(
           )
         )
           throw new Error('Invalid Animator controller asset');
-        if (type === 'protomake.audio-source' && data && typeof data === 'object') {
+        if (
+          type === 'protomake.audio-source' &&
+          data &&
+          typeof data === 'object'
+        ) {
           if (
             'clip' in data &&
             data.clip &&

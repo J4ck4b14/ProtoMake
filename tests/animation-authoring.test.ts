@@ -20,7 +20,10 @@ it('scrubs and previews an existing clip, then cleans state references and edits
     const m = new EditorModel();
     m.load(
       JSON.parse(
-        readFileSync('examples/prototypes/shooter/shooter.protomake.json', 'utf8'),
+        readFileSync(
+          'examples/prototypes/shooter/shooter.protomake.json',
+          'utf8',
+        ),
       ),
     );
     const clip = m.project.assets.find((a) => a.mime === CLIP_MIME)!;

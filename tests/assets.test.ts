@@ -1,6 +1,10 @@
 import { it, expect } from 'vitest';
 import { guid } from '@protomake/core';
-import { AssetDatabase, assetReferences, type AssetData } from '@protomake/assets';
+import {
+  AssetDatabase,
+  assetReferences,
+  type AssetData,
+} from '@protomake/assets';
 import { SpriteRenderer, Camera2D, renderList } from '@protomake/renderer';
 import { EditorModel } from '@protomake/editor';
 import {

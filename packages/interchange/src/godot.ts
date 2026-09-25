@@ -165,7 +165,10 @@ function imageResource(
   };
 }
 
-function collisionMask(layer: number, interchange: ProtoMakeInterchange): number {
+function collisionMask(
+  layer: number,
+  interchange: ProtoMakeInterchange,
+): number {
   let mask = 0;
   const row = interchange.physics.matrix[layer] ?? [];
   row.forEach((enabled, index) => {

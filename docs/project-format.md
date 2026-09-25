@@ -2,19 +2,19 @@
 
 The current project schema is **v11**; the scene schema remains **v1**. Engine releases are independent of these schema numbers.
 
-| Project version | Added data                                                                           | Migration                              |
-| --------------- | ------------------------------------------------------------------------------------ | -------------------------------------- |
-| 1               | Project identity, name, informational engine version, startup scene, embedded scenes | Original Milestone 0 format            |
-| 2               | Embedded GUID-addressed image/text assets                                            | v1 → v2 adds an empty asset collection |
-| 3               | Gravity, physics layers/matrix and input actions                                     | v2 → v3 adds working defaults          |
-| 4               | Folder paths, scene folder assignments, audio mixer buses                            | v3 → v4 adds defaults                  |
-| 5               | Stable multi-behaviour slots and per-slot enabled state                              | v4 → v5 converts `protomake.script` data   |
-| 6               | Behaviour Graph assets and Graph Behaviour slots                                     | v5 → v6 updates engine metadata        |
-| 7               | Persistence settings and achievement definitions                                     | v6 → v7 adds safe defaults             |
-| 8               | ProtoMake 0.13 2D authoring generation                                                   | v7 → v8 updates engine metadata        |
-| 9               | ProtoMake 0.14 live-iteration generation                                                 | v8 → v9 updates engine metadata        |
-| 10              | ProtoMake 0.15 game-feel generation                                                      | v9 → v10 updates engine metadata       |
-| 11              | ProtoMake 0.16 public-release and Interchange foundation                                 | v10 → v11 updates engine metadata      |
+| Project version | Added data                                                                           | Migration                                |
+| --------------- | ------------------------------------------------------------------------------------ | ---------------------------------------- |
+| 1               | Project identity, name, informational engine version, startup scene, embedded scenes | Original Milestone 0 format              |
+| 2               | Embedded GUID-addressed image/text assets                                            | v1 → v2 adds an empty asset collection   |
+| 3               | Gravity, physics layers/matrix and input actions                                     | v2 → v3 adds working defaults            |
+| 4               | Folder paths, scene folder assignments, audio mixer buses                            | v3 → v4 adds defaults                    |
+| 5               | Stable multi-behaviour slots and per-slot enabled state                              | v4 → v5 converts `protomake.script` data |
+| 6               | Behaviour Graph assets and Graph Behaviour slots                                     | v5 → v6 updates engine metadata          |
+| 7               | Persistence settings and achievement definitions                                     | v6 → v7 adds safe defaults               |
+| 8               | ProtoMake 0.13 2D authoring generation                                               | v7 → v8 updates engine metadata          |
+| 9               | ProtoMake 0.14 live-iteration generation                                             | v8 → v9 updates engine metadata          |
+| 10              | ProtoMake 0.15 game-feel generation                                                  | v9 → v10 updates engine metadata         |
+| 11              | ProtoMake 0.16 public-release and Interchange foundation                             | v10 → v11 updates engine metadata        |
 
 Scene v1 contains schemaVersion, UUID id, name and entities. Each entity has UUID id, name, enabled, nullable parent UUID and component payloads keyed by stable type ID. Numeric runtime handles never enter serialized data. Transform stores a six-number affine matrix. New registered component types do not require changing the outer scene envelope.
 

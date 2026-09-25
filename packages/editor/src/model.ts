@@ -148,9 +148,9 @@ export class EditorModel {
     this.changeRuntimeAuthoring('Apply runtime component value', () => {
       const numeric = this.entity(entity);
       if (type === TransformComponent.type) {
-        const body = this.world.components(numeric).get('protomake.rigidbody') as
-          | { mode?: string }
-          | undefined;
+        const body = this.world
+          .components(numeric)
+          .get('protomake.rigidbody') as { mode?: string } | undefined;
         if (body?.mode === 'dynamic')
           throw new Error(
             'Dynamic runtime transforms cannot be applied safely',

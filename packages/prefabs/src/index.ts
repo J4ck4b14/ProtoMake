@@ -20,7 +20,12 @@ const PatchSchema = z.strictObject({
       (p) =>
         ['name', 'enabled', 'components'].includes(p[0]!) &&
         !p.some((k) =>
-          ['__proto__', 'constructor', 'prototype', 'protomake.prefab'].includes(k),
+          [
+            '__proto__',
+            'constructor',
+            'prototype',
+            'protomake.prefab',
+          ].includes(k),
         ),
       'Unsafe override path',
     ),

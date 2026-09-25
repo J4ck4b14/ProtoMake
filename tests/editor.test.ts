@@ -1,7 +1,12 @@
 import { describe, it, expect } from 'vitest';
 import { IDBFactory } from 'fake-indexeddb';
 import { compose, guid } from '@protomake/core';
-import { EditorModel, NoteComponent, pivotDelta, getPath } from '@protomake/editor';
+import {
+  EditorModel,
+  NoteComponent,
+  pivotDelta,
+  getPath,
+} from '@protomake/editor';
 import { ProjectStorage } from '../packages/editor/src/storage';
 import { instantiateScene, serializeProject } from '@protomake/serialization';
 import { Rigidbody2D } from '@protomake/physics2d';

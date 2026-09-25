@@ -16,7 +16,9 @@ let session: GameSession | undefined,
 let failed = false;
 const progress = (stage: string) =>
   window.dispatchEvent(
-    new CustomEvent('protomake:loading', { detail: { phase: 'loading', stage } }),
+    new CustomEvent('protomake:loading', {
+      detail: { phase: 'loading', stage },
+    }),
   );
 function failure(error: unknown): void {
   failed = true;

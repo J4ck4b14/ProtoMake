@@ -1,4 +1,8 @@
-import { AssetSchema, SPRITE_REGION_MIME, type AssetData } from '@protomake/assets';
+import {
+  AssetSchema,
+  SPRITE_REGION_MIME,
+  type AssetData,
+} from '@protomake/assets';
 import { guid } from '@protomake/core';
 import type { EditorModel } from './model';
 import { button, input, node } from './dom';

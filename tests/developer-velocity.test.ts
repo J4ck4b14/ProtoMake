@@ -50,9 +50,9 @@ it('indexes tags and provides component, closest and radius queries', () => {
   expect(model.world.withTag('Enemy')).toHaveLength(2);
   expect(model.world.closestWithTag('Enemy', [10, 0])).toBe(model.entity(near));
   expect(model.world.inRadius([0, 0], 20)).toContain(model.entity(near));
-  expect(model.world.withComponents('protomake.transform', Tags.type)).toHaveLength(
-    2,
-  );
+  expect(
+    model.world.withComponents('protomake.transform', Tags.type),
+  ).toHaveLength(2);
 });
 
 it('runs the complete 0.10 behaviour-service acceptance workflow', async () => {

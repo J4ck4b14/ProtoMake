@@ -125,7 +125,9 @@ it('loads compiled modules and executes two independent project mechanics withou
     expect(editor.world.worldPosition(platform.id)[0]).toBeGreaterThan(
       before[0] + 30,
     );
-    const sprite = editor.world.components(pulse.id).get('protomake.sprite') as {
+    const sprite = editor.world
+      .components(pulse.id)
+      .get('protomake.sprite') as {
       opacity: number;
     };
     expect(sprite.opacity).toBeGreaterThan(0.7);

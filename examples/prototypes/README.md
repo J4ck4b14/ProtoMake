@@ -2,8 +2,8 @@
 
 Run `npm ci`, then `npm run build:prototypes` and `npm run preview:prototypes`. Use `npm run dev` and the editor's **Edit showcase** button to inspect the flagship source project.
 
-| Experience             | Editable project                   | Purpose                                                                                                                                                                     |
-| ---------------------- | ---------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Experience             | Editable project                       | Purpose                                                                                                                                                                     |
+| ---------------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **The Luminous Vault** | `showcase/showcase.protomake.json`     | Flagship vertical slice: lighting, melee/ranged combat, inventory, multiweapon switching, puzzle progression, platforming, enemy projectiles, UI, audio and camera feedback |
 | Signal Patrol          | `shooter/shooter.protomake.json`       | Focused top-down movement, projectile pooling and enemy lab                                                                                                                 |
 | Lantern Steps          | `platformer/platformer.protomake.json` | Focused platforming, collectible and checkpoint lab                                                                                                                         |
