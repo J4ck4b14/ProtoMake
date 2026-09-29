@@ -53,9 +53,7 @@ try {
     mime: 'audio/wav',
     data:
       'data:audio/wav;base64,' +
-      (await readFile('examples/workshop/Audio/Jump.wav')).toString(
-        'base64',
-      ),
+      (await readFile('examples/workshop/Audio/Jump.wav')).toString('base64'),
     width: 0,
     height: 0,
   });

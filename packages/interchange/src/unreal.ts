@@ -58,7 +58,11 @@ function pluginFile(): string {
     Installed: false,
     Modules: [
       { Name: 'ProtoMakeRuntime', Type: 'Runtime', LoadingPhase: 'Default' },
-      { Name: 'ProtoMakeImporter', Type: 'Editor', LoadingPhase: 'PostEngineInit' },
+      {
+        Name: 'ProtoMakeImporter',
+        Type: 'Editor',
+        LoadingPhase: 'PostEngineInit',
+      },
     ],
   });
 }

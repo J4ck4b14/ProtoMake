@@ -247,7 +247,7 @@ export function editBehaviourGraph(
           );
           search.value = '';
           // Initial render happens only after all handlers share the same selection/drag state.
-  renderPalette();
+          renderPalette();
         }),
       );
     palette.hidden = !search.value;

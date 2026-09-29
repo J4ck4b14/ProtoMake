@@ -30,7 +30,10 @@ async function game(
   const model = new EditorModel();
   model.load(
     JSON.parse(
-      await readFile(`examples/prototypes/${name}/${name}.protomake.json`, 'utf8'),
+      await readFile(
+        `examples/prototypes/${name}/${name}.protomake.json`,
+        'utf8',
+      ),
     ),
   );
   if (sceneName) {

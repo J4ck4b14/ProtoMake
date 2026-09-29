@@ -354,7 +354,9 @@ export function lowerProject(project: ProjectData): ProtoMakeInterchange {
       entities: [...scene.entities]
         .sort((a, b) => a.id.localeCompare(b.id))
         .map((entity) => {
-          const transform = entity.components['protomake.transform'] as unknown as {
+          const transform = entity.components[
+            'protomake.transform'
+          ] as unknown as {
             local: readonly [number, number, number, number, number, number];
           };
           return {
@@ -729,7 +731,9 @@ export function createExportManifest(
     report: analyzePortability(interchange, target),
   };
 }
-export function serializeInterchange(interchange: ProtoMakeInterchange): string {
+export function serializeInterchange(
+  interchange: ProtoMakeInterchange,
+): string {
   return deterministicJSON(interchange);
 }
 export function serializeReport(report: PortabilityReport): string {

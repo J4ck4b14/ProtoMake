@@ -35,13 +35,13 @@ Use Node.js 22.12 or later. The dependency lockfile is included; npm ci installs
 
 **What is in each example folder**
 
-| Item                              | Purpose                                        |
-| --------------------------------- | ---------------------------------------------- |
+| Item                                  | Purpose                                        |
+| ------------------------------------- | ---------------------------------------------- |
 | game name followed by .protomake.json | Complete editable project with embedded assets |
-| Images                            | Raw PNG artwork and a size manifest            |
-| Audio/Action.wav                  | Short action sound used by the prototype       |
-| Scripts                           | Main game behaviour and Helpers.ts             |
-| ../web/game name                  | Production build linked from the launcher      |
+| Images                                | Raw PNG artwork and a size manifest            |
+| Audio/Action.wav                      | Short action sound used by the prototype       |
+| Scripts                               | Main game behaviour and Helpers.ts             |
+| ../web/game name                      | Production build linked from the launcher      |
 
 Use the files in Images, Audio and Scripts for a blank-project reconstruction. Do not import sizes.json as a gameplay asset. You do not have to regenerate the projects to use them. `npm run examples:generate` is a maintainer command that writes fresh projects with new identifiers; avoid it while making personal changes to the examples.
 

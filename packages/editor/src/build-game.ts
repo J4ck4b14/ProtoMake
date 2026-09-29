@@ -38,7 +38,10 @@ export function projectBuildFiles(input: ProjectData): BuildFile[] {
   for (const asset of project.assets)
     if (asset.mime === 'text/typescript') asset.data = '';
   files.push(
-    { path: 'project.protomake.json', data: encode(deterministicJSON(project)) },
+    {
+      path: 'project.protomake.json',
+      data: encode(deterministicJSON(project)),
+    },
     { path: 'scripts.json', data: encode(JSON.stringify(scripts)) },
     {
       path: 'BUILD-REPORT.json',
