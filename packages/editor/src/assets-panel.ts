@@ -1,3 +1,6 @@
+/**
+ * Implements the project asset browser, import/create actions, folders and asset-specific editor entry points.
+ */
 import { editMedia, attachMedia } from './media-editor';
 import { CLIP_MIME, CONTROLLER_MIME } from '@protomake/animation';
 import { PREFAB_MIME } from '@protomake/prefabs';
@@ -22,6 +25,7 @@ import { GRAPH_MIME } from '@protomake/graphs';
 import { TILESET_MIME } from '@protomake/tilemap';
 import { sliceSprite } from './sprite-slicer';
 import { createTileSet, editTilemap, editTileSet } from './tilemap-editor';
+/** Owns the asset-tree UI: folders, imports, rename/move operations, previews and drag payloads. */
 export class AssetsPanel {
   private folder = 'Assets';
   private selected: string | undefined;
@@ -40,6 +44,7 @@ export class AssetsPanel {
       this.report(String(error), true);
     }
   }
+  // Batch the file conversion first, then commit the whole import as one undoable project edit.
   private async import(files: FileList | null): Promise<void> {
     if (!files || this.model.locked) return;
     try {
@@ -70,6 +75,7 @@ export class AssetsPanel {
       compileProjectScripts(this.model.project.assets);
     });
   }
+  // Render derives the tree from project metadata; no DOM node is treated as authoritative state.
   render(): void {
     this.host.replaceChildren(node('h2', '', 'Assets'));
     const file = node('input');
@@ -341,6 +347,7 @@ export class AssetsPanel {
       for (const b of this.host.querySelectorAll('button')) b.disabled = true;
   }
 }
+// Thumbnail/preview rendering is lazy because some assets require an initialized GPU renderer.
 export async function attachRenderer(
   area: HTMLElement,
   viewport: SceneViewport,

@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+/**
+ * Automated regression coverage for editor shell; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect, vi } from 'vitest';
 import { IDBFactory } from 'fake-indexeddb';
 vi.mock('@protomake/renderer/pixi', () => ({

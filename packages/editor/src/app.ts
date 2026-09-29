@@ -1,3 +1,6 @@
+/**
+ * Bootstraps the complete editor shell and wires menus, panels, project actions, Play Mode and persistence together.
+ */
 import { buildGame, downloadBuild, previewBuild } from './build-game';
 import { showMixer } from './media-editor';
 import { PrefabLink } from '@protomake/prefabs';
@@ -28,9 +31,11 @@ import type { RecoverySnapshot } from './storage';
 import { LIGHTING_CHANNELS, type LightingChannel } from '@protomake/renderer';
 import { editBehaviourGraph } from './graph-editor';
 applyAppearance(loadAppearance(), false);
+// Shared editor services live for the lifetime of the page; project/runtime state is owned by these instances.
 const model = new EditorModel(),
   storage = new ProjectStorage(),
   accountSync = new AccountSync();
+// Build the persistent shell once. Individual panels redraw from EditorModel state.
 const app = document.getElementById('app')!,
   header = node('header'),
   brand = node('div', 'brand', 'F'),
@@ -161,6 +166,7 @@ mobileViewTools.append(
 );
 setMobilePanel('scene');
 
+// Project file actions validate the dirty-state boundary before replacing authored data.
 let clipboard: SceneData | undefined;
 function canLeave(): boolean {
   return (
@@ -440,6 +446,7 @@ async function showRecovery(preferred?: RecoverySnapshot): Promise<void> {
   dialog.showModal();
 }
 
+// The toolbar mirrors editor state; all mutations still route through the model/history APIs.
 const undo = button('Undo', () => run(() => model.undo())),
   redo = button('Redo', () => run(() => model.redo()));
 toolbar.append(undo, redo, node('span', 'divider'));
@@ -538,6 +545,7 @@ toolbar.append(
   runtime,
   stop,
 );
+// Hierarchy/project rendering is deliberately rebuilt from model state so undo/load cannot leave stale DOM state.
 function renderHierarchy(): void {
   hierarchy.replaceChildren(node('h2', '', 'Hierarchy'));
   const actions = node('div', 'actions');
@@ -811,6 +819,7 @@ window.addEventListener('beforeunload', (e) => {
   }
 });
 
+// Secondary panels and persistence notices are installed after the main authoring surfaces are ready.
 const assetHost = node('section', 'assets panel');
 bottom.append(assetHost);
 new AssetsPanel(assetHost, model, log);

@@ -1,3 +1,6 @@
+/**
+ * Translates the Interchange model into a Unity project and editor importer bundle.
+ */
 import { GRAPH_MIME } from '@protomake/graphs';
 import {
   createExportManifest,

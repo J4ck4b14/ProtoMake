@@ -1,6 +1,10 @@
+/**
+ * Generates the editable shooter, platformer and fighter prototype project files from source assets and scripts.
+ */
 import { createServer } from 'vite';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
+// Vite SSR loads the real editor model so generated examples exercise the same authoring/serialization code as the UI.
 const server = await createServer({
   server: { middlewareMode: true },
   appType: 'custom',
@@ -12,6 +16,7 @@ try {
   const { createPrefab, placePrefab } = await server.ssrLoadModule(
     '/packages/editor/src/prefab-actions.ts',
   );
+  // Generate each teaching project independently so its JSON, scripts and assets can be inspected or exported on their own.
   for (const game of ['shooter', 'platformer', 'fighter']) {
     const m = new EditorModel();
     const root = `examples/prototypes/${game}`;
@@ -103,12 +108,12 @@ try {
       'Audio/Action.wav',
       'audio',
       'audio/wav',
-      `data:audio/wav;base64,${(await readFile('examples/milestones-5-7/Audio/Jump.wav')).toString('base64')}`,
+      `data:audio/wav;base64,${(await readFile('examples/workshop/Audio/Jump.wav')).toString('base64')}`,
     );
     await mkdir(`${root}/Audio`, { recursive: true });
     await writeFile(
       `${root}/Audio/Action.wav`,
-      await readFile('examples/milestones-5-7/Audio/Jump.wav'),
+      await readFile('examples/workshop/Audio/Jump.wav'),
     );
     for (const name of await readdir(`${root}/Scripts`))
       if (name.endsWith('.ts'))

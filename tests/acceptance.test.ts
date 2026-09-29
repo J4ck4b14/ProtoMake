@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for acceptance; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect } from 'vitest';
 import { readFile } from 'node:fs/promises';
 import { EditorModel } from '../packages/editor/src/model';
@@ -14,7 +17,7 @@ it('runs the shipped workshop with compiled scripts, real physics, animation par
   const m = new EditorModel();
   m.load(
     JSON.parse(
-      await readFile('examples/milestones-5-7/Workshop.protomake.json', 'utf8'),
+      await readFile('examples/workshop/Workshop.protomake.json', 'utf8'),
     ),
   );
   const player = [...m.world.all()].find((e) => e.name === 'Player')!;

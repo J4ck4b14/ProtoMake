@@ -1,8 +1,11 @@
+/**
+ * Serves an exported game directory with safe static-file routing for local verification.
+ */
 import { URL } from 'node:url';
 import { createServer } from 'node:http';
 import { readFile, stat } from 'node:fs/promises';
 import { resolve, extname, sep } from 'node:path';
-const root = resolve(process.argv[2] ?? 'examples/milestones-5-7/web-build'),
+const root = resolve(process.argv[2] ?? 'examples/workshop/web-build'),
   port = Number(process.argv[3] ?? 4180);
 await stat(root);
 const mime = {

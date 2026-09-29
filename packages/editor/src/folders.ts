@@ -1,3 +1,6 @@
+/**
+ * Implements folder-tree normalization and movement rules for assets and scenes.
+ */
 import { AssetSchema } from '@protomake/assets';
 import { compileProjectScripts } from '@protomake/scripting/compiler';
 import type { EditorModel } from './model';

@@ -1,3 +1,6 @@
+/**
+ * Creates the component registry required to deserialize and run complete projects.
+ */
 import { Behaviours, Perception2D } from '@protomake/scripting';
 import { PrefabLink } from '@protomake/prefabs';
 import { Animator } from '@protomake/animation';

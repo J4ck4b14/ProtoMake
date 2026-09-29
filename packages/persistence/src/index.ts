@@ -1,3 +1,6 @@
+/**
+ * Implements runtime save slots, migrations, autosave, achievements and session-scoped state services.
+ */
 import { z } from 'zod';
 
 const id = z
@@ -37,6 +40,7 @@ export interface SaveRecord {
   readonly state: Readonly<Record<string, unknown>>;
   readonly integrity: string;
 }
+// Backends isolate storage mechanics from save validation/migration policy.
 export interface SaveBackend {
   write(record: SaveRecord): Promise<void>;
   read(
@@ -47,6 +51,7 @@ export interface SaveBackend {
   list(project: string, profile?: string): Promise<readonly SaveRecord[]>;
   delete(project: string, profile: string, slot: string): Promise<void>;
 }
+// Memory storage is deterministic and useful for tests or temporary sessions.
 export class MemorySaveBackend implements SaveBackend {
   private readonly records = new Map<string, SaveRecord>();
   private key(project: string, profile: string, slot: string): string {
@@ -83,6 +88,7 @@ export class MemorySaveBackend implements SaveBackend {
     this.records.delete(this.key(project, profile, slot));
   }
 }
+// Browser storage persists the same SaveRecord shape without coupling services to localStorage.
 export class BrowserSaveBackend implements SaveBackend {
   constructor(private readonly storage: Storage = localStorage) {}
   private key(project: string, profile: string, slot: string): string {
@@ -131,6 +137,7 @@ export interface SaveRegistration {
 export type SaveMigration = (
   state: Readonly<Record<string, unknown>>,
 ) => Readonly<Record<string, unknown>>;
+// The integrity marker catches accidental/casual corruption; it is not intended as cryptographic authentication.
 function integrity(value: string): string {
   let hash = 0x811c9dc5;
   for (let index = 0; index < value.length; index++) {
@@ -139,6 +146,7 @@ function integrity(value: string): string {
   }
   return (hash >>> 0).toString(16).padStart(8, '0');
 }
+/** Captures registered systems into versioned slots, verifies integrity and applies ordered migrations on load. */
 export class SaveService {
   private readonly registrations = new Map<
     string,
@@ -178,6 +186,7 @@ export class SaveService {
       throw new Error(`Invalid save migration ${fromVersion}`);
     this.migrations.set(fromVersion, migration);
   }
+  // Capture every registered owner into one record so a slot represents a coherent game state.
   async save(profile = 'default', slot = 'manual'): Promise<SaveRecord> {
     id.parse(profile);
     id.parse(slot);
@@ -206,6 +215,7 @@ export class SaveService {
     await this.backend.write(record);
     return record;
   }
+  // Restore only after migration and integrity checks succeed; partial loads are not applied.
   async load(profile = 'default', slot = 'manual'): Promise<SaveRecord> {
     id.parse(profile);
     id.parse(slot);
@@ -245,6 +255,7 @@ export class SaveService {
   }
 }
 
+// Achievements are project definitions plus a compact unlocked-ID set suitable for save registration.
 export class AchievementService {
   private readonly unlocked = new Set<string>();
   private readonly definitions = new Map<string, AchievementDefinition>();
@@ -286,6 +297,7 @@ export class AchievementService {
 }
 
 /** Volatile state shared by every scene in one play session. */
+// SessionStateService is a small key/value save participant for game-specific progress.
 export class SessionStateService {
   private readonly values = new Map<string, unknown>();
   has(key: string): boolean {

@@ -1,3 +1,6 @@
+/**
+ * Small reusable project-script lookup helpers shared by generated teaching prototypes.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 import type { SpriteData } from '@protomake/renderer';
 export function sprite(

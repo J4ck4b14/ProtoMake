@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for game feel; keeps the behavior executable and documents the expected public contract.
+ */
 import { expect, it } from 'vitest';
 import { Engine } from '@protomake/runtime';
 import { EditorModel } from '@protomake/editor';

@@ -1,3 +1,6 @@
+/**
+ * Defines tile-set and sparse tilemap data plus helpers used by authoring, rendering and physics.
+ */
 import { z } from 'zod';
 import type { ComponentDefinition, ComponentRegistry } from '@protomake/core';
 

@@ -1,6 +1,6 @@
-# Game feel 0.15
+# Game feel
 
-ProtoMake 0.15 adds a compact set of production-facing feedback tools that remain ordinary authored components and services.
+ProtoMake provides a compact set of production-facing feedback tools that remain ordinary authored components and services.
 
 - **Particle Emitter 2D** supports continuous rate, startup burst, bounded capacity, lifetime/speed ranges, angle/spread, gravity, size/color fade, sorting, and script-triggered bursts through `ctx.particles.emit()`.
 - Animation clips carry named timed events with optional scalar payloads. Runtime events enter the shared signal service, so `ctx.events.on('footstep', handler)` can drive sound or VFX. Transitions have an authored blend duration and cross-fade the source/destination sprite frames.

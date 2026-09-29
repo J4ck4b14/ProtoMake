@@ -1,3 +1,6 @@
+/**
+ * Provides deterministic path, naming and text/binary file helpers used by every target exporter.
+ */
 import type { InterchangeAsset } from './index';
 
 export interface ExportFile {

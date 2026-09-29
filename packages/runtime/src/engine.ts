@@ -1,3 +1,6 @@
+/**
+ * Coordinates system lifecycle and fixed/update phases while leaving frame scheduling to the host.
+ */
 import { EventBus, type World } from '@protomake/core';
 import { TimeService, type TimeSnapshot } from './time';
 export interface EngineContext {

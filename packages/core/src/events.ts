@@ -1,3 +1,6 @@
+/**
+ * Provides the small synchronous event dispatcher used by core and runtime systems.
+ */
 /** Dispatch is synchronous, ordered, and snapshot-based. Listener failures propagate. */
 export class EventBus<Events extends object> {
   private readonly listeners = new Map<

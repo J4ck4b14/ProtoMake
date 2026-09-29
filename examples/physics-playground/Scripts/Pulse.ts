@@ -1,3 +1,6 @@
+/**
+ * Physics playground helper that drives a repeated visual/runtime pulse.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 export const fields = {
   speed: { type: 'number', default: 2 },

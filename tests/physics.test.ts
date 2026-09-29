@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for physics; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect } from 'vitest';
 import { EditorModel } from '@protomake/editor';
 import { compose } from '@protomake/core';

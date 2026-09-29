@@ -1,3 +1,6 @@
+/**
+ * Renders and edits component properties for the current selection while routing changes through editor history.
+ */
 import { editMedia } from './media-editor';
 import {
   Animator,
@@ -25,6 +28,7 @@ export class Inspector {
     private readonly openScript?: (assetId: string) => void,
     private readonly openGraph?: (assetId: string) => void,
   ) {}
+  // Rebuild from the current selection. Specialized authoring UIs handle composite data before generic fields.
   render(): void {
     const model = this.model;
     this.host.replaceChildren();
@@ -302,6 +306,7 @@ export class Inspector {
         control.disabled = true;
   }
 
+  // Transform editing exposes friendly TRS values while the model continues storing an affine matrix.
   private renderTransform(data: unknown): void {
     const transform = TransformComponent.schema.parse(data),
       parts = decompose(transform.local),
@@ -388,6 +393,7 @@ export class Inspector {
     this.host.append(section);
   }
 
+  // Behaviour slots keep stable identities so per-instance values and prefab overrides remain deterministic.
   private renderBehaviours(data: unknown): void {
     const behaviours = Behaviours.schema.parse(data),
       section = node('section', 'component behaviours'),

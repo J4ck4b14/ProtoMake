@@ -3,5 +3,5 @@ dist
 package-lock.json
 
 public/player
-examples/milestones-5-7/web-build
+examples/workshop/web-build
 examples/prototypes/web

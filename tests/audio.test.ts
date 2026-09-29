@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for audio; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect, vi } from 'vitest';
 import {
   AudioSource,

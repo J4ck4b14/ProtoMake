@@ -1,3 +1,6 @@
+/**
+ * Shared entity/UI lookup helpers used by the platformer prototype script.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 import type { SpriteData } from '@protomake/renderer';
 export function sprite(

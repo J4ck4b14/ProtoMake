@@ -1,3 +1,6 @@
+/**
+ * Normalizes browser frame timestamps into safe engine delta values.
+ */
 export interface TimeSnapshot {
   readonly delta: number;
   readonly elapsed: number;

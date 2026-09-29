@@ -1,3 +1,6 @@
+/**
+ * Implements the entity hierarchy, transforms and component access for a live ECS world.
+ */
 import {
   ComponentRegistry,
   ComponentStore,

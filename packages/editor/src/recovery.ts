@@ -1,3 +1,6 @@
+/**
+ * Maintains crash-recovery snapshots separately from explicit saves and exposes restore/discard decisions.
+ */
 import type { EditorModel } from './model';
 import { ProjectStorage, type RecoverySnapshot } from './storage';
 

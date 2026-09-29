@@ -1,4 +1,4 @@
-# Project scripting — ProtoMake 0.10
+# Project scripting
 
 Create a TypeScript asset from **Assets → + Script**, or double-click an existing `.ts` asset to open it directly. Compile, Save, then Attach to selection. Each attachment creates a stable behaviour slot with its own enabled state, script asset reference and exposed values. An entity can own any number of script behaviours. Replacing one slot's script resets only that slot's exposed overrides.
 
@@ -61,7 +61,7 @@ Physics events call onCollisionEnter/onCollisionExit or onTriggerEnter/onTrigger
 | `ctx.particles.emit(entity?, count?)`                          | Bounded burst from a Particle Emitter 2D                                                  |
 | `ctx.body.velocity/setVelocity/impulse/teleport`               | Concise rigid-body controls without adapter handles                                       |
 | `ctx.input.getVector/getAxis/isPressed/wasPressed/wasReleased` | Named input actions                                                                       |
-| `ctx.physics.velocity/setVelocity/impulse/teleport/raycast`    | ProtoMake physics API; no Rapier handles                                                  |
+| `ctx.physics.velocity/setVelocity/impulse/teleport/raycast`    | ProtoMake physics API; no Rapier handles                                                      |
 | `ctx.loadScene(idOrName)`                                      | Queue a validated scene transition after the current frame                                |
 | `ctx.session.get/set/has/delete/clear`                         | Share cloned, volatile run state across scene transitions; cleared when Play ends         |
 | `ctx.log(text)`                                                | Contextual editor Console log                                                             |
@@ -77,6 +77,6 @@ Project code runs only when Play loads modules. The same-origin iframe gives a s
 
 During Play, scripts may be edited and saved, then **Recompile** validates a fresh module graph and restarts the active scene. Stateful in-place class replacement and external-package bundling are deferred.
 
-## Animation and audio services (Milestone 6)
+## Animation and audio services
 
 ScriptContext now provides `setParameter`, `trigger`, `animationState`, `playAudio`, `pauseAudio`, `stopAudio` and `setBus`. These use the same runtime services in editor Play and standalone exports. See [animation/audio](animation-audio.md) for signatures and examples.

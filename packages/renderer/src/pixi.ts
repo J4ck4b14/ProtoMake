@@ -1,3 +1,6 @@
+/**
+ * Implements the Pixi-backed renderer, scene synchronization, lighting surfaces and editor debug drawing.
+ */
 import {
   Application,
   Container,
@@ -156,6 +159,7 @@ function canvasContext(
   return context;
 }
 
+/** Synchronizes ECS render components into Pixi display objects without exposing Pixi handles outside this adapter. */
 export class PixiRenderer implements Renderer2D {
   private readonly root = new Container();
   private readonly debugLines = new Graphics();
@@ -256,6 +260,7 @@ export class PixiRenderer implements Renderer2D {
     return { ...this.statsValue };
   }
 
+  // Asset changes rebuild texture lookup state before entity synchronization uses it.
   async setAssets(assets: readonly AssetData[]): Promise<void> {
     const images = assets.filter((asset) => asset.kind === 'image'),
       regions = assets.filter((asset) => asset.mime === SPRITE_REGION_MIME),
@@ -344,6 +349,7 @@ export class PixiRenderer implements Renderer2D {
     for (const surface of this.lightSurfaces.values()) surface.staticKey = '';
   }
 
+  // Camera selection/effects are resolved into one world-to-screen transform shared by sprites, lights and UI debug overlays.
   private runtimeScreenMatrix(world: World): ScreenMatrix {
     const cameras = [...world.query(Camera2D.type)]
         .map(([id]) => ({ id, data: world.read(id, Camera2D)! }))
@@ -774,6 +780,7 @@ export class PixiRenderer implements Renderer2D {
     this.statsValue.renderMs = performance.now() - started;
   }
 
+  // Each frame synchronizes entities, then renders lighting/occlusion and finally submits the Pixi scene.
   render(world: World, view?: View): void {
     if (this.disposed) return;
     let x = view?.x ?? 0,

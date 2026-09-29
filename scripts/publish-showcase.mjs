@@ -1,3 +1,6 @@
+/**
+ * Builds the showcase project and copies its standalone files into the public production output.
+ */
 import { execFileSync } from 'node:child_process';
 import { rm } from 'node:fs/promises';
 

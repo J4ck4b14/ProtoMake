@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for unity export; keeps the behavior executable and documents the expected public contract.
+ */
 import { expect, it } from 'vitest';
 import { guid } from '@protomake/core';
 import { EditorModel } from '@protomake/editor';
@@ -50,9 +53,7 @@ it('generates a deterministic Unity project driven by supported Editor APIs', ()
     first = exportUnity(interchange),
     second = exportUnity(interchange),
     files = new Map(first.map((file) => [file.path, file.data])),
-    importer = decoded(
-      files.get('Assets/ProtoMake/Editor/ProtoMakeImporter.cs')!,
-    ),
+    importer = decoded(files.get('Assets/ProtoMake/Editor/ProtoMakeImporter.cs')!),
     runtime = decoded(
       files.get('Assets/ProtoMake/Runtime/ProtoMakeGraphBehaviour.cs')!,
     );

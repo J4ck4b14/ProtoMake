@@ -1,3 +1,6 @@
+/**
+ * Implements owner-scoped signals, timers and tweens used by project behaviours and graphs.
+ */
 import {
   composeAffine,
   decompose,

@@ -1,3 +1,6 @@
+/**
+ * Browser entry point for standalone player pages; loads a project and owns the frame scheduler/UI boot sequence.
+ */
 import { loadStage } from './loading';
 import { validateProject } from '@protomake/serialization';
 import type { ScriptModule, ScriptFields } from '@protomake/scripting';
@@ -16,9 +19,7 @@ let session: GameSession | undefined,
 let failed = false;
 const progress = (stage: string) =>
   window.dispatchEvent(
-    new CustomEvent('protomake:loading', {
-      detail: { phase: 'loading', stage },
-    }),
+    new CustomEvent('protomake:loading', { detail: { phase: 'loading', stage } }),
   );
 function failure(error: unknown): void {
   failed = true;

@@ -1,3 +1,6 @@
+/**
+ * Implements authoring commands for creating, unpacking and applying/reverting prefab overrides.
+ */
 import { guid } from '@protomake/core';
 import { AssetSchema } from '@protomake/assets';
 import {

@@ -1,3 +1,6 @@
+/**
+ * Defines behaviour slots, exposed script fields and optional perception authoring metadata.
+ */
 import { z } from 'zod';
 import type { ComponentDefinition } from '@protomake/core';
 const behaviourId = z.string().regex(/^[A-Za-z0-9_-]+$/);

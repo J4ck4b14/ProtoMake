@@ -1,6 +1,6 @@
 # ADR 009: Shared session composition and static game export
 
-Accepted for Milestones 6–7.
+Status: Accepted.
 
 GameSession owns runtime service composition for editor Play and the standalone player. The editor is excluded from the player's build graph, and the TypeScript compiler is kept in authoring tools. Exported scripts are linked ES modules with relative file imports. The game needs no authoring server or CDN.
 

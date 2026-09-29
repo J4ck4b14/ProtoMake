@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+/**
+ * Automated regression coverage for editor ui; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect, vi } from 'vitest';
 import { EditorModel } from '@protomake/editor';
 import { Inspector } from '../packages/editor/src/inspector';

@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+/**
+ * Automated regression coverage for player loading ui; keeps the behavior executable and documents the expected public contract.
+ */
 import { readFileSync } from 'node:fs';
 import { it, expect, vi } from 'vitest';
 it('shows animated stage feedback, reveals Start only when ready, and reports a stalled stage', async () => {

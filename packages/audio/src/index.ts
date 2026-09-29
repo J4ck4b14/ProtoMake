@@ -1,7 +1,11 @@
+/**
+ * Defines audio components and runs Web Audio playback, buses, polyphony and lightweight 2D spatial sound.
+ */
 import { z } from 'zod';
 import type { ComponentDefinition, World, Guid } from '@protomake/core';
 import type { AssetData } from '@protomake/assets';
 import type { System } from '@protomake/runtime';
+// Mixer data is serializable project state; Web Audio nodes are runtime-only.
 export const MixerSchema = z
   .array(
     z.strictObject({
@@ -47,6 +51,7 @@ const SourceSchema = z
   .refine((source) => source.minDistance <= source.maxDistance, {
     message: 'Audio minimum distance must not exceed maximum distance',
   });
+// AudioSource describes playback intent on an entity, not an active browser AudioBufferSourceNode.
 export const AudioSource: ComponentDefinition<z.infer<typeof SourceSchema>> = {
   type: 'protomake.audio-source',
   displayName: 'Audio Source',
@@ -93,6 +98,7 @@ interface Voice {
   ended: boolean;
 }
 /** Bounded voices per source. Buffers are shared; Web Audio source nodes remain one-shot. */
+/** Maps AudioSource components and mixer buses onto a lazily unlocked Web Audio graph. */
 export class AudioSystem implements System {
   readonly id = 'protomake.audio';
   private readonly buffers = new Map<string, AudioBuffer>();
@@ -140,6 +146,7 @@ export class AudioSystem implements System {
       throw e;
     }
   }
+  // Browsers require a user gesture before audio can run, so context creation/resume is explicit.
   async unlock(): Promise<void> {
     if (!this.disposed && this.context.state === 'suspended')
       await this.context.resume();
@@ -161,6 +168,7 @@ export class AudioSystem implements System {
     if (!data) throw new Error(`Entity ${id} has no AudioSource`);
     return data;
   }
+  // Each play call creates a fresh one-shot node; component state tracks logical playback only.
   play(id: Guid, resume = false): void {
     if (this.disposed) throw new Error('Audio service has stopped');
     const data = this.source(id);
@@ -259,6 +267,7 @@ export class AudioSystem implements System {
   start(): void {
     this.update();
   }
+  // Update reconciles ECS source settings with currently playing Web Audio nodes.
   update(): void {
     const present = new Set<Guid>();
     for (const [id] of this.world.query(AudioSource.type)) {

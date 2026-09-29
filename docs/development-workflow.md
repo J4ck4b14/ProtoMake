@@ -1,6 +1,6 @@
-# ProtoMake 0.10 Developer Velocity
+# Development workflow
 
-ProtoMake 0.10 removes the single-script attachment limit and makes common runtime coordination available through shared engine services.
+ProtoMake supports multiple behaviour attachments and exposes common runtime coordination through shared engine services.
 
 ## Behaviour composition
 

@@ -1,121 +1,150 @@
-# ProtoMake 0.16.3
+# ProtoMake
 
-A reusable, browser-native 2D engine and visual editor for human-authored projects.
+ProtoMake is a browser-native 2D game engine and visual editor built around portable, human-authored projects. The repository contains the editor, runtime/player, project scripting, physics, rendering, audio, animation, UI, persistence, visual logic, prefabs, export tooling, examples and automated tests.
 
-**Milestones 0–7 and ProtoMake 0.9–0.16.3 are implemented.** ProtoMake 0.16.3 completes the portability series with a deterministic Unreal Engine 5 project and C++ plugin. Its Editor module imports source media, maps, actors/components, Paper2D sprites/flipbooks, 2D-plane physics, cameras, audio and Enhanced Input assets through supported engine facilities; its Runtime module executes the declared portable Behaviour Graph subset. ProtoMake never synthesizes `.uasset` files and does not use Unreal Python as a gameplay runtime. Godot 4 and Unity exports remain available from 0.16.1 and 0.16.2.
+## Highlights
 
-## Flagship showcase
+- Scene and entity authoring with hierarchy, transforms, selection tools, snapping, undo/redo and IndexedDB project storage.
+- PNG/JPEG/WebP, text, JSON, TypeScript, audio and animation assets with a GUID-based asset database.
+- Pixi-based 2D rendering, cameras, particles, configurable lighting and shadow casters.
+- Rapier 2D physics with rigid bodies, colliders, sensors, raycasts, character movement and contact events.
+- TypeScript behaviours with exposed fields, entity references, lifecycle callbacks and editor diagnostics.
+- Behaviour Graphs for visual game logic using the same runtime services as TypeScript behaviours.
+- Prefabs with linked instances, inherited properties and per-property overrides.
+- Runtime UI, named save profiles/slots, achievements and session-scoped state.
+- Animation clips/controllers, audio sources, buses and lightweight spatial sound.
+- Standalone web builds plus deterministic project export for Godot 4, Unity and Unreal Engine 5.
+- Optional account-backed project continuity through the included reference server.
 
-**The Luminous Vault: Blackward** is a three-room action-platforming vertical slice built around constrained visibility. Ambient contribution is exactly zero, and an explicit player-following blackout mask guarantees pure black beyond the lantern's short reach while it reveals hand-authored masonry, arches and hazards nearby. Opening the carried lantern reveals the route but lets sentinels acquire the player from farther away; shuttering it creates genuine stealth at the cost of sight. Three or fewer weak authored lights per room, telegraphed enemy volleys and tiny projectile glows preserve the darkness. Bidirectional faded thresholds preserve health, weapons, ammunition, pickups, defeated enemies and puzzle state through the run-scoped session API. Melee/ranged combat, a two-ward puzzle, platforming, particles, distinct synthesized effects, UI, animation, camera feedback and an achievement are ordinary editable project systems—there are no showcase-specific engine shortcuts.
+## Showcase
 
-After installing dependencies, run `npm run dev`, then choose **Play showcase** to launch the game immediately or **Edit showcase** to inspect the project before pressing **Play**. `npm run build` also includes a standalone version at `/showcase/` for GitHub Pages.
+**The Luminous Vault: Blackward** is a three-room action-platforming vertical slice built around constrained visibility. It demonstrates lighting and stealth, melee and ranged combat, persistence across scene transitions, platforming, particles, UI, animation, camera feedback and achievements using ordinary editable project systems.
+
+After installing dependencies, run `npm run dev`, then choose **Play showcase** to launch it or **Edit showcase** to inspect the project first. `npm run build` also publishes a standalone showcase build.
 
 ## Prototype workshop
 
-Read [ProtoMake-Prototype-Workshop.docx](docs/ProtoMake-Prototype-Workshop.docx) or its [Markdown source](docs/workshop.md). The 19-page guide explains reconstruction from a blank scene, exact entities/settings, scripts, tests, common mistakes and export.
+The repository includes a step-by-step [prototype workshop](docs/workshop.md) and a formatted [DOCX version](docs/ProtoMake-Prototype-Workshop.docx). The guide rebuilds the included examples from a blank scene and covers assets, scripts, tests, common mistakes and export.
 
-Run `npm run build:prototypes` and `npm run preview:prototypes` to open the flagship plus three focused teaching labs: **Signal Patrol** (shooter), **Lantern Steps** (platformer) and **Sparring Room** (two-player local fighter). Complete editable JSON projects and raw images/audio/scripts are in [examples/prototypes](examples/prototypes/README.md).
+Run:
 
-Animation tools include clip playback/scrubbing, a proportional frame timeline, an automatic state graph and transition priority editing. [Light 2D](docs/lighting.md) offers ambient, point, spot and rectangular area types, static/mixed/dynamic mobility, screen-space surface falloff and rectangle shadow casters. Existing projects without active lights keep their previous appearance. ProtoMake does not yet provide normal-map lighting or HDR/bloom.
+```sh
+npm run build:prototypes
+npm run preview:prototypes
+```
 
-For a focused lighting/perception test, import [Lantern Shadow & Stealth Lab](examples/lighting-shadow-demo/README.md): it combines dim ambient fill, static/mixed/dynamic fixtures, channel masks, a carried torch, shadow-casting geometry, Perception 2D visualization and a guard using `ctx.canSee()` + `ctx.illumination()`.
+This serves the showcase plus three focused teaching examples: **Signal Patrol** (shooter), **Lantern Steps** (platformer) and **Sparring Room** (two-player local fighter). Their editable projects, scripts and media live under [`examples/prototypes`](examples/prototypes/README.md).
 
-## Start here
+For a focused lighting/perception example, see [`examples/lighting-shadow-demo`](examples/lighting-shadow-demo/README.md).
 
-Extract the archive and open a terminal in the directory containing **package.json and package-lock.json**. This archive puts those files at its root; there is no extra `protomake` folder inside it.
+## Requirements
 
-Requires Node.js 22.12+ and npm 11.9.0 (validated with Node 24.19.0). Run:
+- Node.js 22.12 or newer
+- npm 11.9 or newer
+
+Install and start the editor:
 
 ```sh
 npm ci
 npm run dev
 ```
 
-Open the local URL printed by Vite. The root page is the editor; `/foundation.html` retains the original Milestone 0 harness. If another server is still running, stop it or check the new URL carefully. IndexedDB project storage is scoped to browser and origin, including port. For optional account-backed project continuity, use `npm run dev:account`; see [account continuity](docs/account-sync.md).
+Open the local URL printed by Vite. The root page is the editor. `/foundation.html` is a compact systems harness used for low-level engine inspection.
 
-In the editor click **Import project** and select:
+To load the workshop project, choose **Import project** and select:
 
 ```text
-examples/milestones-5-7/Workshop.protomake.json
+examples/workshop/Workshop.protomake.json
 ```
 
-Press **Play**, then click the game viewport. Move with A/D or left/right arrows; jump with Space. Gamepad left stick and the bottom face button are also mapped. The example adds ten linked prefab enemies, parameter-driven sprite animation and a jumping sound to the physics playground. Its mechanics are ordinary project scripts and assets.
+Press **Play**, then focus the game viewport. Move with A/D or the arrow keys and jump with Space. Gamepad movement and jump are also mapped.
 
-Drag the panel dividers to resize your workspace. Assets now has real folders, and the Hierarchy has a Group selection command.
-
-Start testing with [TESTING-CHECKLIST.md](TESTING-CHECKLIST.md). Save your test project and export JSON when reporting a reproducible problem.
-
-## Implemented
-
-| Milestone | Working scope                                                                                                                                                                                                                                            |
-| --------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 0         | Strict TypeScript monorepo, entities/components, affine hierarchy, lifecycle/time/events, validated scenes, migrations, automated gates                                                                                                                  |
-| 1         | Project/scene creation and metadata, hierarchy and Inspector, selection/multi-selection, marquee, pan/zoom/grid/snapping, explicit move/rotate/scale handles, parenting, duplication, clipboard, undo/redo, IndexedDB save/reopen, isolated Play context |
-| 2         | PNG/JPEG/WebP import, text/JSON/TypeScript assets, GUID database, rename/move/delete checks, Pixi adapter, sprites with tint/opacity/flip/pivot/sorting, Camera2D, runtime rendering                                                                     |
-| 3         | Real Rapier/WASM fixed-step simulation, static/dynamic/kinematic bodies, box/circle/capsule colliders, sensors/contact events, layer matrix, gravity, raycasts, debug lines, named keyboard/mouse/gamepad input                                          |
-| 4         | Project TypeScript editing/compilation/module linking, ScriptBehaviour, exposed fields and entity references, lifecycle hooks, component/world/input/physics/scene access, collision/trigger callbacks, contextual Console errors, rebuild on Play       |
-| 5         | Linked hierarchy prefabs, inherited base properties, tokenized overrides, per-property apply/revert, propagation across scenes, Inspector indicators                                                                                                     |
-| 6         | Ordered sprite frames, clip/state playback, bool/float/int/trigger parameters, transitions, frame/state editor forms, AudioSource, WAV/MP3/OGG import, Web Audio mixer and buses                                                                         |
-| 7         | Separate production player, compiled project JS modules, dependency report, Build ZIP, standalone production preview and static-hosting instructions                                                                                                     |
-| 0.10      | Multiple independently enabled script behaviours, friendly transforms, tags/queries, runtime prefab lifecycle, signals, timers, tweens, pointer/camera conversion and visual input authoring                                                             |
-| 0.11      | Versioned Behaviour Graph assets, registered node definitions, typed ports, visual authoring, graph variables, shared runtime services and Play Mode execution highlighting                                                                              |
-| 0.12      | DOM-backed runtime UI, flexible layout, text/image/controls, UI signals, named save profiles and slots, save migrations, integrity checks, autosave, achievements and persistent services                                                                |
-| 0.13      | Sprite slicing and reusable regions, tile set/palette authoring, sparse layered tilemaps, animation/rules, chunked collision, Character Body 2D, camera follow/zones and shake                                                                           |
-| 0.14      | Runtime hierarchy and property tuning, safe authoring Apply, Play From Here, scene restart, script recompile/restart, graph value inspection and per-system profiling                                                                                    |
-| 0.15      | Particle emitters, animation events/cross-fades, bounded polyphonic and spatial audio, camera kick/zoom pulse, and rigid-body scripting conveniences                                                                                                     |
-| 0.16      | Public release documentation, deterministic Interchange IR, target capability metadata, portability analysis, stable ID maps, coordinate conversion, manifests and diagnostics                                                                           |
-| 0.16.1    | Deterministic Godot 4 project/scene generation, source media copying, input/audio setup, core 2D component reconstruction, portable Graph runtime and editor ZIP export                                                                                  |
-| 0.16.2    | Unity 2022.3+ project output, supported Editor API importer, copied media, scenes, 2D physics, Input System actions, sprite animation/controllers, particles, Graph runtime and editor ZIP export                                                        |
-| 0.16.3    | Unreal Engine 5 project/plugin source bundle, AssetTools/Paper2D/Enhanced Input importer, generated maps/actors/components, C++ Graph runtime, diagnostics, and no synthesized `.uasset` files                                                           |
-
-## Editor Quality polish
-
-- **Recovery + history:** project edits use the existing bounded undo/redo command history, while a separate rotating autosave/checkpoint journal and emergency snapshot protect against crashes without polluting undo.
-- **Visual authoring:** light volumes/range handles, collider/trigger shapes, camera frames, shadow casters and Perception 2D cones are visible in the Scene view.
-- **Lighting:** static/mixed/dynamic lights now have receiver/shadow channel masks, shadow opacity/bias/softness, cached static contributions and live profiling/debug heatmaps. `ctx.illumination()`, `ctx.lightAt()` and `ctx.canSee()` expose compatible gameplay primitives.
-- **Editor colours:** Settings exposes accent and surface colours. Text/focus colours are derived automatically for readable contrast.
-- **Scripts as assets:** the source editor adds line numbers, syntax colour, diagnostics/jump-to-error, `ctx` completion/API search, templates, exposed-field metadata, Ctrl/Cmd+S and protected drafts.
-- **Project continuity:** Account is optional. The reference Node server has revision conflict protection plus expiring/revocable sessions, bounded auth attempts and storage quotas. Local IndexedDB and portable `.protomake.json` export/import remain independently available.
-- **Mobile/tablet:** <=800 CSS px uses touch-sized panel tabs and explicit Scene controls; Scene view supports pinch zoom and the scripting workspace collapses cleanly on narrow/tablet layouts. Desktop retains the resizable multi-panel layout.
-
-See [ProtoMake 0.9 Editor Quality](docs/editor-quality-0.9.md) for the implementation contracts.
-
-## Public alpha: zero-cost hosting
-
-ProtoMake can be hosted as a static site. **Save locally** writes projects to IndexedDB in the current browser; **Export backup** downloads a portable `.protomake.json`; **Import project** opens that file later or on another device. Accounts are therefore optional for the public alpha. A first-run notice explains the storage model instead of silently implying that browser storage is a cloud backup.
-
-For a free launch, push the repository to GitHub and enable **Settings → Pages → GitHub Actions**. The checked-in Pages workflow verifies ProtoMake, builds `dist/`, and deploys it. Vite uses relative production paths, so a project URL such as `https://YOUR_USERNAME.github.io/ProtoMake/` works without a custom domain. See [zero-cost GitHub Pages deployment](docs/github-pages.md).
-
-Before a public push, run `npm audit`, review current development-tool advisories, update deliberately, regenerate the lockfile, and rerun the complete launch verification. Build/test tooling is not served by the static production player, but the public repository should still record and address relevant advisories.
-
-The early development-repository reflog format and milestone records are documented in [repository history and reflogs](docs/git-history.md); the public, human-readable timeline is in [HISTORY.md](HISTORY.md).
-
-## Verification
+For optional account-backed continuity during local development, run:
 
 ```sh
-npm run typecheck
-npm run lint
-npm test
-npm run build
-npm run preview
+npm run dev:account
 ```
 
-The suite includes 138 automated tests, with actual Rapier simulation, execution of compiled project modules, and deterministic Interchange/portability/Godot/Unity/Unreal-generation checks. DOM tests exercise the full editor shell, Inspector, graph workspace, runtime UI, live-iteration inspector and viewport event handlers; graphics are mocked in these DOM tests. GPU appearance, real file picking, target-engine import/compilation, audio behavior and input feel remain part of the manual acceptance checklist.
+See [account continuity](docs/account-sync.md) for the storage and conflict model.
 
-`npm run format` formats source/docs, and `npm run test:watch` runs tests interactively. CI configuration runs clean install, typecheck, lint/format/boundaries, tests and production build. Remote GitHub CI has not run because this repository has not been pushed to GitHub.
+## Repository layout
 
-## Boundaries and limitations
+```text
+packages/       Engine, editor and runtime packages
+scripts/        Build, export, preview and example-generation tools
+tests/          Automated regression and integration tests
+examples/       Editable example projects and teaching material
+public/         Static assets copied into web builds
+docs/           Architecture and authoring documentation
+```
 
-- **Build ZIP** exports the current project. **Preview build** runs those production files in a separate tab. `npm run build` builds the editor, Play host and reusable standalone player bundle. The included `examples/milestones-5-7/web-build/` is a generated game; `npm run preview:game` serves it independently. See [web build](docs/web-build.md).
-- The included account server is a self-hostable reference backend, not a hosted production identity service. Cross-device use requires a reachable HTTPS deployment/reverse proxy. The reference server now includes basic auth rate limiting and quotas, but public deployment still needs durable sessions/database operations, backups, migrations, password recovery/email verification and operational monitoring as appropriate.
-- Script compilation reports syntax, static metadata and import/link errors. Full semantic project-script TypeScript checking belongs to an external TS editor/`tsc` for now. The engine, editor and checked-in example scripts are strictly typechecked.
-- Each entity can own multiple independently enabled TypeScript or Graph Behaviours with stable slot identities and exposed values. Runtime imports must be relative project TS modules; acyclic imports are supported. External runtime packages, dynamic imports and Node APIs are unsupported in project scripts.
-- Scripts can be edited during Play; **Recompile** validates them and performs a fast scene restart. Stateful in-place class replacement is intentionally not claimed.
-- The same-origin iframe isolates ordinary runtime state and lifetime, **not malicious code**. Only press Play on trusted projects. Arbitrary creator code can access browser APIs and an infinite loop can block the tab.
-- Physics supports non-sheared, nonzero transforms; circles/capsules require uniform scale. Dynamic bodies own their position/rotation. Character Body 2D provides grounded/wall/ceiling state and move-and-slide; complex concave character shapes and tilemap object layers are deferred.
-- JSON exports embed asset bytes. Imports are capped at 20 MiB per file; browser quotas apply. Undo retains up to 100 project snapshots. This is intended for small-to-medium authoring sessions until profiled further.
-- The highest-priority enabled camera renders; simultaneous multi-camera composition is deferred. Scene selection markers for non-rendering entities appear only in the editor.
+The package split keeps runtime/editor boundaries explicit. Project scripts use the public runtime context instead of importing renderer or editor internals directly.
 
-Prefabs do not yet support nested relationships or structural overrides. Animation remains sprite-based rather than skeletal; spatial audio is a lightweight 2D attenuation/pan model rather than HRTF. Export conservatively includes every project scene/asset. Detailed contracts are in [prefabs](docs/prefabs.md) and [animation/audio](docs/animation-audio.md).
+## Development commands
 
-See [architecture](ARCHITECTURE.md), [editor guide](docs/editor.md), [scripting guide](docs/scripting.md), [Developer Velocity 0.10](docs/developer-velocity-0.10.md), [Visual Logic 0.11](docs/visual-logic-0.11.md), [Game UI & Persistence 0.12](docs/game-ui-persistence-0.12.md), [2D Authoring 0.13](docs/authoring-2d-0.13.md), [Live Iteration 0.14](docs/live-iteration-0.14.md), [Game Feel 0.15](docs/game-feel-0.15.md), [Interchange and portability](docs/portability.md), [showcase](docs/showcase.md), [roadmap](docs/roadmap.md), [browser support](docs/browser-support.md), [versioning](docs/versioning.md), [lighting](docs/lighting.md), [account continuity](docs/account-sync.md), [GitHub Pages deployment](docs/github-pages.md), [project history](HISTORY.md), [project format](docs/project-format.md), [runtime](docs/runtime.md), [license](LICENSE), and [contributing](CONTRIBUTING.md).
+```sh
+npm run typecheck   # strict TypeScript validation
+npm run lint        # ESLint, Prettier check and package-boundary validation
+npm test            # Vitest test suite
+npm run build       # player, editor and showcase production builds
+npm run preview     # preview the production editor build
+npm run format      # apply repository formatting
+npm run test:watch  # interactive test runner
+```
+
+CI performs a clean install, typecheck, lint/format/boundary checks, tests and a production build.
+
+## Builds and export
+
+**Build ZIP** exports the current project as a standalone web game. **Preview build** runs those production files separately from the editor. The workshop fixture can also be exported from the command line:
+
+```sh
+npm run build:player
+npm run export:game -- examples/workshop/Workshop.protomake.json my-game
+npm run preview:game -- my-game
+```
+
+ProtoMake also provides one-way project export for Godot 4, Unity and Unreal Engine 5 through the Interchange layer. Exporters report unsupported or partially portable features instead of silently changing project semantics. See [portability](docs/portability.md).
+
+## Hosting
+
+The editor can be hosted as a static site. **Save locally** stores projects in IndexedDB for the current browser/origin, while **Export backup** and **Import project** provide portable project files. Accounts are optional.
+
+The checked-in GitHub Pages workflow verifies and builds the project before deployment. Vite uses relative production paths so the same build can work at a domain root or a repository subpath. See [GitHub Pages deployment](docs/github-pages.md).
+
+## Important boundaries
+
+- Project TypeScript is compiled and linked by ProtoMake, but full semantic project-script checking remains better suited to an external TypeScript editor/`tsc` workflow.
+- Play Mode isolates ordinary runtime state and lifetime; it is not a security sandbox. Only run projects you trust.
+- Physics assumes non-sheared, nonzero transforms. Circles and capsules require uniform scale.
+- JSON project exports embed asset bytes, so browser storage quotas and import-size limits still apply.
+- Runtime rendering uses the highest-priority enabled camera; simultaneous multi-camera composition is not provided.
+- Prefabs do not support nested prefab relationships or structural overrides.
+- Animation is sprite-based rather than skeletal, and spatial audio uses a lightweight 2D attenuation/pan model rather than HRTF.
+
+## Documentation
+
+- [Editor](docs/editor.md)
+- [Runtime](docs/runtime.md)
+- [Project scripting](docs/scripting.md)
+- [Development workflow](docs/development-workflow.md)
+- [Visual logic](docs/visual-logic.md)
+- [Runtime UI and persistence](docs/ui-persistence.md)
+- [2D authoring](docs/authoring-2d.md)
+- [Live iteration](docs/live-iteration.md)
+- [Game feel](docs/game-feel.md)
+- [Lighting](docs/lighting.md)
+- [Prefabs](docs/prefabs.md)
+- [Animation and audio](docs/animation-audio.md)
+- [Project format](docs/project-format.md)
+- [Portability](docs/portability.md)
+- [Web builds](docs/web-build.md)
+- [Browser support](docs/browser-support.md)
+- [Versioning policy](docs/versioning.md)
+- [Verification](docs/verification.md)
+- [Showcase](docs/showcase.md)
+- [Prototype workshop](docs/workshop.md)
+
+## License
+
+See [LICENSE](LICENSE).

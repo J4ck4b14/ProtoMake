@@ -1,6 +1,6 @@
 # ADR 004: Host-driven runtime and independent worlds
 
-Accepted for Milestone 0.
+Status: Accepted.
 
 Keep runtime scheduling independent of browser DOM. Hosts call tick with elapsed seconds. Systems execute in registration order, fixed before variable updates, and tear down in reverse. Errors propagate with context.
 

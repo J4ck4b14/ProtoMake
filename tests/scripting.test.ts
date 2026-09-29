@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for scripting; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { guid } from '@protomake/core';
@@ -125,9 +128,7 @@ it('loads compiled modules and executes two independent project mechanics withou
     expect(editor.world.worldPosition(platform.id)[0]).toBeGreaterThan(
       before[0] + 30,
     );
-    const sprite = editor.world
-      .components(pulse.id)
-      .get('protomake.sprite') as {
+    const sprite = editor.world.components(pulse.id).get('protomake.sprite') as {
       opacity: number;
     };
     expect(sprite.opacity).toBeGreaterThan(0.7);

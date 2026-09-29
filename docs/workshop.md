@@ -2,13 +2,13 @@
 
 ## Build a shooter a platformer and a local fighting game
 
-ProtoMake 0.9.3 • September 2026 • Practical workshop
+ProtoMake • Practical workshop
 
 This workshop takes you from an empty ProtoMake scene to three small playable games. You will author entities, reuse prefabs, connect scripts to named input actions, edit sprite animations, light a scene and export a standalone web build. Each chapter ends with observable checks. The completed projects are included so you can compare your work at any point.
 
 The games deliberately use compact rules and editable placeholder art. Signal Patrol is a side-firing arena shooter. Lantern Steps is a platformer with collectibles and a checkpoint. Sparring Room is a two-player local fighting prototype with attack phases, guarding and rematches. They are teaching projects, not finished commercial games.
 
-**Start with the completed builds.** Extract the release into a fresh folder. Open a terminal in the directory containing package.json and package-lock.json, then run:
+**Start with the completed builds.** Extract the archive into a fresh folder. Open a terminal in the directory containing package.json and package-lock.json, then run:
 
 ```sh
 npm ci
@@ -27,7 +27,7 @@ The new examples target a desktop keyboard and an approximately 800 by 500 game 
 
 Use Node.js 22.12 or later. The dependency lockfile is included; npm ci installs its pinned versions. The exported games themselves need only an HTTP server and a browser with WebGL and Web Audio. A direct file double-click is not a supported way to launch them.
 
-1. Run `npm run dev`. Open the exact local URL printed by Vite. The editor opens at the root page. Stop older development servers first so you do not accidentally test an old build.
+1. Run `npm run dev`. Open the exact local URL printed by Vite. The editor opens at the root page. Stop other development servers first so you do not accidentally test the wrong server instance.
 2. Import one completed project from `examples/prototypes/shooter/shooter.protomake.json`, `platformer/platformer.protomake.json` or `fighter/fighter.protomake.json`. These paths are relative to `examples/prototypes` after the first example.
 3. Press Play, then click the game viewport to enable sound and focus input. Stop returns to the authored scene. Changes made by gameplay are disposable runtime state.
 4. Use **Save locally** for the browser's project store and **Export backup** for a portable `.protomake.json` backup. Local storage belongs to that browser origin. Export a backup before changing origins/devices or clearing browser data.
@@ -35,13 +35,13 @@ Use Node.js 22.12 or later. The dependency lockfile is included; npm ci installs
 
 **What is in each example folder**
 
-| Item                                  | Purpose                                        |
-| ------------------------------------- | ---------------------------------------------- |
+| Item                              | Purpose                                        |
+| --------------------------------- | ---------------------------------------------- |
 | game name followed by .protomake.json | Complete editable project with embedded assets |
-| Images                                | Raw PNG artwork and a size manifest            |
-| Audio/Action.wav                      | Short action sound used by the prototype       |
-| Scripts                               | Main game behaviour and Helpers.ts             |
-| ../web/game name                      | Production build linked from the launcher      |
+| Images                            | Raw PNG artwork and a size manifest            |
+| Audio/Action.wav                  | Short action sound used by the prototype       |
+| Scripts                           | Main game behaviour and Helpers.ts             |
+| ../web/game name                  | Production build linked from the launcher      |
 
 Use the files in Images, Audio and Scripts for a blank-project reconstruction. Do not import sizes.json as a gameplay asset. You do not have to regenerate the projects to use them. `npm run examples:generate` is a maintainer command that writes fresh projects with new identifiers; avoid it while making personal changes to the examples.
 
@@ -380,7 +380,7 @@ The examples contain six linked drones, four linked coins or two linked fighters
 
 **Deletion behavior.** The Animator editor prevents removing its last state, updates transition references when a state is renamed and removes attached transitions when a state is deleted. Deleting a parameter also removes rules using it; this avoids accidentally turning a conditional rule into an always-true transition. Undo the save if that deletion was unintended.
 
-**Prefab boundary.** Nested prefabs and arbitrary structural overrides are outside this release. For significant structural changes, inspect the prefab base carefully or unpack intentionally. Do not assume the workflow has every capability of Unity or Unreal's prefab systems.
+**Prefab boundary.** Nested prefabs and arbitrary structural overrides are outside the current prefab scope. For significant structural changes, inspect the prefab base carefully or unpack intentionally. Do not assume the workflow has every capability of Unity or Unreal's prefab systems.
 
 ---
 
@@ -405,7 +405,7 @@ The export destination must be empty. Do not overwrite your only custom build as
 
 **Loading diagnostics.** The player displays a spinner, stage and elapsed seconds. Individual asynchronous stages time out after 30 seconds; an independent HTML watchdog reports a 35-second stall. A spinner only proves the UI is responsive. The stage/error text identifies where initialization stopped. An infinite synchronous user script can block both rendering and timers.
 
-**Regression lesson.** The earlier player hung because startup awaited a renderer module that imported shared exports from the waiting entry module. Startup now runs inside an async function without blocking module evaluation. The build rejects top-level await in player chunks. File availability and passing logic tests alone had not caught that browser module-evaluation problem.
+**Startup boundary.** Player startup runs inside an async function without blocking module evaluation because renderer chunks import shared exports from the entry module. The build rejects top-level await in player chunks. This keeps the module graph evaluable before asynchronous startup work begins.
 
 ---
 
@@ -423,12 +423,12 @@ The export destination must be empty. Do not overwrite your only custom build as
 | Preview tab fails        | Popups, Service Worker support, localhost/HTTPS; try the independent export      |
 | Player file cannot load  | Serve the whole export over HTTP; do not mix old and new chunks                  |
 
-**Verification evidence.** The release's automated suite covers the three gameplay flows, real Rapier integration, compiled script modules, animation edits, loading feedback and lighting math. Production and export checks are recorded in the repository. Automated checks do not replace manual GPU, keyboard, audio and interaction verification in target browsers, so each example should also be playtested before release.
+**Verification evidence.** The repository's automated suite covers the three gameplay flows, real Rapier integration, compiled script modules, animation edits, loading feedback and lighting math. Production and export checks are recorded in the repository. Automated checks do not replace manual GPU, keyboard, audio and interaction verification in target browsers, so each example should also be playtested before release.
 
 **Useful source entry points.** Read the main script in each example's Scripts folder for game rules; Helpers.ts for bars and sprite visibility; packages/scripting/src/runtime.ts for ScriptContext; packages/animation/src/index.ts for playback and transitions; packages/renderer/src/lighting.ts for illumination; and tests/prototypes.test.ts for executable gameplay checks. These local sources are the implementation authority for this workshop. docs/lighting.md, docs/animation-audio.md and docs/web-build.md provide focused references.
 
 **Mobile, appearance and continuity.** At 800 CSS pixels or below the editor switches to touch-sized Hierarchy, Scene, Inspector, Project, Console and Assets tabs; the Scene tab adds explicit Pan, zoom and Frame controls. Settings lets you choose the editor accent and surface colours while ProtoMake derives readable foreground colours automatically. Cloud sync is optional: with `npm run dev:account` or a deployed ProtoMake account server, projects can be saved and reopened across browsers/devices with revision-conflict protection. The public GitHub Pages alpha needs no backend: Save locally uses IndexedDB, while Export backup/Import project provide portable cross-device continuity.
 
-**Next step.** Choose one example and make a small original variation with a clear completion condition. Write three acceptance checks before adding features. Keep an exported playable build and a `.protomake.json` backup at each milestone. A useful portfolio extension should explain a design choice, demonstrate its implementation and show how you verified it—not merely add more systems.
+**Next step.** Choose one example and make a small original variation with a clear completion condition. Write three acceptance checks before adding features. Keep an exported playable build and a `.protomake.json` backup at each checkpoint. A useful portfolio extension should explain a design choice, demonstrate its implementation and show how you verified it—not merely add more systems.
 
 The supplied geometric PNGs and short WAV are workshop placeholder assets. They are included for use and modification with the project; retain the repository license and third-party notices when redistributing ProtoMake. Replace the presentation with your own art and sound when developing a distinctive game.

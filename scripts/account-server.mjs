@@ -1,3 +1,6 @@
+/**
+ * Reference account/sync HTTP server with session handling, revision checks, rate limits and storage quotas.
+ */
 import { createServer } from 'node:http';
 import { Buffer } from 'node:buffer';
 import { URL } from 'node:url';
@@ -10,6 +13,7 @@ import {
   timingSafeEqual,
 } from 'node:crypto';
 
+// Environment variables make the reference server usable locally without baking deployment policy into it.
 const port = Number(process.env.PROTOMAKE_ACCOUNT_PORT || 4174);
 const host = process.env.PROTOMAKE_ACCOUNT_HOST || '127.0.0.1';
 const allowedOrigin = process.env.PROTOMAKE_ACCOUNT_ORIGIN || '';
@@ -44,6 +48,7 @@ try {
   if (error?.code !== 'ENOENT') throw error;
 }
 
+// Writes are serialized through mutate() so concurrent requests cannot overwrite a newer revision.
 async function persist() {
   await mkdir(dirname(dataFile), { recursive: true });
   const temp = `${dataFile}.${process.pid}.${randomUUID()}.tmp`;
@@ -98,6 +103,7 @@ async function body(request) {
   return JSON.parse(Buffer.concat(chunks).toString('utf8') || '{}');
 }
 
+// Credentials are salted and compared in constant time; raw passwords are never stored.
 function passwordHash(password, salt = randomBytes(16).toString('hex')) {
   const hash = scryptSync(password, salt, 64).toString('hex');
   return { salt, hash };
@@ -135,6 +141,7 @@ function issue(user) {
   };
 }
 
+// Authentication throttling is intentionally simple and process-local for this reference service.
 function rateLimited(request) {
   const key = request.socket.remoteAddress || 'unknown',
     now = Date.now(),
@@ -151,6 +158,7 @@ function routeProject(pathname) {
   return match ? decodeURIComponent(match[1]) : undefined;
 }
 
+// The HTTP surface is small on purpose: auth, project list/load/save/delete, and health/CORS handling.
 const server = createServer(async (request, response) => {
   try {
     const url = new URL(

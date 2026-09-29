@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+/**
+ * Automated regression coverage for live iteration; keeps the behavior executable and documents the expected public contract.
+ */
 import { expect, it } from 'vitest';
 import { EditorModel } from '@protomake/editor';
 import { RuntimeInspector } from '../packages/editor/src/runtime-inspector';

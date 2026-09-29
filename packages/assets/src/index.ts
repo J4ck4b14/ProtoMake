@@ -1,3 +1,6 @@
+/**
+ * Owns project asset records, path validation and the in-memory asset database used by editor and runtime code.
+ */
 import { z } from 'zod';
 import { guid, GUID_PATTERN, type ComponentRegistry } from '@protomake/core';
 export const SPRITE_REGION_MIME = 'application/x-protomake-sprite-region';

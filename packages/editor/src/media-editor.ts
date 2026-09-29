@@ -1,3 +1,6 @@
+/**
+ * Routes animation and audio assets into their specialized authoring surfaces.
+ */
 import { guid } from '@protomake/core';
 import { AssetSchema } from '@protomake/assets';
 import {

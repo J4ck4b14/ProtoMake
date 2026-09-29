@@ -1,3 +1,6 @@
+/**
+ * Defines and simulates bounded runtime-owned 2D particle emitters.
+ */
 import { z } from 'zod';
 import {
   compose,
@@ -10,6 +13,7 @@ import { SpriteRenderer } from './components';
 
 const finite = z.number().finite(),
   color = z.string().regex(/^#[0-9a-fA-F]{6}$/);
+// Emitter data is deterministic authoring state; individual particles exist only in runtime memory.
 const ParticleEmitterSchema = z.strictObject({
   texture: z.string(),
   emitting: z.boolean(),
@@ -110,6 +114,7 @@ interface Particle {
   startColor: string;
   endColor: string;
 }
+// Stable hashing seeds repeatable pseudo-random emission from entity IDs.
 const hash = (value: string) => {
   let result = 2166136261;
   for (const character of value)
@@ -131,6 +136,7 @@ const mixColor = (a: string, b: string, t: number) => {
   return `#${value.toString(16).padStart(6, '0')}`;
 };
 
+/** Simulates lightweight CPU particles and exposes render-ready particles without creating ECS entities per particle. */
 export class ParticleSystem implements System {
   readonly id = 'protomake.particles';
   private readonly emitters = new Map<Guid, EmitterState>();
@@ -213,6 +219,7 @@ export class ParticleSystem implements System {
       if (data.playOnAwake && data.burst) this.emit(stable, data.burst);
     }
   }
+  // Emit first, then age/integrate existing particles and discard expired entries.
   update(context: EngineContext): void {
     const present = new Set<Guid>();
     for (const [id] of this.world.query(ParticleEmitter2D.type)) {

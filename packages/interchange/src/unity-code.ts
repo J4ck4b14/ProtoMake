@@ -1,4 +1,10 @@
+/**
+ * Contains the C# source templates emitted into exported Unity projects.
+ */
+// Runtime identity component: keeps ProtoMake IDs/tags attached to generated GameObjects.
 export const UNITY_IDENTITY = `using UnityEngine;
+
+// Generated support component used to resolve exported entities by their stable ProtoMake ID.
 
 namespace ProtoMake.Generated
 {
@@ -24,7 +30,10 @@ namespace ProtoMake.Generated
 }
 `;
 
+// Small graph interpreter used by generated MonoBehaviours at runtime.
 export const UNITY_GRAPH_RUNTIME = `using System;
+
+// Generated graph runtime. It intentionally mirrors only the portable node set.
 using System.Collections.Generic;
 using Newtonsoft.Json.Linq;
 using UnityEngine;
@@ -173,7 +182,10 @@ namespace ProtoMake.Generated
 }
 `;
 
+// Editor importer: reconstructs scenes, assets, physics and input from the interchange payload.
 export const UNITY_IMPORTER = `using System;
+
+// Generated editor importer. Reimporting rebuilds the generated ProtoMake area only.
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;

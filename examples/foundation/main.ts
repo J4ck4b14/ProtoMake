@@ -1,3 +1,6 @@
+/**
+ * Runs the low-level core/serialization/runtime harness shown by foundation.html.
+ */
 import { createRegistry } from '@protomake/core';
 import {
   instantiateScene,

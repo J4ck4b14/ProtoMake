@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for runtime; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect } from 'vitest';
 import { World, createRegistry } from '@protomake/core';
 import { Engine, TimeService, frameDeltaSeconds } from '@protomake/runtime';

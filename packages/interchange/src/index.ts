@@ -1,3 +1,6 @@
+/**
+ * Builds the engine-neutral Interchange representation and reports portability limitations before export.
+ */
 import { BehaviourGraphSchema, GRAPH_MIME } from '@protomake/graphs';
 import { deterministicJSON, type ProjectData } from '@protomake/serialization';
 
@@ -99,6 +102,7 @@ const full = (reason: string): Capability => ({
     reason,
   });
 
+// Capability tables are explicit so exporters can report unsupported semantics before writing target files.
 const componentCapabilities: Readonly<
   Record<string, Readonly<Record<ExportTarget, Capability>>>
 > = {
@@ -340,6 +344,7 @@ export function convertScale(
   return [scale[0], scale[1]];
 }
 
+/** Lowers validated ProtoMake data into an engine-neutral representation with stable authored identities. */
 export function lowerProject(project: ProjectData): ProtoMakeInterchange {
   const scenes = [...project.scenes]
     .sort((a, b) => a.id.localeCompare(b.id))
@@ -349,9 +354,7 @@ export function lowerProject(project: ProjectData): ProtoMakeInterchange {
       entities: [...scene.entities]
         .sort((a, b) => a.id.localeCompare(b.id))
         .map((entity) => {
-          const transform = entity.components[
-            'protomake.transform'
-          ] as unknown as {
+          const transform = entity.components['protomake.transform'] as unknown as {
             local: readonly [number, number, number, number, number, number];
           };
           return {
@@ -493,6 +496,7 @@ function affineShear(value: InterchangeEntity['transform']): number {
     : (value[0] * value[2] + value[1] * value[3]) / (scaleX * scaleY);
 }
 
+/** Compares project features against one target profile and returns actionable diagnostics instead of silently dropping data. */
 export function analyzePortability(
   interchange: ProtoMakeInterchange,
   target: ExportTarget,
@@ -687,6 +691,7 @@ function stableTargetId(id: string, target: ExportTarget): string {
   if (target === 'unity') return hex;
   return `protomake_${hex}`;
 }
+/** Produces deterministic target-side identifiers so repeated exports keep references stable. */
 export function createIdMap(
   interchange: ProtoMakeInterchange,
   target: ExportTarget,
@@ -724,9 +729,7 @@ export function createExportManifest(
     report: analyzePortability(interchange, target),
   };
 }
-export function serializeInterchange(
-  interchange: ProtoMakeInterchange,
-): string {
+export function serializeInterchange(interchange: ProtoMakeInterchange): string {
   return deterministicJSON(interchange);
 }
 export function serializeReport(report: PortabilityReport): string {

@@ -1,3 +1,6 @@
+/**
+ * Regenerates the workshop acceptance fixture from editable source assets and scripts.
+ */
 import { createServer } from 'vite';
 import { readFile, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
@@ -38,7 +41,7 @@ try {
       data:
         'data:image/png;base64,' +
         (
-          await readFile(`examples/milestones-5-7/Images/Frame-${i + 1}.png`)
+          await readFile(`examples/workshop/Images/Frame-${i + 1}.png`)
         ).toString('base64'),
       width: 48,
       height: 48,
@@ -50,7 +53,7 @@ try {
     mime: 'audio/wav',
     data:
       'data:audio/wav;base64,' +
-      (await readFile('examples/milestones-5-7/Audio/Jump.wav')).toString(
+      (await readFile('examples/workshop/Audio/Jump.wav')).toString(
         'base64',
       ),
     width: 0,
@@ -130,7 +133,7 @@ try {
       enemyScript,
       'Assets/Scripts/Enemy.ts',
       'text/typescript',
-      await readFile('examples/milestones-5-7/Scripts/Enemy.ts', 'utf8'),
+      await readFile('examples/workshop/Scripts/Enemy.ts', 'utf8'),
     ),
   );
   const player = [...model.world.all()].find((e) => e.name === 'Player'),
@@ -139,7 +142,7 @@ try {
       .get('protomake.behaviours'),
     script = playerBehaviours.items[playerBehaviours.order[0]].script;
   const playerSource = await readFile(
-    'examples/milestones-5-7/Scripts/PlayerController.ts',
+    'examples/workshop/Scripts/PlayerController.ts',
     'utf8',
   );
   model.change('Example media', () => {
@@ -211,7 +214,7 @@ try {
   }
   model.select([player.guid]);
   await writeFile(
-    'examples/milestones-5-7/Workshop.protomake.json',
+    'examples/workshop/Workshop.protomake.json',
     JSON.stringify(model.project, null, 2) + '\n',
   );
   console.log(

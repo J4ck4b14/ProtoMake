@@ -1,3 +1,6 @@
+/**
+ * Defines component schemas, registration and sparse component storage shared by every world.
+ */
 import type { EntityId } from './identity';
 export interface Schema<T> {
   parse(value: unknown): T;

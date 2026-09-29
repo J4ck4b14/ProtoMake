@@ -1,3 +1,6 @@
+/**
+ * Implements Scene-view drawing, navigation, selection, gizmos, snapping and editor-only debug overlays.
+ */
 import {
   Camera2D,
   Light2D,
@@ -200,6 +203,7 @@ export class SceneViewport {
       positions.reduce((a, p) => a + p[1], 0) / positions.length,
     ];
   }
+  // Start one gesture record here; move/up update or commit that same history operation.
   private down(e: PointerEvent): void {
     if (this.model.locked) return;
     this.canvas.focus();
@@ -498,6 +502,7 @@ export class SceneViewport {
     return [m[0], m[1], m[2], m[3], offset[0], offset[1]];
   }
 
+  // Debug lighting samples the same gameplay query used by runtime perception, but at a coarser editor grid.
   private drawLightingHeatmap(c: CanvasRenderingContext2D): void {
     if (!this.lightingDebug) return;
     const sample = createLightingSampler(this.model.world),
@@ -752,6 +757,7 @@ export class SceneViewport {
     c.restore();
   }
 
+  // Draw order keeps world content first and editor-only selection/gizmo/debug overlays on top.
   draw(): void {
     const c = this.context,
       ratio = devicePixelRatio || 1;

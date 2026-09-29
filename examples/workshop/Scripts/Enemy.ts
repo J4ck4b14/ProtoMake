@@ -1,3 +1,6 @@
+/**
+ * Workshop enemy behaviour that moves a simple obstacle/enemy using the public script context.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 export const fields = { speed: { type: 'number', default: 1 } } as const;
 export default class Enemy {

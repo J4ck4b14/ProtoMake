@@ -1,9 +1,13 @@
+/**
+ * Describes the project-script API for editor help, templates and completion without coupling UI to runtime internals.
+ */
 export interface ScriptApiEntry {
   name: string;
   signature: string;
   description: string;
 }
 
+// This table powers scripting help/autocomplete; signatures mirror the runtime ScriptContext contract.
 export const SCRIPT_CONTEXT_API: readonly ScriptApiEntry[] = [
   {
     name: 'position',

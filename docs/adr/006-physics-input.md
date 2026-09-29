@@ -1,6 +1,6 @@
 # ADR 006: Fixed-step physics ownership and named input
 
-Accepted at Milestone 3.
+Status: Accepted.
 
 Rapier 2D 0.19.3 is isolated behind Physics2D. World units are creator-defined; the default gravity is 980 units/s² for pixel-sized scenes. Dynamic bodies own world position/rotation after each step; static and position-kinematic bodies read authored/runtime transforms before the step. Explicit teleport and velocity APIs avoid transform/physics contention. Body/collider component changes rebuild the body's configuration; per-step velocity control uses the physics API instead of rewriting authored initial velocity fields.
 

@@ -1,3 +1,6 @@
+/**
+ * Builds the editor UI for signing in, configuring the sync endpoint and managing account-backed projects.
+ */
 import type { EditorModel } from './model';
 import type { AccountSync } from './account-sync';
 import { node, button, input } from './dom';

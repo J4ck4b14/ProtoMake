@@ -1,6 +1,6 @@
 # ADR 002: Affine transforms are canonical
 
-Accepted for Milestone 0.
+Status: Accepted.
 
 Store a six-number local affine matrix. Provide ordinary TRS composition at the API boundary. Reparenting with world preservation multiplies by the inverse new-parent world matrix before changing ownership.
 

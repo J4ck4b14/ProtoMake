@@ -1,3 +1,6 @@
+/**
+ * Physics playground behaviour for a moving kinematic platform.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 export const fields = {
   speed: { type: 'number', default: 1.2 },

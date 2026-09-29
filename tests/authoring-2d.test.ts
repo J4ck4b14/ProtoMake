@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for authoring 2d; keeps the behavior executable and documents the expected public contract.
+ */
 import { expect, it } from 'vitest';
 import { compose, guid } from '@protomake/core';
 import {

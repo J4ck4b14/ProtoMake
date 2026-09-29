@@ -1,3 +1,6 @@
+/**
+ * Builds project/editor settings forms for physics, input, persistence, appearance and related authoring options.
+ */
 import { PhysicsSettingsSchema } from '@protomake/physics2d';
 import type { EditorModel } from './model';
 import { node, button, input } from './dom';

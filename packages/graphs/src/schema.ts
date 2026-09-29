@@ -1,3 +1,6 @@
+/**
+ * Defines serializable Behaviour Graph assets, nodes, ports, groups and validation rules.
+ */
 import { z } from 'zod';
 
 export const GRAPH_MIME = 'application/x-protomake-behaviour-graph' as const;

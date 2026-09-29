@@ -1,6 +1,6 @@
 # Lantern Shadow & Stealth Lab
 
-Import `lighting-shadow-demo.protomake.json` into ProtoMake 0.9. This is an authoring/regression scene, not a replacement for the bundled platformer/fighter/shooter prototypes.
+Import `lighting-shadow-demo.protomake.json` into ProtoMake. This is an authoring/regression scene, not a replacement for the bundled platformer/fighter/shooter prototypes.
 
 It demonstrates:
 

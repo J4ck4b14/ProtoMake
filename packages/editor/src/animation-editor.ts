@@ -1,3 +1,6 @@
+/**
+ * Implements authoring tools for animation clips, controllers, frames, transitions and parameters.
+ */
 import { clipPreview } from './animation-preview';
 import { animatorGraph } from './animator-graph';
 import {
@@ -34,6 +37,7 @@ function number(
   field.input.onchange = () => change(field.input.valueAsNumber);
   return field.row;
 }
+/** Edits clips/controllers in place while keeping timeline, state graph and preview selection coherent. */
 export function animationEditor(
   mime: string,
   path: string,
@@ -56,6 +60,7 @@ export function animationEditor(
       .map((a) => ({ id: a.id, name: a.path }));
   let stopPreview = () => {};
   let selected = controller?.initial ?? '';
+  // Clip editing mutates frame/order data directly; render() refreshes dependent previews.
   function renderClip(c: AnimationClip): void {
     stopPreview = clipPreview(body, c, assets);
     const name = input('Clip name', c.name),
@@ -163,6 +168,7 @@ export function animationEditor(
       }),
     );
   }
+  // Controller editing keeps state names, transitions and parameter references consistent together.
   function renderController(c: AnimatorController): void {
     animatorGraph(
       body,
@@ -469,6 +475,7 @@ export function animationEditor(
       }),
     );
   }
+  // Rebuild the active editor after structural changes; playback preview is always stopped first.
   function render(): void {
     stopPreview();
     body.replaceChildren();

@@ -1,3 +1,6 @@
+/**
+ * Connects runtime prefab creation/destruction to scene worlds and the scripting service boundary.
+ */
 import {
   composeAffine,
   decompose,

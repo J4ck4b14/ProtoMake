@@ -1,3 +1,6 @@
+/**
+ * Platformer prototype controller covering movement, combat, pickups, checkpoints, hazards and UI state.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 import { show, sprite, bar } from './Helpers';
 export const fields = {

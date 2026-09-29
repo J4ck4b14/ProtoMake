@@ -1,16 +1,14 @@
+/**
+ * Automated regression coverage for editor; keeps the behavior executable and documents the expected public contract.
+ */
 import { describe, it, expect } from 'vitest';
 import { IDBFactory } from 'fake-indexeddb';
 import { compose, guid } from '@protomake/core';
-import {
-  EditorModel,
-  NoteComponent,
-  pivotDelta,
-  getPath,
-} from '@protomake/editor';
+import { EditorModel, NoteComponent, pivotDelta, getPath } from '@protomake/editor';
 import { ProjectStorage } from '../packages/editor/src/storage';
 import { instantiateScene, serializeProject } from '@protomake/serialization';
 import { Rigidbody2D } from '@protomake/physics2d';
-describe('Milestone 1 acceptance', () => {
+describe('editor acceptance', () => {
   it('creates a project, scene, entities, components, saves and reopens equivalent data', async () => {
     const editor = new EditorModel();
     editor.newProject('Acceptance');

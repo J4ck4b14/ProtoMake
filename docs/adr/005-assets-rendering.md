@@ -1,6 +1,6 @@
 # ADR 005: Portable assets and a Pixi adapter
 
-Accepted at Milestone 2.
+Status: Accepted.
 
 Project schema v2 embeds asset metadata and bytes for portable JSON exports and transactional browser saves. Each asset has a durable UUID independent of a case-insensitive, relative organizational path. Images accept PNG/JPEG/WebP only; no executable SVG/HTML import. Single-file imports are capped at 20 MiB. Browser storage quotas still apply and failed saves are reported without marking the project saved.
 

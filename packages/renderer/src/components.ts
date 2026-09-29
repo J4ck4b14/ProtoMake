@@ -1,3 +1,6 @@
+/**
+ * Defines serializable rendering, camera, lighting and shadow-related components.
+ */
 import { z } from 'zod';
 import type { ComponentDefinition, ComponentRegistry } from '@protomake/core';
 
@@ -6,6 +9,7 @@ const color = z.string().regex(/^#[0-9a-fA-F]{6}$/),
   channelMask = z.number().int().min(0).max(15);
 
 /** Four deliberately small lighting channels keep authoring readable and rendering bounded. */
+// Lighting channels are bit positions so lights, sprites and shadow casters can filter cheaply at render time.
 export const LIGHTING_CHANNELS = [
   'World',
   'Characters',
@@ -33,6 +37,7 @@ export function channelEnabled(
   return (mask & channelBit(channel)) !== 0;
 }
 
+// Renderer components remain declarative; Pixi object ownership lives in the renderer implementation.
 const SpriteSchema = z.strictObject({
   texture: z.string(),
   secondaryTexture: z.string().default(''),
@@ -111,6 +116,7 @@ export const SpriteRenderer: ComponentDefinition<SpriteData> = {
   ],
 };
 
+// Camera helpers are separate components so authored follow/zone behavior composes with Camera2D.
 const CameraFollowSchema = z.strictObject({
   target: z.string(),
   deadZoneWidth: finite.nonnegative(),
@@ -181,6 +187,7 @@ export const CameraZone2D: ComponentDefinition<
   ),
 };
 
+// Shadow casters carry occlusion geometry independently from a sprite's visual bounds.
 const ShadowCasterSchema = z.strictObject({
   width: finite.positive(),
   height: finite.positive(),
@@ -257,6 +264,7 @@ export const Camera2D: ComponentDefinition<CameraData> = {
   ],
 };
 
+// Light2D stores engine-neutral light data; renderer-specific meshes/textures are derived at runtime.
 const LightSchema = z
   .strictObject({
     kind: z.enum(['ambient', 'point', 'spot', 'area']),
@@ -337,6 +345,7 @@ export const Light2D: ComponentDefinition<LightData> = {
   ],
 };
 
+// Keep registration centralized so editor inspectors and runtime worlds share identical definitions.
 export function registerRendering(registry: ComponentRegistry): void {
   registry.register(SpriteRenderer);
   registry.register(ShadowCaster2D);

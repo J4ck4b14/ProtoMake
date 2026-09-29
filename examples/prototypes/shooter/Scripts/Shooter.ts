@@ -1,3 +1,6 @@
+/**
+ * Shooter prototype controller covering player input, pooled projectiles, enemies, scoring and round flow.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 import { sprite, show, bar, clamp } from './Helpers';
 export const fields = { speed: { type: 'number', default: 230 } } as const;

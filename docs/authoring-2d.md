@@ -1,6 +1,6 @@
-# ProtoMake 0.13: 2D authoring
+# 2D authoring
 
-ProtoMake 0.13 turns repeated 2D setup into reusable authored data. Sprite regions and tile sets are project assets with GUID identity; tilemaps, character motion and camera behaviours are ordinary scene components. Editor Play and standalone builds consume the same records.
+ProtoMake turns repeated 2D setup into reusable authored data. Sprite regions and tile sets are project assets with GUID identity; tilemaps, character motion and camera behaviours are ordinary scene components. Editor Play and standalone builds consume the same records.
 
 ## Sprite regions
 

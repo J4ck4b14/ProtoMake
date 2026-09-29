@@ -1,7 +1,7 @@
-import type {
-  RuntimePropertySnapshot,
-  RuntimeSnapshot,
-} from '@protomake/player';
+/**
+ * Builds the live runtime inspector and gates which runtime values may be applied back to authored data.
+ */
+import type { RuntimePropertySnapshot, RuntimeSnapshot } from '@protomake/player';
 import type { RuntimeExposedField } from '@protomake/scripting';
 import type { EditorModel } from './model';
 import type { PlayMode } from './play-mode';

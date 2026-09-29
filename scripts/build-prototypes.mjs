@@ -1,3 +1,6 @@
+/**
+ * Builds the teaching prototypes as standalone web projects using the production player bundle.
+ */
 import { execFileSync } from 'node:child_process';
 import { copyFile, mkdir, rm } from 'node:fs/promises';
 

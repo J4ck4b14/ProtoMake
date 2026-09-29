@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for export; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect } from 'vitest';
 import { projectBuildFiles, zipFiles } from '../packages/editor/src/build-game';
 import { EditorModel } from '../packages/editor/src/model';

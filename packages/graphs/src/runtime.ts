@@ -1,3 +1,6 @@
+/**
+ * Executes validated Behaviour Graphs, propagating flow/data values through the shared script context.
+ */
 import type { ContactEvent } from '@protomake/physics2d/rapier';
 import type { AssetData } from '@protomake/assets';
 import type { Behaviour, ScriptContext } from '@protomake/scripting';
@@ -22,6 +25,7 @@ export interface GraphRuntimeOptions {
   readonly trace?: (event: GraphTrace) => void;
   readonly budget?: number;
 }
+/** Instantiates behaviour graphs and exposes optional execution traces for editor debugging. */
 export class GraphRuntime {
   private readonly assets = new Map<string, AssetData>();
   readonly registry: NodeRegistry;
@@ -47,6 +51,7 @@ export class GraphRuntime {
   }
 }
 
+// One GraphBehaviour owns the variables and execution guards for a single graph attachment.
 class GraphBehaviour implements Behaviour {
   private readonly variables = new Map<string, GraphValue>();
   private readonly state = new Map<string, Map<string, unknown>>();
@@ -79,6 +84,7 @@ class GraphBehaviour implements Behaviour {
       this.variables.set(name, value);
     }
   }
+  // Runtime values are copied out for inspection; callers never receive the mutable backing map.
   runtimeValues(): Readonly<Record<string, GraphValue>> {
     return Object.fromEntries(this.variables);
   }
@@ -149,6 +155,7 @@ class GraphBehaviour implements Behaviour {
         }
       }
   }
+  // Build a node execution view lazily so value connections are evaluated only when requested.
   private execution(
     node: GraphNode,
     context: ScriptContext,
@@ -201,6 +208,7 @@ class GraphBehaviour implements Behaviour {
       continue: continuation,
     };
   }
+  // Flow edges use a bounded queue; delayed continuations re-enter through the same path.
   private flow(
     source: GraphNode,
     port: string,
@@ -255,6 +263,7 @@ class GraphBehaviour implements Behaviour {
       }
     }
   }
+  // Engine lifecycle callbacks simply dispatch their matching event nodes.
   awake(context: ScriptContext): void {
     this.run('awake', context);
   }

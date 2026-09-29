@@ -1,3 +1,6 @@
+/**
+ * Defines project input maps and resolves keyboard, pointer and gamepad state into named runtime actions.
+ */
 import { z } from 'zod';
 const BindingSchema = z
   .string()

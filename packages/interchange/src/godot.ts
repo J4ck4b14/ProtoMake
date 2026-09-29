@@ -1,3 +1,6 @@
+/**
+ * Translates the portable Interchange model into a deterministic Godot 4 project.
+ */
 import { GRAPH_MIME } from '@protomake/graphs';
 import {
   createExportManifest,
@@ -17,6 +20,7 @@ import {
   type ExportFile,
 } from './files';
 
+// Loose component payloads are normalized at the exporter boundary before writing Godot text.
 type Data = Record<string, unknown>;
 
 const json = (value: unknown): string => JSON.stringify(value),
@@ -43,6 +47,7 @@ function color(value: string, alpha = 1): string {
   return `Color(${parseInt(match[1]!, 16) / 255}, ${parseInt(match[2]!, 16) / 255}, ${parseInt(match[3]!, 16) / 255}, ${alpha})`;
 }
 
+// Godot scene paths are parent-relative, so parents must be emitted before their children.
 function hierarchy(scene: InterchangeScene): {
   readonly entities: readonly InterchangeEntity[];
   readonly paths: ReadonlyMap<string, string>;
@@ -73,6 +78,7 @@ function hierarchy(scene: InterchangeScene): {
   return { entities, paths };
 }
 
+// Collects external/sub resources first, then renders a stable .tscn document.
 class SceneWriter {
   private readonly external = new Map<string, number>();
   private readonly extLines: string[] = [];
@@ -113,6 +119,7 @@ class SceneWriter {
   }
 }
 
+// Pick the closest native Godot node for the entity's physics role.
 function mainNodeType(entity: InterchangeEntity): string {
   if (component(entity, 'protomake.character-body')) return 'CharacterBody2D';
   const body = component(entity, 'protomake.rigidbody'),
@@ -165,10 +172,7 @@ function imageResource(
   };
 }
 
-function collisionMask(
-  layer: number,
-  interchange: ProtoMakeInterchange,
-): number {
+function collisionMask(layer: number, interchange: ProtoMakeInterchange): number {
   let mask = 0;
   const row = interchange.physics.matrix[layer] ?? [];
   row.forEach((enabled, index) => {
@@ -223,6 +227,7 @@ function colliderLines(
   return result;
 }
 
+// Convert one interchange scene into Godot nodes, resources and component metadata.
 function sceneFile(
   scene: InterchangeScene,
   interchange: ProtoMakeInterchange,
@@ -396,6 +401,7 @@ function scenePath(scene: InterchangeScene): string {
   return `Scenes/${safeFileName(scene.name)}-${scene.id.replaceAll('-', '').slice(0, 8)}.tscn`;
 }
 
+// Project-level settings carry display, physics and startup-scene configuration.
 function projectFile(interchange: ProtoMakeInterchange): string {
   const startup =
       interchange.scenes.find(
@@ -467,6 +473,7 @@ function mixerFile(interchange: ProtoMakeInterchange): string {
 
 const RADIAL_LIGHT = `<svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 512 512"><defs><radialGradient id="g"><stop offset="0" stop-color="white"/><stop offset="1" stop-color="white" stop-opacity="0"/></radialGradient></defs><rect width="512" height="512" fill="url(#g)"/></svg>\n`;
 
+// Input is bridged through a generated autoload so graph/script behavior uses stable action names.
 function inputScript(interchange: ProtoMakeInterchange): string {
   return `extends Node
 
@@ -638,6 +645,7 @@ func _find_entity(root: Node, id: String):
 \treturn null
 `;
 
+// Explain the generated project boundary and anything that needs manual follow-up.
 function readme(interchange: ProtoMakeInterchange): string {
   const report = createExportManifest(interchange, 'godot').report;
   return `# ${interchange.source.name} — Godot export
@@ -653,6 +661,7 @@ ProtoMake remains the source of truth. This is a one-way export, not a round tri
 `;
 }
 
+// Assemble deterministic files last so callers receive a stable export ordering.
 export function exportGodot(interchange: ProtoMakeInterchange): ExportFile[] {
   const manifest = createExportManifest(interchange, 'godot'),
     files: ExportFile[] = [

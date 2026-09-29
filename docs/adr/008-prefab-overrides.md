@@ -1,6 +1,6 @@
 # ADR 008: Linked prefab identity and tokenized overrides
 
-Accepted for Milestone 5.
+Status: Accepted.
 
 Prefab bases are typed project assets containing one validated entity hierarchy. Instance members retain asset ID, base entity ID, instance-root ID and explicit property patches. Token arrays avoid ambiguity between dotted component IDs, stable behaviour identities and nested property paths. Object leaves are diffed, arrays replaced atomically, and deletion is represented separately from null.
 

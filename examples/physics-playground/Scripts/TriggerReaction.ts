@@ -1,3 +1,6 @@
+/**
+ * Physics playground behaviour that demonstrates trigger callbacks and a visible reaction.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 export const fields = {
   target: { type: 'entity', default: '' },
@@ -9,8 +12,7 @@ export default class TriggerReaction {
   onTriggerEnter(ctx: ScriptContext) {
     const id = this.target || ctx.entity;
     const sprite = ctx.get<Record<string, unknown>>('protomake.sprite', id);
-    if (sprite)
-      ctx.set('protomake.sprite', { ...sprite, tint: this.color }, id);
+    if (sprite) ctx.set('protomake.sprite', { ...sprite, tint: this.color }, id);
     ctx.log('Trigger entered: target tint changed in runtime only.');
   }
   onTriggerExit(ctx: ScriptContext) {

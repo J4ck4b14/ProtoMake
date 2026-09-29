@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for loading; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect, vi } from 'vitest';
 import { loadStage } from '../packages/player/src/loading';
 it('reports progress and returns the loaded resource', async () => {

@@ -1,3 +1,6 @@
+/**
+ * Workshop player controller demonstrating named input, physics movement, jumping and animation/audio hooks.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 export const fields = {
   speed: { type: 'number', default: 220 },

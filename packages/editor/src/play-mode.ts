@@ -1,3 +1,6 @@
+/**
+ * Coordinates editor Play/Pause/Step/Stop behavior and the boundary between authored and runtime state.
+ */
 import type { EditorModel } from './model';
 import type { RuntimeSnapshot } from '@protomake/player';
 export class PlayMode {

@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for core; keeps the behavior executable and documents the expected public contract.
+ */
 import { describe, it, expect } from 'vitest';
 import {
   World,

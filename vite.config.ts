@@ -1,3 +1,6 @@
+/**
+ * Vite configuration for editor, player and static-host builds, including workspace aliases and deterministic chunking.
+ */
 import { defineConfig } from 'vite';
 import { fileURLToPath } from 'node:url';
 export default defineConfig({

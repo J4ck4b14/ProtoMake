@@ -1,9 +1,13 @@
+/**
+ * Defines animation clips/controllers and advances runtime sprite animation, transitions and animation events.
+ */
 import { z } from 'zod';
 import type { ComponentDefinition, World, Guid } from '@protomake/core';
 import type { AssetData } from '@protomake/assets';
 import { SPRITE_REGION_MIME } from '@protomake/assets';
 import type { EngineContext, System } from '@protomake/runtime';
 import { SpriteRenderer } from '@protomake/renderer';
+// Clip/controller assets are validated separately from the Animator component that references them.
 export const CLIP_MIME = 'application/x-protomake-animation',
   CONTROLLER_MIME = 'application/x-protomake-animator';
 export const AnimationClipSchema = z
@@ -130,6 +134,7 @@ export const Animator: ComponentDefinition<z.infer<typeof AnimatorSchema>> = {
     { path: 'speed', label: 'Playback speed', kind: 'number' },
   ],
 };
+// Build ID-indexed asset maps once per update rather than repeatedly scanning the project asset list.
 export function animationAssets(assets: readonly AssetData[]): {
   clips: Map<string, AnimationClip>;
   controllers: Map<string, AnimatorController>;
@@ -160,6 +165,7 @@ export function animationAssets(assets: readonly AssetData[]): {
         throw new Error(`Animator state ${s.name}: missing clip ${s.clip}`);
   return { clips, controllers };
 }
+// Frame lookup handles looping and clamping without mutating playback state.
 export function frameAt(clip: AnimationClip, time: number): number {
   const duration = clip.frames.reduce((n, f) => n + f.duration, 0);
   let position = clip.loop
@@ -181,6 +187,7 @@ interface Playback {
   blendDuration: number;
   eventsStarted: boolean;
 }
+/** Advances animator state machines, writes sprite frames and emits authored animation events. */
 export class AnimationSystem implements System {
   readonly id = 'protomake.animation';
   private readonly data: ReturnType<typeof animationAssets>;
@@ -219,6 +226,7 @@ export class AnimationSystem implements System {
     }
     return player;
   }
+  // Parameters/triggers are runtime state; controller assets remain immutable.
   setParameter(id: Guid, name: string, value: boolean | number): void {
     const player = this.player(id),
       definition = this.data.controllers.get(player.controller)!.parameters[
@@ -249,6 +257,7 @@ export class AnimationSystem implements System {
   start(): void {
     this.advance(0);
   }
+  // State transitions are evaluated before frame sampling so the visible frame matches the active state.
   update(context: EngineContext): void {
     this.advance(context.time.delta);
   }

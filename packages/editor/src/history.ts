@@ -1,3 +1,6 @@
+/**
+ * Implements bounded undo/redo and gesture coalescing for authored project changes.
+ */
 export interface Command {
   readonly label: string;
   undo(): void;

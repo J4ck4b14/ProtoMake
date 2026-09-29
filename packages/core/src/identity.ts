@@ -1,3 +1,6 @@
+/**
+ * Creates and validates stable GUID identities used by entities, scenes, assets and project records.
+ */
 export type EntityId = number;
 export type Guid = string;
 export const GUID_PATTERN =

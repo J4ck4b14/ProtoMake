@@ -1,3 +1,6 @@
+/**
+ * Shared lookup/convenience helpers used by the showcase project script.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 import type { SpriteData } from '@protomake/renderer';
 export function sprite(

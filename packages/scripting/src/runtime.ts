@@ -1,3 +1,6 @@
+/**
+ * Builds each behaviour ScriptContext and synchronizes TypeScript/Graph lifecycle callbacks with the live world.
+ */
 import { inverse, multiply, type World, type Guid } from '@protomake/core';
 import type { EngineContext, System } from '@protomake/runtime';
 import type { InputService } from '@protomake/input';
@@ -95,6 +98,7 @@ export interface RuntimeScriptServices {
     emit(entity: Guid, count?: number): void;
   };
 }
+/** Public services visible to one running behaviour; engine internals stay behind these stable adapters. */
 export interface ScriptContext {
   setParameter(name: string, value: boolean | number, entity?: Guid): void;
   trigger(name: string, entity?: Guid): void;
@@ -280,6 +284,7 @@ interface RuntimeInspectableBehaviour extends Behaviour {
   >;
   setRuntimeValue?(name: string, value: unknown): void;
 }
+/** Owns behaviour instances and keeps their lifecycle synchronized with enabled entities and authored slots. */
 export class ScriptSystem implements System {
   readonly id = 'protomake.scripts';
   private instances = new Map<string, Instance>();
@@ -743,6 +748,7 @@ export class ScriptSystem implements System {
       );
     }
   }
+  // Reconcile authored/live behaviour slots without leaking stale listeners, timers or tween ownership.
   private synchronize(): void {
     const present = new Set<Guid>();
     for (const [numeric] of this.world.query(Behaviours.type)) {
@@ -831,6 +837,7 @@ export class ScriptSystem implements System {
     for (const [owner, instance] of [...this.instances])
       if (!present.has(owner)) this.dispose(instance);
   }
+  // Start performs a full synchronization before any per-frame callbacks can run.
   start(): void {
     this.off = this.physics.events.on('contact', (event) => {
       for (const id of new Set([event.a, event.b]))

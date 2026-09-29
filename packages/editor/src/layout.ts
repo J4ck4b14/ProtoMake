@@ -1,3 +1,6 @@
+/**
+ * Persists local panel sizes and installs resizable editor splitters without touching project data.
+ */
 import { node } from './dom';
 const defaults = {
   left: 230,

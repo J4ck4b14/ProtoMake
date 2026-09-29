@@ -1,3 +1,6 @@
+/**
+ * Owns Behaviour Graph node definitions, typed ports and validation lookups.
+ */
 import type { ContactEvent } from '@protomake/physics2d/rapier';
 import type { ScriptContext } from '@protomake/scripting';
 import type { BehaviourGraph, GraphNodeSchema, GraphValue } from './schema';

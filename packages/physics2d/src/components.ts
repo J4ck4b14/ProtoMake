@@ -1,3 +1,6 @@
+/**
+ * Defines serializable 2D physics components and validates authored body/collider settings.
+ */
 import { z } from 'zod';
 import type {
   ComponentDefinition,

@@ -1,7 +1,7 @@
-import {
-  scriptLexemes,
-  type ScriptLexeme,
-} from '@protomake/scripting/compiler';
+/**
+ * Provides the lightweight source editor surface with synchronized highlighting, line numbers and diagnostics.
+ */
+import { scriptLexemes, type ScriptLexeme } from '@protomake/scripting/compiler';
 import { node } from './dom';
 import { SCRIPT_CONTEXT_API, type ScriptApiEntry } from './scripting-api';
 

@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for graphs; keeps the behavior executable and documents the expected public contract.
+ */
 import { describe, expect, it, vi } from 'vitest';
 import { guid } from '@protomake/core';
 import type { AssetData } from '@protomake/assets';

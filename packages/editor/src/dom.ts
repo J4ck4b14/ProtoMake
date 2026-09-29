@@ -1,3 +1,6 @@
+/**
+ * Contains small DOM construction helpers used throughout the editor UI.
+ */
 export function node<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   className = '',

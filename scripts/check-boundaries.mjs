@@ -1,3 +1,6 @@
+/**
+ * Verifies package dependency boundaries so runtime packages cannot accidentally import editor-only code.
+ */
 import { readdir, readFile } from 'node:fs/promises';
 const allowed = {
   core: [],

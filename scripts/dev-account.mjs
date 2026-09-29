@@ -1,3 +1,6 @@
+/**
+ * Starts Vite together with the local account service for cross-device/account-sync development.
+ */
 import { spawn } from 'node:child_process';
 import { createServer } from 'vite';
 

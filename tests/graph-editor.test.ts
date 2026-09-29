@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+/**
+ * Automated regression coverage for graph editor; keeps the behavior executable and documents the expected public contract.
+ */
 import { expect, it } from 'vitest';
 import { EditorModel } from '@protomake/editor';
 import { GRAPH_MIME } from '@protomake/graphs';

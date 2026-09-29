@@ -1,3 +1,6 @@
+/**
+ * ESLint configuration for TypeScript/JavaScript source, scripts and repository-specific environment globals.
+ */
 import js from '@eslint/js';
 import ts from 'typescript-eslint';
 export default ts.config(
@@ -6,7 +9,7 @@ export default ts.config(
       'dist/**',
       'node_modules/**',
       'public/player/**',
-      'examples/milestones-5-7/web-build/**',
+      'examples/workshop/web-build/**',
       'examples/prototypes/web/**',
     ],
   },

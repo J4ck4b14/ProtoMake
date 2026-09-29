@@ -1,3 +1,6 @@
+/**
+ * Builds the project input-action authoring UI and validates bindings before committing them to project data.
+ */
 import { InputMapSchema, type InputAction } from '@protomake/input';
 import { button, input, node } from './dom';
 

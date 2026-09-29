@@ -1,3 +1,6 @@
+/**
+ * Main showcase gameplay controller for traversal, combat, stealth, puzzles, persistence and presentation feedback.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 import type { LightData, SpriteData } from '@protomake/renderer';
 import { clamp, sprite } from './Helpers';
@@ -59,6 +62,7 @@ interface Shot {
 const RUN_KEY = 'luminous-vault.run';
 const ENTRY_KEY = 'luminous-vault.entry';
 
+// Session state is plain serializable data so scene changes can preserve the run without retaining scene objects.
 function freshRun(): RunState {
   return {
     health: 5,
@@ -75,6 +79,7 @@ function freshRun(): RunState {
 }
 
 /** One controller is used in all three rooms; ctx.session carries the run. */
+/** Coordinates room-local entities with the run-scoped session state; no engine-side showcase shortcuts are required. */
 export default class Showcase {
   room: Room = 'gate';
   speed = 220;

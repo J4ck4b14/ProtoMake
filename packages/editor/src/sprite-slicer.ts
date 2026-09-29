@@ -1,8 +1,7 @@
-import {
-  AssetSchema,
-  SPRITE_REGION_MIME,
-  type AssetData,
-} from '@protomake/assets';
+/**
+ * Provides sprite-region slicing and editing tools over imported source images.
+ */
+import { AssetSchema, SPRITE_REGION_MIME, type AssetData } from '@protomake/assets';
 import { guid } from '@protomake/core';
 import type { EditorModel } from './model';
 import { button, input, node } from './dom';

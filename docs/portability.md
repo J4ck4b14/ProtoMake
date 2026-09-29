@@ -13,7 +13,7 @@ Arbitrary project TypeScript is always manual unless a specific translator is ad
 
 ## Godot 4 export
 
-ProtoMake 0.16.1 generates a ZIP that opens as a Godot 4 project. Use **Analyze portability → Export Godot project**. The export writes ordinary `project.godot`, `.tscn`, `.gd`, `.tres`, JSON, image and audio files; it does not depend on undocumented engine formats.
+The Godot exporter generates a ZIP that opens as a Godot 4 project. Use **Analyze portability → Export Godot project**. The export writes ordinary `project.godot`, `.tscn`, `.gd`, `.tres`, JSON, image and audio files; it does not depend on undocumented engine formats.
 
 Generated scenes retain hierarchy and stable ProtoMake identity metadata. Media is copied byte-for-byte under `Generated/ProtoMake/Assets`; core sprites, cameras, 2D lights, audio players, rigid/character bodies and collision shapes are reconstructed. The generated input autoload preserves named keyboard, mouse and gamepad bindings, while the graph runtime executes only the explicitly reported portable node subset.
 
@@ -21,7 +21,7 @@ Keep custom Godot work outside `Generated/ProtoMake`. Re-export may replace that
 
 ## Unity export
 
-ProtoMake 0.16.2 generates a Unity 2022.3+ project. Open the exported directory in Unity; after package and script compilation, the importer runs once for each source fingerprint. **Tools → ProtoMake → Reimport** provides an explicit rerun.
+The Unity exporter generates a Unity 2022.3+ project. Open the exported directory in Unity; after package and script compilation, the importer runs once for each source fingerprint. **Tools → ProtoMake → Reimport** provides an explicit rerun.
 
 The bundle intentionally contains no generated `.unity`, `.prefab`, `.anim`, `.controller` or `.meta` serialization. The importer creates those through `EditorSceneManager`, `AssetDatabase`, `AnimationUtility`, `AnimatorController` and Input System APIs. It reconstructs hierarchy/TRS, source media and sprite references, Rigidbody2D/colliders and layer collision rules, cameras, audio, particles, input actions, sprite animation/state controllers, and portable Behaviour Graph components.
 
@@ -29,7 +29,7 @@ Generated assets live in `Assets/Generated/ProtoMake`; keep target-side code and
 
 ## Unreal Engine 5 export
 
-ProtoMake 0.16.3 generates a UE 5.4+ project with the ProtoMake Portability plugin. Its Editor module imports media through AssetTools, creates maps and attached actors through world/component APIs, reconstructs supported Paper2D sprites and flipbooks, collision primitives, orthographic cameras, audio components and Enhanced Input assets, and stores the complete ProtoMake payload on stable identity components. **Tools → ProtoMake → Reimport** reruns the source-fingerprint-aware import.
+The Unreal exporter generates a UE 5.4+ project with the ProtoMake Portability plugin. Its Editor module imports media through AssetTools, creates maps and attached actors through world/component APIs, reconstructs supported Paper2D sprites and flipbooks, collision primitives, orthographic cameras, audio components and Enhanced Input assets, and stores the complete ProtoMake payload on stable identity components. **Tools → ProtoMake → Reimport** reruns the source-fingerprint-aware import.
 
 The plugin's separate Runtime module provides the portable Behaviour Graph ActorComponent in C++. Unreal Python is not part of gameplay or import. ProtoMake writes source code, JSON and source media only—never `.uasset` or `.umap` binaries. Unreal creates those under `/Game/Generated/ProtoMake` through its own asset system.
 

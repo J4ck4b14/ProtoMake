@@ -1,3 +1,6 @@
+/**
+ * Lays out and renders the animator state graph used by the animation authoring UI.
+ */
 import type { AnimatorController } from '@protomake/animation';
 import { node, button } from './dom';
 /** Automatic graph layout is derived from state order, never hidden asset metadata. */

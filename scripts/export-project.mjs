@@ -1,3 +1,6 @@
+/**
+ * Exports a .protomake.json project into a standalone static web folder and matching ZIP archive.
+ */
 import { createServer } from 'vite';
 import { readFile, writeFile, mkdir, readdir } from 'node:fs/promises';
 import { dirname, join } from 'node:path';

@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+/**
+ * Automated regression coverage for ui persistence; keeps the behavior executable and documents the expected public contract.
+ */
 import { describe, expect, it, vi } from 'vitest';
 import { createRegistry, World } from '@protomake/core';
 import { SignalService } from '@protomake/runtime';

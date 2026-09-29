@@ -1,3 +1,6 @@
+/**
+ * Serializes and validates scene/entity/component data, then instantiates validated scenes into fresh worlds.
+ */
 import { z } from 'zod';
 import {
   GUID_PATTERN,
@@ -28,8 +31,8 @@ export type SceneData = z.infer<typeof SceneSchema>;
 export const sceneMigrations = new MigrationChain(SCENE_SCHEMA_VERSION);
 
 /**
- * 0.9.0 briefly shipped an invalid camelCase component id. Keep imported/recovered
- * projects readable while canonicalizing every subsequent capture/save.
+ * Accept the alternate camelCase component id on import/recovery so compatible
+ * project files remain readable, then canonicalize it on the next capture/save.
  */
 function normalizeLegacyComponentTypes(input: unknown): unknown {
   if (

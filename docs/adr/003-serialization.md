@@ -1,6 +1,6 @@
 # ADR 003: Strict JSON with independent schema versions
 
-Accepted for Milestone 0.
+Status: Accepted.
 
 Keep Zod in serialization; core needs only a parse contract. Scene and project formats are strict JSON with separate versions, durable IDs and deterministic object ordering. Validate all content before instantiating a new world. Unknown components fail with context.
 

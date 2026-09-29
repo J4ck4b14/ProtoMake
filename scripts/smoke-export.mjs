@@ -1,12 +1,15 @@
+/**
+ * Smoke-tests the real production export path and verifies the exported player over HTTP.
+ */
 import { preview, createServer as createViteServer } from 'vite';
 import { createServer } from 'node:http';
 import { readFile, readdir } from 'node:fs/promises';
 import { URL } from 'node:url';
 import { Buffer } from 'node:buffer';
 import assert from 'node:assert/strict';
-const root = process.argv[2] ?? 'examples/milestones-5-7/web-build';
+const root = process.argv[2] ?? 'examples/workshop/web-build';
 const projectPath =
-  process.argv[3] ?? 'examples/milestones-5-7/Workshop.protomake.json';
+  process.argv[3] ?? 'examples/workshop/Workshop.protomake.json';
 async function files(dir) {
   const result = [];
   for (const entry of await readdir(dir, { withFileTypes: true })) {

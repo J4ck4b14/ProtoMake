@@ -1,3 +1,6 @@
+/**
+ * Bundles the standalone player and writes a manifest consumed by editor/game export tooling.
+ */
 import { build, loadConfigFromFile } from 'vite';
 import { readFile, writeFile, readdir, rename, mkdir } from 'node:fs/promises';
 import { createHash } from 'node:crypto';

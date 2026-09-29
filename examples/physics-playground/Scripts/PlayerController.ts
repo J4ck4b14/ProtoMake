@@ -1,3 +1,6 @@
+/**
+ * Physics playground player controller for horizontal movement and jumping.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 export const fields = {
   speed: { type: 'number', default: 220 },

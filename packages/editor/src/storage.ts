@@ -1,3 +1,6 @@
+/**
+ * Persists projects and recovery snapshots in IndexedDB and exposes safe project listing/load/delete operations.
+ */
 import type { ProjectData } from '@protomake/serialization';
 
 export interface ProjectSummary {
@@ -43,9 +46,7 @@ export class ProjectStorage {
       request.onsuccess = () => resolve(request.result);
       request.onerror = () => reject(request.error);
       request.onblocked = () =>
-        reject(
-          new Error('Project storage is blocked by another ProtoMake tab'),
-        );
+        reject(new Error('Project storage is blocked by another ProtoMake tab'));
     });
   }
 

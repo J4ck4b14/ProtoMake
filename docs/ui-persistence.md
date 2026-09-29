@@ -1,4 +1,4 @@
-# Game UI & Persistence 0.12
+# Game UI and persistence
 
 ## Runtime UI
 

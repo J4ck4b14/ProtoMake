@@ -1,3 +1,6 @@
+/**
+ * Evaluates 2D light contribution, shadow occlusion and line-of-sight queries shared by rendering and gameplay.
+ */
 import type { Matrix2D, World } from '@protomake/core';
 import {
   Light2D,

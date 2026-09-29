@@ -1,3 +1,6 @@
+/**
+ * Hosts the Play iframe and mediates messages between the editor and the isolated runtime page.
+ */
 import { runtimeRegistry } from '@protomake/player';
 import { GameSession } from '@protomake/player/session';
 import {
@@ -15,6 +18,7 @@ import {
   type PersistentGameServices,
 } from '@protomake/persistence';
 import { frameDeltaSeconds } from '@protomake/runtime';
+// The host is isolated in an iframe/window; a random token prevents unrelated windows from sending control messages.
 const token = location.hash.slice(1),
   status = document.getElementById('status')!,
   host = document.getElementById('game')!;
@@ -32,6 +36,7 @@ document.body.style.cssText =
   'margin:0;background:#10161d;color:#dce5ed;font:11px system-ui;overflow:hidden';
 status.style.cssText =
   'position:absolute;bottom:4px;left:8px;z-index:2;margin:0;color:#b6c8d8;pointer-events:none';
+// All host/editor communication uses the same tagged envelope for status, errors and inspection data.
 function send(kind: string, message?: string, detail?: unknown): void {
   parent.postMessage({ kind, token, message, detail }, location.origin);
 }
@@ -59,6 +64,7 @@ function fault(error: unknown): void {
   session = undefined;
   send('faulted');
 }
+/** Recreates a GameSession from serialized project data and reports staged loading progress to the editor. */
 async function loadScene(scene: SceneData): Promise<void> {
   if (!project) throw new Error('No project');
   loading = true;
@@ -222,6 +228,7 @@ for (const level of ['log', 'warn', 'error'] as const) {
     send(level === 'error' ? 'error' : 'log', values.map(String).join(' '));
   };
 }
+// requestAnimationFrame drives variable-rate rendering while GameSession owns fixed-step simulation internally.
 function frame(now: number): void {
   try {
     if (!loading) {

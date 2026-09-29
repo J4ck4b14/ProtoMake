@@ -886,7 +886,7 @@ textarea {
   }
 }
 
-/* ProtoMake 0.9 editor-quality scripting workspace. The textarea remains the source
+/* Script-authoring workspace. The textarea remains the source
    of truth; a synchronized overlay provides syntax colour without a heavy IDE dependency. */
 .script-workspace {
   display: grid;

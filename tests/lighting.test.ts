@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for lighting; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect } from 'vitest';
 import { EditorModel } from '@protomake/editor';
 import { compose } from '@protomake/core';
@@ -47,8 +50,7 @@ it('canonicalizes the briefly shipped camelCase shadow-caster id', () => {
   authored.addComponent(ShadowCaster2D.type);
   const legacy = structuredClone(authored.project),
     wall = legacy.scenes[0]!.entities.find((entity) => entity.id === wallId)!;
-  wall.components['protomake.shadowCaster'] =
-    wall.components[ShadowCaster2D.type]!;
+  wall.components['protomake.shadowCaster'] = wall.components[ShadowCaster2D.type]!;
   delete wall.components[ShadowCaster2D.type];
 
   const reopened = new EditorModel();

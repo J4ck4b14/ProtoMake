@@ -1,3 +1,6 @@
+/**
+ * Defines the renderer abstraction so authored/runtime code never depends directly on Pixi objects.
+ */
 import type { World } from '@protomake/core';
 import type { AssetData } from '@protomake/assets';
 export interface View {

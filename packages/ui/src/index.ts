@@ -1,3 +1,6 @@
+/**
+ * Defines runtime UI components and renders accessible DOM controls synchronized with the ECS world.
+ */
 import { z } from 'zod';
 import type { AssetData } from '@protomake/assets';
 import {
@@ -8,6 +11,7 @@ import {
 } from '@protomake/core';
 import type { SignalService, System } from '@protomake/runtime';
 
+// Component schemas are deliberately data-only; the runtime system owns DOM creation and events.
 const LayoutSchema = z.strictObject({
   direction: z.enum(['row', 'column']),
   align: z.enum(['start', 'center', 'end', 'stretch']),
@@ -91,6 +95,7 @@ export const UiLayout: ComponentDefinition<z.infer<typeof LayoutSchema>> = {
     },
   ],
 };
+// UiRoot establishes a screen-space UI tree that is independent from world rendering.
 export const UiRoot: ComponentDefinition<{ visible: boolean }> = {
   type: 'protomake.ui-root',
   displayName: 'UI Root',
@@ -197,6 +202,7 @@ export const UiImage: ComponentDefinition<{
     },
   ],
 };
+// Interactive controls expose simple data components so scripts do not manipulate DOM nodes directly.
 export const UiButton: ComponentDefinition<{
   label: string;
   signal: string;
@@ -331,6 +337,7 @@ const uiDefinitions: readonly ComponentDefinition<unknown>[] = [
   UiTextInput,
   UiScrollArea,
 ] as const;
+// Register every UI component in one place so editor/runtime schemas stay identical.
 export function registerUi(registry: ComponentRegistry): void {
   for (const definition of uiDefinitions) registry.register(definition);
 }
@@ -341,6 +348,7 @@ export interface RuntimeUiService {
   setValue(entity: Guid, value: number | boolean | string): void;
 }
 
+/** Mirrors UI components into a DOM overlay and translates DOM input back into engine events. */
 export class RuntimeUiSystem implements System, RuntimeUiService {
   readonly id = 'protomake.ui';
   private readonly assets = new Map<string, AssetData>();
@@ -354,6 +362,7 @@ export class RuntimeUiSystem implements System, RuntimeUiService {
   ) {
     for (const asset of assets) this.assets.set(asset.id, asset);
   }
+  // Rebuild once on start; subsequent frames patch values while preserving focused controls.
   start(): void {
     this.host.style.position ||= 'relative';
     this.root = document.createElement('div');
@@ -581,6 +590,7 @@ export class RuntimeUiSystem implements System, RuntimeUiService {
       transform: `translate(${translateX}, ${translateY})`,
     });
   }
+  // Script-facing setters update ECS data; rendering then follows the same normal update path.
   setText(entity: Guid, text: string): void {
     const id = this.world.find(entity);
     if (id === undefined) throw new Error(`Missing UI entity ${entity}`);

@@ -1,3 +1,6 @@
+/**
+ * Adapts Rapier 2D to ProtoMake worlds, synchronizing bodies, colliders, contacts, queries and character movement.
+ */
 import RAPIER from '@dimforge/rapier2d-compat';
 import {
   World,
@@ -50,6 +53,7 @@ interface TileChunkRecord {
   signature: string;
 }
 let initialized: Promise<void> | undefined;
+/** Keeps Rapier state derived from ECS components and writes simulated transforms back through the world API. */
 export class Physics2D {
   readonly id = 'protomake.physics';
   readonly events = new EventBus<{ contact: ContactEvent }>();
@@ -139,6 +143,7 @@ export class Physics2D {
     this.physics.removeRigidBody(record.body);
     this.bodies.delete(id);
   }
+  // Component signatures detect authoring changes; only changed bodies/colliders are rebuilt.
   private sync(): void {
     const candidates = new Set<number>();
     for (const type of [
@@ -254,6 +259,7 @@ export class Physics2D {
     this.syncTilemaps();
     this.physics.propagateModifiedBodyPositionsToColliders();
   }
+  // Solid tile cells are grouped into fixed chunk bodies to avoid one Rapier body per tile.
   private syncTilemaps(): void {
     const seen = new Set<string>();
     for (const [id] of this.world.query(Tilemap2D.type)) {
@@ -327,6 +333,7 @@ export class Physics2D {
   fixedUpdate(context: EngineContext): void {
     this.step(context.time.fixedDelta);
   }
+  // Dynamic bodies own simulated position/rotation; static and kinematic bodies read current ECS transforms first.
   step(dt: number): void {
     if (this.disposed) throw new Error('Physics world disposed');
     if (!Number.isFinite(dt) || dt <= 0)

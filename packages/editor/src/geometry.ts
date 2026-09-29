@@ -1,3 +1,6 @@
+/**
+ * Contains editor-side geometry helpers for hit testing, selection and 2D viewport calculations.
+ */
 import { inverse, type Matrix2D } from '@protomake/core';
 export type Point = readonly [number, number];
 export function point(m: Matrix2D, p: Point): Point {

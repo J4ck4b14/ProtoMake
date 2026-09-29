@@ -1,3 +1,6 @@
+/**
+ * Handles authenticated project synchronization, revisions and conflict-safe communication with the account server.
+ */
 import type { ProjectData } from '@protomake/serialization';
 
 export interface CloudProjectSummary {
@@ -71,8 +74,7 @@ export class AccountSync {
 
   private persist(): void {
     try {
-      if (this.token)
-        sessionStorage.setItem('protomake.sync.token', this.token);
+      if (this.token) sessionStorage.setItem('protomake.sync.token', this.token);
       else sessionStorage.removeItem('protomake.sync.token');
       if (this.userValue)
         sessionStorage.setItem(

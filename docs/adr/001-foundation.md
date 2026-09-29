@@ -1,6 +1,6 @@
 # ADR 001: Component-oriented world, sparse stores
 
-Accepted for Milestone 0.
+Status: Accepted.
 
 Use world-local monotonic numeric handles with scene-scoped UUID identity. Keep component membership in per-type sparse Maps and hierarchy in a child index. Public state is immutable; mutation is validated and explicit.
 

@@ -1,6 +1,6 @@
-# Live iteration 0.14
+# Live iteration
 
-ProtoMake 0.14 keeps Play Mode isolated while exposing a deliberate live-tuning bridge. Open **Runtime** during Play to inspect the active hierarchy, registered component fields, script and graph variables, recent graph values, global gravity, and per-system frame timings.
+Play Mode remains isolated while exposing a deliberate live-tuning bridge. Open **Runtime** during Play to inspect the active hierarchy, registered component fields, script and graph variables, recent graph values, global gravity, and per-system frame timings.
 
 Changing a control updates the running scene immediately. **Apply** copies that one value into authored project data through validation and undo history. Dynamic rigid bodies own their runtime transforms, so their Transform values are intentionally rejected by Apply; tune their body or behaviour fields instead. Runtime-created entities and missing authoring targets are never invented silently.
 

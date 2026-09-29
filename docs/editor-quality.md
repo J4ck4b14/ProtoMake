@@ -1,6 +1,6 @@
-# ProtoMake 0.9 — Editor Quality
+# Editor quality
 
-ProtoMake 0.9 deliberately freezes broad engine expansion and concentrates on authoring reliability, visual feedback and the cost model of systems that already exist.
+These systems focus on authoring reliability, visual feedback and keeping existing engine features predictable to work with.
 
 ## Project safety
 

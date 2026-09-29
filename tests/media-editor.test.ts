@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+/**
+ * Automated regression coverage for media editor; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect } from 'vitest';
 import { EditorModel } from '../packages/editor/src/model';
 import {

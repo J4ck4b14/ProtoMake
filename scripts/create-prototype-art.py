@@ -1,3 +1,5 @@
+"""Creates small deterministic placeholder/teaching art assets used by the prototype examples."""
+
 from pathlib import Path
 from PIL import Image,ImageDraw,ImageFont
 import json

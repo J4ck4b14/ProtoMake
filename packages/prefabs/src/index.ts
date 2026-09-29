@@ -1,3 +1,6 @@
+/**
+ * Defines prefab documents, linked-instance overrides and propagation/remapping logic across scenes.
+ */
 import { z } from 'zod';
 import { guid, GUID_PATTERN, type ComponentDefinition } from '@protomake/core';
 type Json = z.infer<ReturnType<typeof z.json>>;
@@ -20,12 +23,7 @@ const PatchSchema = z.strictObject({
       (p) =>
         ['name', 'enabled', 'components'].includes(p[0]!) &&
         !p.some((k) =>
-          [
-            '__proto__',
-            'constructor',
-            'prototype',
-            'protomake.prefab',
-          ].includes(k),
+          ['__proto__', 'constructor', 'prototype', 'protomake.prefab'].includes(k),
         ),
       'Unsafe override path',
     ),

@@ -1,3 +1,6 @@
+/**
+ * Two-player local fighting prototype: input, movement, attacks, hit resolution, round state and feedback.
+ */
 import type { ScriptContext } from '@protomake/scripting';
 import { sprite, show, bar, clamp } from './Helpers';
 export const fields = { speed: { type: 'number', default: 180 } } as const;

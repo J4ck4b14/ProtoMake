@@ -1,3 +1,6 @@
+/**
+ * Runs isolated animation previews without mutating the authored project or runtime world.
+ */
 import { frameAt, type AnimationClip } from '@protomake/animation';
 import type { AssetData } from '@protomake/assets';
 import { node, button, input } from './dom';

@@ -1,3 +1,6 @@
+/**
+ * Generates the flagship showcase project from explicit scene/entity/component data and reusable source assets.
+ */
 import { createServer } from 'vite';
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { randomUUID } from 'node:crypto';
@@ -17,6 +20,7 @@ try {
     root = 'examples/prototypes/showcase',
     assetIds = {};
 
+  // Small builders keep the authored data explicit while avoiding hundreds of repeated registry/default calls.
   const asset = (name, kind, mime, data, width = 0, height = 0) => {
     const id = randomUUID();
     assetIds[name] = id;
@@ -338,6 +342,7 @@ try {
     negativeY: [],
   });
 
+  // Configure project-wide settings before creating assets or scene content.
   m.change('Configure Luminous Vault', () => {
     m.project.name = 'The Luminous Vault: Blackward';
     m.project.engineVersion = '0.16.3';
@@ -385,6 +390,7 @@ try {
     ];
   });
 
+  // Import source media and project scripts into the generated project asset database.
   const imageSizes = JSON.parse(
     await readFile(`${root}/Images/sizes.json`, 'utf8'),
   );
@@ -482,6 +488,7 @@ try {
     }),
   );
 
+  // Every room receives the same player/runtime support objects; room builders add only authored level content.
   const baseRoom = (room) => {
     const camera = entity('Camera', 0, 0);
     component(camera, 'protomake.camera', { background: '#000000', zoom: 1 });
@@ -785,6 +792,7 @@ try {
     }
   };
 
+  // Room builders describe geometry, encounters and lights using the helpers above.
   const buildGate = () => {
     baseRoom('gate');
     arch('West threshold arch', -336, 92, 118, 228, '#34494c');
@@ -1028,6 +1036,7 @@ try {
     });
   };
 
+  // Author the three scenes, restore the intended startup scene, then serialize one canonical project file.
   m.change('Author The Black Gate', buildGate);
   const startup = m.sceneId;
   m.renameScene('The Black Gate');

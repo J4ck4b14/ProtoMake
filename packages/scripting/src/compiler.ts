@@ -1,3 +1,6 @@
+/**
+ * Compiles and links project TypeScript modules, extracts authoring metadata and returns contextual diagnostics.
+ */
 import ts from 'typescript';
 import type { AssetData } from '@protomake/assets';
 import type { ScriptField, ScriptFields } from './component';
@@ -8,6 +11,7 @@ export interface ScriptLexeme {
 }
 
 /** Lightweight lexical data for editor syntax colour without coupling the editor package to TypeScript. */
+// Lexing is lightweight and editor-oriented; TypeScript remains the source of syntax diagnostics.
 export function scriptLexemes(source: string): ScriptLexeme[] {
   const scanner = ts.createScanner(
       ts.ScriptTarget.Latest,
@@ -99,6 +103,7 @@ function literal(node: ts.Expression): unknown {
   }
   throw new Error('Script fields must use static literal metadata');
 }
+/** Extracts public script fields and their defaults so the Inspector can edit behaviour values without executing code. */
 export function scriptFields(source: string, path = 'Script.ts'): ScriptFields {
   const file = ts.createSourceFile(
     path,
@@ -189,6 +194,7 @@ export function scriptFields(source: string, path = 'Script.ts'): ScriptFields {
   }
   return result;
 }
+// Field values cross a serialization boundary, so validate them independently from compiled code.
 export function validateField(
   name: string,
   field: ScriptField,
@@ -213,6 +219,7 @@ export interface ScriptDiagnostic {
   message: string;
 }
 
+// Diagnostics combine compiler errors with ProtoMake-specific restrictions and import rules.
 export function scriptDiagnostics(
   source: string,
   path = 'Script.ts',
@@ -243,6 +250,7 @@ export function scriptDiagnostics(
     });
 }
 
+// Compilation targets browser ESM and leaves project-relative imports for the project compiler to resolve.
 export function compileScript(
   source: string,
   path = 'Script.ts',
@@ -323,6 +331,7 @@ function resolvePath(from: string, relative: string): string {
   }
   return parts.join('/').replace(/\.js$/, '.ts');
 }
+/** Compiles the project script graph as a unit so relative imports and shared modules resolve consistently. */
 export function compileProjectScripts(
   assets: readonly AssetData[],
 ): CompiledScript[] {
@@ -352,6 +361,7 @@ export function compileProjectScripts(
   for (const script of compiled) walk(script);
   return compiled;
 }
+// Return module text by normalized path for runtime loaders and export tooling.
 export function moduleSources(
   compiled: readonly CompiledScript[],
   createURL: (code: string, id: string) => string,

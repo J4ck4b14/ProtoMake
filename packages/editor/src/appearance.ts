@@ -1,3 +1,6 @@
+/**
+ * Stores editor appearance preferences and derives readable foreground/focus colors from user-selected surfaces.
+ */
 export interface EditorAppearance {
   accent: string;
   surface: string;

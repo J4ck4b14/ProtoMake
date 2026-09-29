@@ -1,3 +1,6 @@
+/**
+ * Defines the project envelope, validates cross-scene/assets settings and migrates supported project schemas.
+ */
 import { animationAssets, CONTROLLER_MIME } from '@protomake/animation';
 import { MixerSchema, defaultMixer } from '@protomake/audio';
 import {
@@ -34,6 +37,7 @@ import {
   validateScene,
 } from './scene';
 import { MigrationChain } from './migrations';
+// The schema version advances only when serialized project shape changes.
 export const PROJECT_SCHEMA_VERSION = 11;
 export const ProjectSchema = z.strictObject({
   schemaVersion: z.literal(PROJECT_SCHEMA_VERSION),
@@ -51,6 +55,7 @@ export const ProjectSchema = z.strictObject({
   persistence: PersistenceSettingsSchema,
 });
 export type ProjectData = z.infer<typeof ProjectSchema>;
+// Migrations are intentionally linear: each step knows only how to reach the next schema.
 export const projectMigrations = new MigrationChain(PROJECT_SCHEMA_VERSION);
 projectMigrations.register(1, (input) => ({
   ...(input as object),
@@ -188,6 +193,7 @@ projectMigrations.register(10, (input) => ({
   schemaVersion: 11,
   engineVersion: '0.16.0',
 }));
+// New projects start from the same validated defaults used by deserialization.
 export function createProject(name: string): ProjectData {
   return ProjectSchema.parse({
     schemaVersion: PROJECT_SCHEMA_VERSION,
@@ -205,6 +211,7 @@ export function createProject(name: string): ProjectData {
     persistence: defaultPersistence(),
   });
 }
+/** Migrates untrusted input, validates every scene/asset and returns normalized project data. */
 export function validateProject(
   input: unknown,
   registry: ComponentRegistry,
@@ -315,11 +322,7 @@ export function validateProject(
           )
         )
           throw new Error('Invalid Animator controller asset');
-        if (
-          type === 'protomake.audio-source' &&
-          data &&
-          typeof data === 'object'
-        ) {
+        if (type === 'protomake.audio-source' && data && typeof data === 'object') {
           if (
             'clip' in data &&
             data.clip &&
@@ -437,6 +440,7 @@ export function validateProject(
     );
   return project;
 }
+// Stable JSON output keeps backups, dirty-state checks and source-control diffs predictable.
 export function serializeProject(
   project: ProjectData,
   registry: ComponentRegistry,
@@ -450,6 +454,7 @@ export function deserializeProject(
   return validateProject(JSON.parse(json) as unknown, registry);
 }
 
+// Folder metadata is advisory, but every referenced folder/asset must still exist.
 export function validateFolders(
   project: Pick<ProjectData, 'folders' | 'assets' | 'sceneFolders' | 'scenes'>,
 ): void {

@@ -1,3 +1,6 @@
+/**
+ * Provides stable renderer sorting rules for layer/order/entity combinations.
+ */
 import type { World } from '@protomake/core';
 import { SpriteRenderer, type SpriteData } from './components';
 export function renderList(

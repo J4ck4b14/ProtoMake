@@ -44,7 +44,7 @@ The workflow also supports **Actions → Deploy ProtoMake to GitHub Pages → Ru
 
 ## Local certification before the first push
 
-First apply the dev-tool security updates identified during the 0.9.2 audit and let npm regenerate `package-lock.json`:
+To refresh the pinned development tools and regenerate `package-lock.json` deliberately:
 
 ```sh
 npm install --save-dev vite@7.3.6 vitest@4.1.11 esbuild@0.28.2

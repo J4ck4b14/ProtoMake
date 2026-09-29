@@ -1,3 +1,6 @@
+/**
+ * Implements 2D affine transform math, including editor-facing TRS decomposition while preserving shear.
+ */
 /** Column-major affine matrix: [a, b, c, d, tx, ty]. Coordinates use radians. */
 export type Matrix2D = readonly [
   number,

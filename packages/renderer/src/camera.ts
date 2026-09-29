@@ -1,3 +1,6 @@
+/**
+ * Resolves active cameras, follow/zone behavior and camera effects into the transform used for rendering.
+ */
 import {
   inverse,
   multiply,

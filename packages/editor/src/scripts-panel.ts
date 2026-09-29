@@ -1,3 +1,6 @@
+/**
+ * Implements TypeScript asset editing, diagnostics, drafts and script attachment workflows inside the editor.
+ */
 import { guid } from '@protomake/core';
 import {
   compileScript,
@@ -9,6 +12,7 @@ import { node, button, input } from './dom';
 import { ScriptCodeEditor } from './code-editor';
 import { SCRIPT_CONTEXT_API } from './scripting-api';
 
+// Starter templates are deliberately small and use only the documented ScriptContext surface.
 const templates = {
   Behaviour: `import type { ScriptContext } from '@protomake/scripting';
 
@@ -138,8 +142,10 @@ export interface ScriptOpenLocation {
   column?: number;
 }
 
+// Drafts live outside project data until the user explicitly saves/compiles them.
 const draftPrefix = 'protomake.scriptDraft.v2.';
 
+/** Builds the script workspace: asset tree, editor buffer, diagnostics, compile/save actions and API reference. */
 export function showScripts(
   model: EditorModel,
   report: (message: string, error?: boolean) => void,
@@ -248,6 +254,7 @@ export function showScripts(
 
   const showDiagnostics = () => {
     diagnosticList.replaceChildren();
+    // Diagnostics are recalculated from the current buffer, not the last saved asset.
     const diagnostics = scriptDiagnostics(code.value, name.input.value);
     if (!diagnostics.length) {
       diagnosticList.append(node('p', 'ok', 'Syntax diagnostics: no errors.'));
@@ -314,6 +321,7 @@ export function showScripts(
     );
     return result;
   };
+  // Saving recompiles the project script graph before replacing/adding the asset.
   const saveButton = button('Save script · Ctrl/Cmd+S', () => {
     try {
       check();

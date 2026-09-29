@@ -1,3 +1,6 @@
+/**
+ * Collects runtime hierarchy/component values and system timings for editor-side live inspection.
+ */
 import type { InspectorField } from '@protomake/core';
 import type { EngineProfile } from '@protomake/runtime';
 import type { RuntimeBehaviourSnapshot } from '@protomake/scripting';

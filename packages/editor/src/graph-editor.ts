@@ -1,3 +1,6 @@
+/**
+ * Implements the Behaviour Graph authoring workspace, including nodes, links, selection, editing and debug state.
+ */
 import { AssetSchema } from '@protomake/assets';
 import { guid } from '@protomake/core';
 import {
@@ -17,6 +20,7 @@ interface View {
   zoom: number;
 }
 
+/** Creates a minimal graph asset with a valid entry point and stable editor metadata. */
 export function createGraphAsset(
   model: EditorModel,
   path = 'Assets/Behaviour.graph',
@@ -48,6 +52,7 @@ export function createGraphAsset(
   return id;
 }
 
+/** Builds the graph authoring surface and keeps palette, selection, wiring and serialized graph data synchronized. */
 export function editBehaviourGraph(
   model: EditorModel,
   report: (message: string, error?: boolean) => void,
@@ -229,6 +234,7 @@ export function editBehaviourGraph(
     view.y = (bounds.height - (minY + maxY) * view.zoom) / 2;
     render();
   };
+  // The palette is filtered independently from the canvas so searching never mutates the graph.
   const renderPalette = () => {
     palette.replaceChildren();
     for (const definition of registry.search(search.value).slice(0, 30))
@@ -240,7 +246,8 @@ export function editBehaviourGraph(
             (-view.y + 120) / view.zoom,
           );
           search.value = '';
-          renderPalette();
+          // Initial render happens only after all handlers share the same selection/drag state.
+  renderPalette();
         }),
       );
     palette.hidden = !search.value;
@@ -274,6 +281,7 @@ export function editBehaviourGraph(
       render();
     }
   };
+  // Canvas rendering is derived from the graph model; pointer handlers write through a single commit path.
   const render = () => {
     surface.replaceChildren();
     surface.style.transform = `translate(${view.x}px, ${view.y}px) scale(${view.zoom})`;

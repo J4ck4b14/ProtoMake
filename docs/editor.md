@@ -1,6 +1,6 @@
-# ProtoMake editor — Milestones 1–4
+# ProtoMake editor
 
-Run `npm ci` and `npm run dev` from the directory containing package.json. The root page now opens the editor; `/foundation.html` keeps the original Milestone 0 harness.
+Run `npm ci` and `npm run dev` from the directory containing package.json. The root page opens the editor; `/foundation.html` provides a compact low-level engine harness.
 
 Create entities through Hierarchy; select in the tree or scene, with Shift/Ctrl for multi-selection. Empty-space dragging selects a marquee. Q/W/E/R/H select selection/move/rotation/scale/pan tools. Use the visible axis handles, rotation ring or scale squares to transform. F frames selected entities (or all entities when selection is empty). Middle-drag or Space-drag pans; wheel zooms at the pointer. Grid and snapping have independent toggles; Alt bypasses snapping. Rotate snaps in 15-degree increments; scale snaps in 0.1 increments. Arrow keys nudge by one world unit; Shift uses grid spacing. Escape cancels an active gesture.
 
@@ -12,7 +12,7 @@ Play creates a separate iframe containing a deserialized world. Pause/Step/Resum
 
 Automated acceptance covers save/reopen equivalence through an IndexedDB implementation, command undo/redo, transform gestures, component editing and isolation. DOM tests exercise the actual inspector and viewport event handlers with a mocked canvas context; they do not claim GPU or visual validation.
 
-Assets imports images/text/scripts, places image or sliced-region sprites, moves or renames assets without changing their UUID, and blocks referenced deletion. **Slice sprite** creates reusable region assets without duplicating source pixels. **+ Tile set**, **Edit tile set**, and **Edit tilemap** provide tile definitions, collision flags and sparse layer painting. Layer/order integers define deterministic sprite sorting. The highest-priority enabled Camera2D controls the game view; editor navigation stays independent. See [2D authoring](authoring-2d-0.13.md).
+Assets imports images/text/scripts, places image or sliced-region sprites, moves or renames assets without changing their UUID, and blocks referenced deletion. **Slice sprite** creates reusable region assets without duplicating source pixels. **+ Tile set**, **Edit tile set**, and **Edit tilemap** provide tile definitions, collision flags and sparse layer painting. Layer/order integers define deterministic sprite sorting. The highest-priority enabled Camera2D controls the game view; editor navigation stays independent. See [2D authoring](authoring-2d.md).
 
 Settings edits gravity, named physics layers, their symmetric collision matrix and JSON input definitions. It also exposes editor accent/surface colours; ProtoMake automatically chooses contrasting text/focus colours. Physics debug draws runtime collider geometry while Play is active. **Assets → + Script** creates TypeScript in the editor and double-clicking a `.ts` asset opens the source editor; the Scripts menu remains a shortcut. The source editor protects unsaved browser-local drafts and supports Ctrl/Cmd+S. Exposed fields appear in Inspector after attachment; see docs/scripting.md.
 
@@ -30,4 +30,4 @@ Mobile support means the authoring UI is usable on a modern touch browser; it do
 
 ## Live iteration
 
-During Play, **Runtime** opens the live hierarchy and exposed component, behaviour, graph and physics settings. Controls update the running scene immediately. Each **Apply** action copies only that value into the authored project through validation and history; dynamic physics transforms are rejected because the body owns them. **Restart**, **Play Here**, and **Recompile** shorten the edit-test loop without merging runtime state into the editor world. See [Live Iteration 0.14](live-iteration-0.14.md).
+During Play, **Runtime** opens the live hierarchy and exposed component, behaviour, graph and physics settings. Controls update the running scene immediately. Each **Apply** action copies only that value into the authored project through validation and history; dynamic physics transforms are rejected because the body owns them. **Restart**, **Play Here**, and **Recompile** shorten the edit-test loop without merging runtime state into the editor world. See [live iteration](live-iteration.md).

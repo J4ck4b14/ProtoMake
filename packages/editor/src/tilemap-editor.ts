@@ -1,9 +1,13 @@
+/**
+ * Implements tile-set, palette and sparse tilemap authoring tools.
+ */
 import { AssetSchema, SPRITE_REGION_MIME } from '@protomake/assets';
 import { guid } from '@protomake/core';
 import { TILESET_MIME, TileSetSchema, Tilemap2D } from '@protomake/tilemap';
 import type { EditorModel } from './model';
 import { button, input, node } from './dom';
 
+// New tile sets start with one editable tile so the authoring surface is immediately useful.
 export function createTileSet(
   model: EditorModel,
   selected: string | undefined,
@@ -44,6 +48,7 @@ export function createTileSet(
   });
 }
 
+/** Edits tile definitions and source texture metadata while keeping the asset schema valid. */
 export function editTileSet(
   model: EditorModel,
   selected: string | undefined,
@@ -130,6 +135,7 @@ export function editTileSet(
   dialog.showModal();
 }
 
+/** Provides paint/erase/pick tools over Tilemap2D cell data; world entities remain untouched. */
 export function editTilemap(
   model: EditorModel,
   report: (message: string, error?: boolean) => void,

@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for prototypes; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect } from 'vitest';
 import { readFile } from 'node:fs/promises';
 import { EditorModel } from '@protomake/editor';
@@ -27,10 +30,7 @@ async function game(
   const model = new EditorModel();
   model.load(
     JSON.parse(
-      await readFile(
-        `examples/prototypes/${name}/${name}.protomake.json`,
-        'utf8',
-      ),
+      await readFile(`examples/prototypes/${name}/${name}.protomake.json`, 'utf8'),
     ),
   );
   if (sceneName) {

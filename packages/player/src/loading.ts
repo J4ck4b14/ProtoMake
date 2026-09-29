@@ -1,3 +1,6 @@
+/**
+ * Tracks staged player startup so failures identify the subsystem that stalled or failed to initialize.
+ */
 /** A stalled service must report its stage; late-created resources are released. */
 export async function loadStage<T>(
   label: string,

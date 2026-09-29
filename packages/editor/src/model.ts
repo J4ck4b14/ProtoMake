@@ -1,3 +1,6 @@
+/**
+ * Owns the editable project model and the validated, undoable operations used by editor UI code.
+ */
 import { runtimeRegistry } from '@protomake/player';
 import { PrefabLink } from '@protomake/prefabs';
 import { captureOverrides } from './prefab-actions';
@@ -40,6 +43,7 @@ interface Snapshot {
   sceneId: Guid;
   selection: Guid[];
 }
+/** Owns editable project state, selection, undo history and the live ECS scene used by editor panels. */
 export class EditorModel {
   readonly history = new History();
   readonly selection = new Set<Guid>();
@@ -76,6 +80,7 @@ export class EditorModel {
   private ensureEditable(): void {
     if (this.locked) throw new Error('Stop Play Mode before editing');
   }
+  // Transactions snapshot project + selection so failed edits can be rolled back atomically.
   private snapshot(): Snapshot {
     return structuredClone({
       project: this.project,
@@ -139,6 +144,7 @@ export class EditorModel {
   changeRuntimeAuthoring(label: string, operation: () => void): void {
     this.transact(label, operation, true);
   }
+  // Play-mode values are opt-in authoring changes; unsafe dynamic transforms are rejected.
   applyRuntimeComponent(
     entity: Guid,
     type: string,
@@ -148,9 +154,9 @@ export class EditorModel {
     this.changeRuntimeAuthoring('Apply runtime component value', () => {
       const numeric = this.entity(entity);
       if (type === TransformComponent.type) {
-        const body = this.world
-          .components(numeric)
-          .get('protomake.rigidbody') as { mode?: string } | undefined;
+        const body = this.world.components(numeric).get('protomake.rigidbody') as
+          | { mode?: string }
+          | undefined;
         if (body?.mode === 'dynamic')
           throw new Error(
             'Dynamic runtime transforms cannot be applied safely',
@@ -187,6 +193,7 @@ export class EditorModel {
       this.project.physics[path] = value;
     });
   }
+  // Selection changes are intentionally outside undo history.
   select(ids: Iterable<Guid>, append = false): void {
     if (!append) this.selection.clear();
     for (const id of ids)
@@ -210,6 +217,7 @@ export class EditorModel {
     this.history.redo();
     this.notify();
   }
+  // Drag/rotate gestures collapse many pointer updates into a single undo entry.
   beginGesture(): void {
     this.ensureEditable();
     if (this.gesture) throw new Error('Gesture already active');
@@ -236,6 +244,7 @@ export class EditorModel {
     this.gesture = undefined;
     this.notify();
   }
+  // Project/scene lifecycle operations rebuild the ECS world from serialized scene data.
   newProject(name: string): void {
     this.ensureEditable();
     this.load(new EditorModel(this.registry).project);
@@ -320,6 +329,7 @@ export class EditorModel {
       this.selection.clear();
     });
   }
+  // Entity edits always go through change() so serialization, validation and undo stay in sync.
   createEntity(name = 'Entity', parent: Guid | null = null): Guid {
     let stable = '';
     this.change('Create entity', () => {
@@ -363,6 +373,7 @@ export class EditorModel {
         );
     });
   }
+  // Clipboard scenes use fresh GUIDs on paste and rewrite internal entity references.
   clipboard(): SceneData {
     const included = new Set<Guid>();
     const pending = this.roots().map((id) => this.entity(id));
@@ -473,6 +484,7 @@ export class EditorModel {
         );
     });
   }
+  // Component and behaviour mutations apply uniformly to the current selection.
   addComponent(type: string): void {
     this.change('Add component', () => {
       for (const id of this.selection)
@@ -630,6 +642,7 @@ export class EditorModel {
     });
   }
 }
+// Inspector helpers read/write dotted paths without exposing prototype mutation.
 export function getPath(data: unknown, path: string): unknown {
   let value = data;
   for (const key of path.split('.')) {

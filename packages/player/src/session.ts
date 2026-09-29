@@ -1,3 +1,6 @@
+/**
+ * Composes renderer, physics, scripting, animation, audio, UI and persistence into one running game session.
+ */
 import { loadStage } from './loading';
 import {
   Engine,
@@ -57,7 +60,7 @@ function setValueAt(data: unknown, path: string, value: unknown): void {
     throw new Error(`Invalid runtime property ${path}`);
   (cursor as Record<string, unknown>)[keys.at(-1)!] = value;
 }
-/** Shared runtime composition for editor Play and exported games. Hosts own scheduling and UI. */
+/** Shared runtime composition for editor Play and exports; coordinates renderer, physics, scripts, audio, UI and persistence. */
 export class GameSession {
   private constructor(
     readonly engine: Engine,
@@ -70,6 +73,7 @@ export class GameSession {
     private readonly sceneName: string,
     private readonly graphValues: Map<string, GraphTrace>,
   ) {}
+  // Creation stages expensive services so failures can unwind already-created resources cleanly.
   static async create(
     canvas: HTMLCanvasElement,
     project: ProjectData,
@@ -222,6 +226,7 @@ export class GameSession {
       throw error;
     }
   }
+  // Debug snapshots are detached from runtime state so editor inspection cannot mutate the running game.
   inspect(): RuntimeSnapshot {
     const world = this.engine.world;
     return {
@@ -294,6 +299,7 @@ export class GameSession {
   ): void {
     this.scripts.setRuntimeValue(entity, behaviour, field, value);
   }
+  // Runtime setting edits update the matching service immediately and are not saved unless explicitly applied by the editor.
   setRuntimeSetting(path: string, value: unknown): void {
     if (
       (path !== 'gravityX' && path !== 'gravityY') ||
@@ -305,6 +311,7 @@ export class GameSession {
       path === 'gravityY' ? value : this.physics.settings.gravityY,
     );
   }
+  // Audio requests return handles so callers can stop or replace a specific playback instance.
   playFrom(position: readonly [number, number]): string {
     const world = this.engine.world,
       id = world.withTag('Player')[0];
@@ -336,6 +343,7 @@ export class GameSession {
   resize(width: number, height: number): void {
     this.renderer.resize(width, height);
   }
+  // tick owns frame ordering: input/scripts, fixed simulation, animation/audio/UI, then render.
   tick(delta: number, debug = false): void {
     if (this.engine.state === 'running') {
       this.input.sample(navigator.getGamepads?.() ?? []);
@@ -364,6 +372,7 @@ export class GameSession {
     this.input.endFrame();
     this.renderer.render(this.engine.world);
   }
+  // Teardown runs in reverse ownership order and releases DOM/GPU/audio resources.
   destroy(): void {
     try {
       this.engine.stop();

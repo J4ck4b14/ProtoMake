@@ -1,3 +1,6 @@
+/**
+ * Translates the Interchange model into an Unreal Engine project plus the ProtoMake portability plugin source.
+ */
 import { GRAPH_MIME } from '@protomake/graphs';
 import {
   createExportManifest,
@@ -55,11 +58,7 @@ function pluginFile(): string {
     Installed: false,
     Modules: [
       { Name: 'ProtoMakeRuntime', Type: 'Runtime', LoadingPhase: 'Default' },
-      {
-        Name: 'ProtoMakeImporter',
-        Type: 'Editor',
-        LoadingPhase: 'PostEngineInit',
-      },
+      { Name: 'ProtoMakeImporter', Type: 'Editor', LoadingPhase: 'PostEngineInit' },
     ],
   });
 }

@@ -1,3 +1,6 @@
+/**
+ * Registers the built-in Behaviour Graph nodes that bridge visual logic to the shared scripting runtime services.
+ */
 import type { Guid } from '@protomake/core';
 import {
   NodeRegistry,
@@ -31,6 +34,7 @@ const entity = (value: GraphValue | undefined, self: Guid): Guid =>
 
 export function coreNodeRegistry(): NodeRegistry {
   const registry = new NodeRegistry();
+  // Lifecycle/contact event nodes share the same no-input registration shape.
   for (const [type, title] of [
     ['event.awake', 'Awake'],
     ['event.start', 'Start'],
@@ -51,6 +55,7 @@ export function coreNodeRegistry(): NodeRegistry {
       ports: [flowOut],
       event: { hook: type.slice('event.'.length) },
     });
+  // Core flow, values, entity lookup, transforms, signals and scene actions.
   registry
     .register({
       type: 'event.inputPressed',
@@ -337,6 +342,7 @@ export function coreNodeRegistry(): NodeRegistry {
         { id: 'message', label: 'Message', type: 'string', default: '' },
       ],
     });
+  // Time, input and physics nodes depend on runtime services but keep graph data engine-agnostic.
   registry
     .register({
       type: 'flow.delay',
@@ -447,6 +453,7 @@ export function coreNodeRegistry(): NodeRegistry {
         return 'out';
       },
     });
+  // UI and persistence nodes expose only serializable values to graph authors.
   registry
     .register({
       type: 'ui.setText',

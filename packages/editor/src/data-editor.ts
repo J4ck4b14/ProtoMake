@@ -1,3 +1,6 @@
+/**
+ * Provides reusable controls for editing structured project data without duplicating form plumbing.
+ */
 import { node, button, input } from './dom';
 export function editData(
   title: string,

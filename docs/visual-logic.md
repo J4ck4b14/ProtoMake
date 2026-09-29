@@ -1,4 +1,4 @@
-# Visual Logic 0.11
+# Visual logic
 
 ProtoMake Behaviour Graphs are versioned JSON assets (`application/x-protomake-behaviour-graph`). Graph, node, connection and group identities are stable; graph variables and node properties remain authored data rather than generated source.
 

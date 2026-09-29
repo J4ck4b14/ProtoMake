@@ -1,3 +1,6 @@
+/**
+ * Automated regression coverage for animation; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect } from 'vitest';
 import {
   AnimationSystem,

@@ -1,4 +1,7 @@
-/** Each migration advances exactly one schema version. No historical schemas are invented. */
+/**
+ * Applies sequential project-schema migrations before current-schema validation.
+ */
+/** Each migration advances exactly one supported schema version. */
 export class MigrationChain {
   private readonly steps = new Map<number, (input: unknown) => unknown>();
   constructor(readonly currentVersion: number) {

@@ -1,4 +1,7 @@
 // @vitest-environment jsdom
+/**
+ * Automated regression coverage for animation authoring; keeps the behavior executable and documents the expected public contract.
+ */
 import { it, expect, vi } from 'vitest';
 import { readFileSync } from 'node:fs';
 import { EditorModel } from '@protomake/editor';
@@ -20,10 +23,7 @@ it('scrubs and previews an existing clip, then cleans state references and edits
     const m = new EditorModel();
     m.load(
       JSON.parse(
-        readFileSync(
-          'examples/prototypes/shooter/shooter.protomake.json',
-          'utf8',
-        ),
+        readFileSync('examples/prototypes/shooter/shooter.protomake.json', 'utf8'),
       ),
     );
     const clip = m.project.assets.find((a) => a.mime === CLIP_MIME)!;

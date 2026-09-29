@@ -1,3 +1,6 @@
+/**
+ * Contains the C++ and build-file templates emitted into exported Unreal Engine projects/plugins.
+ */
 export const UNREAL_RUNTIME_BUILD = `using UnrealBuildTool;
 
 public class ProtoMakeRuntime : ModuleRules
